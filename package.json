@@ -1,0 +1,44 @@
+{
+  "name": "easyapi-table-console",
+  "version": "1.0.0",
+  "description": "EasyAPI表格系统控制台",
+  "author": "EasyAPI <leida@easyapi.com>",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt --open",
+    "build": "nuxt build",
+    "start": "nuxt start --hostname 0.0.0.0 --port 8820",
+    "generate": "nuxt generate",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "precommit": "npm run lint",
+    "pm2": "pm2 start npm --name 'easyapi-table-console' -- run start"
+  },
+  "dependencies": {
+    "nuxt": "^2.15.8",
+    "@nuxtjs/axios": "^5.13.6",
+    "element-ui": "^2.15.8",
+    "js-cookie": "^3.0.1",
+    "vue-quill-editor": "^3.0.6"
+  },
+  "devDependencies": {
+    "@nuxtjs/proxy": "^2.1.0",
+    "@nuxtjs/eslint-config": "^9.0.0",
+    "@nuxtjs/eslint-module": "^3.1.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": ">=16.0.3",
+    "eslint-plugin-import": ">=2.26.0",
+    "eslint-plugin-jest": ">=26.1.4",
+    "eslint-plugin-node": ">=11.1.0",
+    "eslint-plugin-nuxt": ">=3.2.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": ">=6.0.0",
+    "eslint-plugin-standard": ">=5.0.0",
+    "eslint-plugin-vue": "^8.6.0",
+    "node-sass": "^6.0.1",
+    "sass-loader": "^10.2.1",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.6.2"
+  }
+}
