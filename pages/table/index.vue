@@ -25,6 +25,7 @@
           <el-table
             :data='providerList'
             :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+            v-loading='loadingData'
             element-loading-text='数据正在加载中...'
           >
             <template slot='empty'>
@@ -96,18 +97,13 @@
     watch: {
       provider(val) {
         if (val) {
-          let params = {}
-          getRecordList(params, this.provider, this).then(res => {
-            for (let fields of res.data.content) {
-              this.providerList.push(fields.fields)
-            }
-          })
+          this.getRecordList()
         }
       }
     },
     head() {
       return {
-        title: '金融专辑 - EasyAPI服务市场',
+        title: '数据表格 - EasyAPI服务市场',
         meta: [
           { hid: 'description', name: 'description', content: '服务市场场景化服务' },
           { hid: 'keyword', name: 'keyword', content: '服务市场场景化服务' }
@@ -124,6 +120,24 @@
       },
       getProvider(data) {
         this.provider = data
+      },
+      getRecordList() {
+        this.loadingData = true
+        let params = {}
+        getRecordList(params, this.provider, this).then(res => {
+          if (res.data.code == 1) {
+            this.loadingData = false
+            for (let fields of res.data.content) {
+              this.providerList.push(fields.fields)
+            }
+            this.pagination.total = Number(res.data.totalElements)
+          } else {
+            this.loadingData = false
+            this.tableText = '暂无数据'
+            this.providerList = []
+            this.pagination.total = 0
+          }
+        })
       },
 
 
@@ -142,33 +156,14 @@
           this.$refs.child.formValidate = row
         })
       },
-      //删除文章分类
-      deleteArticleCategory(row) {
-        this.$confirm('您确定要删除该分类吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          let data = {}
-          deleteArticleCategory(row.articleCategoryId, data, this).then(res => {
-            if (res.data.code === 1) {
-              this.getArticleCategories()
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-            }
-          })
-        })
-      },
       //分页
       fatherSize(data) {
         this.pagination.size = data
-        this.getArticleCategories()
+        this.getRecordList()
       },
       fatherCurrent(data) {
         this.pagination.page = data
-        this.getArticleCategories()
+        this.getRecordList()
       },
       search(item) {
         let { title } = item
