@@ -33,7 +33,7 @@ ol {
 
 span,
 img {
-  display: inline-block;
+  //display: inline-block;
 }
 
 /*弹性布局*/
@@ -109,17 +109,15 @@ img {
   bottom: 10px;
   overflow: auto;
   padding: 15px;
-  background: #fff;
   margin-left: 210px;
 }
 
-.main-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.main-top {
+  background-color: #ffffff;
+  padding: 15px;
 }
 
-.main-title b {
+.main-top b {
   font-size: 20px;
 }
 
@@ -133,6 +131,10 @@ img {
 
 .mg-rt-10 {
   margin-right: 10px;
+}
+
+.mg-tp-15 {
+  margin-top: 15px;
 }
 
 .main-content {

@@ -1,7 +1,8 @@
 <template>
   <div class="sidebar">
-    <div class="menu" v-for="(menu, index) in menuList" :key="index">
-      <nuxt-link :to="menu.path" :class="activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
+    <div class="menu" v-for="(menu, index) in menuList" :key="index" @click="getFields(menu.serve)">
+      <nuxt-link :to="menu.path"
+                 :class="activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
         <i :class="menu.icon"></i>
         <span>{{ menu.title }}</span>
       </nuxt-link>
@@ -10,6 +11,8 @@
 </template>
 
 <script>
+  import { getFieldList } from '../../api/serve'
+
   export default {
     name: 'Aside',
     data() {
@@ -17,30 +20,29 @@
         activePath: '',
         menuList: [
           {
-            title: '推广计划管理',
-            path: '/plan',
-            icon: 'el-icon-s-help'
-          },
-          {
-            title: '广告创意管理',
-            path: '/idea',
-            icon: 'el-icon-s-help'
-          },
-          {
-            title: '广告位管理',
-            path: '/slot',
-            icon: 'el-icon-s-help'
-          },
-          {
-            title: '客户管理',
-            path: '/customer',
-            icon: 'el-icon-s-help'
+            title: '常客服务',
+            path: '/table',
+            icon: 'el-icon-s-help',
+            serve: 'changke_provider'
           }
         ]
       }
     },
     mounted() {
       this.activePath = this.$route.path ? `${this.$route.path}` : '/article'
+      this.getFields('changke_provider')
+    },
+    methods: {
+      getFields(data) {
+        let params = {
+          size: 50
+        }
+        getFieldList(params, data, this).then(res => {
+          console.log(res)
+          this.$emit('getFieldList', res.data.content)
+          this.$emit('getProvider', data)
+        })
+      }
     }
   }
 </script>
