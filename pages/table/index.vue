@@ -27,6 +27,7 @@
             :header-cell-style="{background:'#eef1f6',color:'#606266'}"
             v-loading='loadingData'
             element-loading-text='数据正在加载中...'
+            @row-click="rowClick"
           >
             <template slot='empty'>
               <p>{{ tableText }}</p>
@@ -48,7 +49,7 @@
         <Pagination @fatherSize='fatherSize' @fatherCurrent='fatherCurrent' :size='pagination.size'
                     :total-elements='pagination.total' class='paging'></Pagination>
         <div style='clear: both'></div>
-        <!--<Edit ref='child'></Edit>-->
+        <Edit ref='child'></Edit>
       </div>
     </div>
   </div>
@@ -59,7 +60,7 @@
   import Aside from '../../components/Aside/index.vue'
   import Pagination from '../../components/Pagination/index'
   import SearchArea from '../../components/SearchArea'
-  // import Edit from './components/edit.vue'
+  import Edit from './components/edit.vue'
   import { getRecordList } from '../../api/serve'
 
   export default {
@@ -68,7 +69,8 @@
       Header,
       Aside,
       SearchArea,
-      Pagination
+      Pagination,
+      Edit
     },
     data() {
       return {
@@ -139,6 +141,15 @@
           }
         })
       },
+      /**
+       * 表格行点击
+       */
+      rowClick(row) {
+        console.log(row)
+        this.$refs.child.dialogVisible = true
+        this.$refs.child.fieldList = this.fieldList
+        this.$refs.child.formFields = row
+      },
 
 
       //添加分类
@@ -165,13 +176,16 @@
         this.pagination.page = data
         this.getRecordList()
       },
+
       search(item) {
         let { title } = item
         this.title = title
         this.getArticleList()
-      },
+      }
+      ,
       reset(item) {
-      },
+      }
+      ,
       event(item) {
         let { title } = item
         this.title = title

@@ -38,7 +38,6 @@
           size: 50
         }
         getFieldList(params, data, this).then(res => {
-          console.log(res)
           this.$emit('getFieldList', res.data.content)
           this.$emit('getProvider', data)
         })
