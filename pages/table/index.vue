@@ -23,6 +23,7 @@
             <SearchArea :items='searchItems' @search='search' @event='event' @reset='reset'/>
           </div>
           <el-table
+            border
             :data='providerList'
             :header-cell-style="{background:'#eef1f6',color:'#606266'}"
             v-loading='loadingData'
@@ -149,6 +150,7 @@
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.formFields = row
+        this.$refs.child.content = row.content
       },
 
 

@@ -1,5 +1,6 @@
 <template>
   <el-dialog
+    title=""
     :close-on-click-modal="false"
     :visible.sync="dialogVisible"
     width="80%">
@@ -15,13 +16,14 @@
               :multiple="false"
               :show-file-list="false"
               :on-success="handleAvatarSuccess">
-              <img v-if="formFields[item.key]" :src="formFields[item.key]" class="avatar">
+              <img v-if="formFields[item.key]" :src="formFields[item.key]+'!icon.jpg'" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
-          <el-input v-else v-model="formFields[item.key]" placeholder="请输入名称"/>
+          <el-input v-if="item.key!='img'&&item.key!='content'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
+      <MarkdownEditor v-model="content"></MarkdownEditor>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="confirm('formValidate')">确 定</el-button>
@@ -32,12 +34,15 @@
 
 <script>
   import { getQiniuKey, getQiniuToken } from '../../../api/qiniu'
+  import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
 
   export default {
     name: 'addCategory',
+    components: { MarkdownEditor },
     data() {
       return {
         formFields: {},
+        content: '',
         dialogVisible: false,
         fieldList: '',
         formValidate: {
@@ -54,6 +59,12 @@
       this.getQiniuToken()
       this.getQiniuKey()
     },
+    watch: {
+      content(val) {
+        console.log(val)
+      }
+    },
+
     methods: {
       //获取七牛token
       getQiniuToken() {
