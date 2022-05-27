@@ -21,37 +21,37 @@
 </template>
 
 <script>
-export default {
-  name: 'Header',
-  data() {
-    return {
-      showHeader: '',
-      isActive: true
+  export default {
+    name: 'Header',
+    data() {
+      return {
+        showHeader: true,
+        isActive: true
+      }
+    },
+    mounted() {
+      this.showHeader = this.comsys.showHeader
     }
-  },
-  mounted() {
-    this.showHeader = this.comsys.showHeader
   }
-}
 </script>
 
 <style>
-.header {
-  width: 100%;
-  background: #0000;
-  height: 50px;
-}
+  .header {
+    width: 100%;
+    background: #0000;
+    height: 50px;
+  }
 
-.header-title {
-  width: 100%;
-  height: 100%;
-  padding: 0 30px 0 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .header-title {
+    width: 100%;
+    height: 100%;
+    padding: 0 30px 0 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.el-submenu__title i {
-  color: #0000;
-}
+  .el-submenu__title i {
+    color: #0000;
+  }
 </style>

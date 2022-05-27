@@ -52,20 +52,16 @@
           hideModeSwitch: false,
           language: 'zh-CN',
           plugins: [this.codeSyntaxHighlight]
-        },
-        ifChange: true
+        }
       }
     },
     computed: {},
     watch: {
-      $route() {
-        this.ifChange = true
-      },
       value(newValue, preValue) {
-        if (this.value !== '' && this.ifChange) {
-          this.$refs.toastuiEditor.invoke('setHTML', this.value)
-        }
-        if (this.value == '' && this.$route.path.indexOf('create') !== -1 && this.ifChange) {
+        console.log(newValue)
+        console.log(this.value)
+        if (this.value !== '') {
+          console.log('我执行了')
           this.$refs.toastuiEditor.invoke('setHTML', this.value)
         }
       }
@@ -74,13 +70,9 @@
       this.initEditor()
       this.getqiniuToken()
     },
-    destroyed() {
-      this.destroyEditor()
-    },
     methods: {
       change(e) {
         this.$emit('input', this.$refs.toastuiEditor.invoke('getHTML'))
-        this.ifChange = false
       },
       initEditor() {
         let editor = this.$refs.toastuiEditor.invoke('getCurrentModeEditor')
@@ -91,8 +83,6 @@
           })
           this.getqiniuToken()
         })
-      },
-      destroyEditor() {
       },
       /*
        * 自定义上传图片处理
@@ -108,7 +98,6 @@
         })
           .then(res => {
             let imgUrl = 'https://qiniu.easyapi.com/' + res.data.key
-            console.log(imgUrl)
             callback(imgUrl)
             // this.addImgToMd(imgUrl)
           })

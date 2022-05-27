@@ -80,8 +80,8 @@
         provider: '',
         providerList: [],
 
-
         tableList: [],
+        showHeader: '',
         searchItems: [
           { label: '产品类型', type: 'input', key: 'title' },
           { label: '交付方式', type: 'input', key: 'title' },
@@ -119,7 +119,6 @@
       },
       getFieldList(data) {
         this.fieldList = data
-        console.log(this.fieldList)
       },
       getProvider(data) {
         this.provider = data
@@ -150,7 +149,9 @@
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.formFields = row
-        this.$refs.child.content = row.content
+        setTimeout(() => {
+          this.$refs.child.content = row.content
+        }, 100)
       },
 
 
@@ -195,6 +196,7 @@
     }
     ,
     mounted() {
+      this.showHeader = this.comsys.showHeader
     }
   }
 </script>

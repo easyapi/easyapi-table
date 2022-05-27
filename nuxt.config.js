@@ -25,6 +25,7 @@ module.exports = {
     '@/plugins/element-ui',
     '@/plugins/axios',
     { src: '@/plugins/editor', ssr: false },
+    { src: '@/plugins/nuxt-quill-plugin', ssr: false },
     { src: '@/plugins/codeSyntaxHighlight', ssr: false },
     { src: '@/plugins/commom.js', ssr: false }
   ],
@@ -45,7 +46,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    transpile: [/^element-ui/, 'vue-quill-editor'],
+    transpile: [/^element-ui/],
     extend(config, ctx) {
     },
     maxChunkSize: 300000, // 单个包最大尺寸

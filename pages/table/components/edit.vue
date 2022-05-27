@@ -20,10 +20,10 @@
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
+          <MarkdownEditor v-if="item.key=='content'" v-model="content"></MarkdownEditor>
           <el-input v-if="item.key!='img'&&item.key!='content'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
-      <MarkdownEditor v-model="content"></MarkdownEditor>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="confirm('formValidate')">确 定</el-button>
@@ -61,7 +61,7 @@
     },
     watch: {
       content(val) {
-        console.log(val)
+
       }
     },
 
@@ -124,5 +124,10 @@
     .el-form--inline .el-form-item {
       display: block;
     }
+  }
+</style>
+<style scoped>
+  /deep/ p img {
+    display: block !important;
   }
 </style>
