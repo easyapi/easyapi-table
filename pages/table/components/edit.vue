@@ -125,6 +125,19 @@
       display: block;
     }
   }
+
+  .el-dialog {
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+    overflow-y: auto;
+  }
 </style>
 <style scoped>
   /deep/ p img {
