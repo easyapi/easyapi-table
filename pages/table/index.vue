@@ -8,13 +8,16 @@
           <div>
             <b>表格系统</b>
           </div>
-          <div class="mg-tp-15">
+          <div class="mg-tp-15 flex-r just-between">
             <div class="tabs">
               <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="全部数据" name="first"></el-tab-pane>
                 <el-tab-pane label="我的数据" name="second"></el-tab-pane>
                 <el-tab-pane label="待处理数据" name="third"></el-tab-pane>
               </el-tabs>
+            </div>
+            <div class="add">
+              <el-button type="primary" icon="el-icon-plus" @click="addProvider">添加服务商</el-button>
             </div>
           </div>
         </div>
@@ -124,6 +127,7 @@
         this.provider = data
       },
       getRecordList() {
+        this.providerList = []
         this.loadingData = true
         let params = {}
         getRecordList(params, this.provider, this).then(res => {
@@ -145,13 +149,21 @@
        * 表格行点击
        */
       rowClick(row) {
-        console.log(row)
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
-        this.$refs.child.formFields = row
         setTimeout(() => {
-          this.$refs.child.content = row.content
+          this.$refs.child.formFields = row
         }, 100)
+      },
+
+      /**
+       * 新增服务商
+       */
+      addProvider() {
+        this.$refs.child.dialogVisible = true
+        this.$refs.child.fieldList = this.fieldList
+        this.$refs.child.title = '新增服务商'
+        this.$refs.child.provider = this.provider
       },
 
 
@@ -232,6 +244,10 @@
 
   .tabs {
     width: 50%;
+  }
+
+  .just-between {
+    justify-content: space-between;
   }
 </style>
 <style scoped>

@@ -19,3 +19,23 @@ export const getFieldList = (params, provider, context) => {
 export const getRecordList = (params, provider, context) => {
   return context.$axios.get(`${serviceUrl}/${provider}/records`, { params: { ...params } })
 }
+
+/**
+ * 添加服务商信息
+ *
+ *
+ * @see https://www.easyai.com
+ */
+export const creatRecord = (data, provider, context) => {
+  return context.$axios.post(`${serviceUrl}/${provider}/records`, data)
+}
+
+/**
+ * 修改服务商信息
+ *
+ *
+ * @see https://www.easyai.com
+ */
+export const updateRecord = (data, provider, context) => {
+  return context.$axios.put(`${serviceUrl}/${provider}/records`, data)
+}

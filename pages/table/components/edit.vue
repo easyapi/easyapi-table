@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title=""
+    :title="title"
     :close-on-click-modal="false"
     :visible.sync="dialogVisible"
     width="80%">
@@ -20,7 +20,7 @@
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
-          <MarkdownEditor v-if="item.key=='content'" v-model="content"></MarkdownEditor>
+          <MarkdownEditor v-if="item.key=='content'" v-model="formFields[item.key]"></MarkdownEditor>
           <el-input v-if="item.key!='img'&&item.key!='content'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
@@ -34,6 +34,7 @@
 
 <script>
   import { getQiniuKey, getQiniuToken } from '../../../api/qiniu'
+  import { creatRecord } from '../../../api/serve'
   import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
 
   export default {
@@ -43,8 +44,10 @@
       return {
         formFields: {},
         content: '',
+        title: '',
         dialogVisible: false,
         fieldList: '',
+        provider: '',//服务商
         formValidate: {
           name: '',
           description: '',
@@ -84,10 +87,24 @@
       handleAvatarSuccess(res, file) {
         let img = 'https://qiniu.easyapi.com/' + res.key
         file.url = img
-        this.formValidate.img = img
+        this.formFields.img = img
       },
       confirm(formName) {
-
+        if (this.title == '新增服务商') {
+          let list = []
+          let obj = {}
+          let data = {
+            ...this.formFields
+          }
+          obj.fields = data
+          list.push(obj)
+          creatRecord(list, this.provider, this).then(res => {
+            if (res.data.code == 1) {
+              this.$parent.getRecordList()
+              this.dialogVisible = false
+            }
+          })
+        }
       }
     }
   }
