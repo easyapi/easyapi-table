@@ -21,7 +21,8 @@
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
-          <MarkdownEditor ref="editor" v-if="item.key=='content'" v-model="formFields[item.key]"></MarkdownEditor>
+          <MarkdownEditor :ifChange="ifChange" v-if="item.key=='content'"
+                          v-model="formFields[item.key]"></MarkdownEditor>
           <el-input v-if="item.key!='img'&&item.key!='content'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
@@ -44,12 +45,14 @@
     data() {
       return {
         formFields: {
-          img: ''
+          img: '',
+          content: ''
         },
         title: '',
         dialogVisible: false,
         fieldList: '',
         sheetId: '',//服务商
+        ifChange: '',
         recordId: '',
         dataObj: { token: '', key: '' }
       }
@@ -84,7 +87,6 @@
         let img = 'https://qiniu.easyapi.com/' + res.key
         file.url = img
         this.formFields.img = img
-        console.log(this.formFields.img)
       },
       close() {
         this.formFields = {}

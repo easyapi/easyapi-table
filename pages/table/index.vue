@@ -167,7 +167,7 @@
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.title = '新增服务商'
-        this.$refs.child.sheetId = this.sheetId
+        // this.$refs.child.ifChange = true
       },
       //分页
       fatherSize(data) {

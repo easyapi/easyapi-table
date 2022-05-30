@@ -14,9 +14,9 @@
         type: String,
         default: ''
       },
-      isClear: {
+      ifChange: {
         type: Boolean,
-        default: false
+        default: true
       },
       id: {
         type: String,
@@ -64,10 +64,17 @@
       value(newValue, preValue) {
         console.log(newValue)
         console.log(this.value)
-        if (this.value !== '') {
+        console.log(this.ifChange)
+        if (this.value !== '' && this.ifChange) {
           console.log('我执行了')
           this.$refs.toastuiEditor.invoke('setHTML', this.value)
         }
+        if (this.value == '' && this.ifChange) {
+          this.$refs.toastuiEditor.invoke('setHTML', this.value)
+        }
+      },
+      ifChange(val) {
+        console.log(val)
       }
     },
     mounted() {
