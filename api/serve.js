@@ -26,8 +26,8 @@ export const getRecordList = (params, provider, context) => {
  *
  * @see https://www.easyai.com
  */
-export const creatRecord = (data, provider, context) => {
-  return context.$axios.post(`${serviceUrl}/${provider}/records`, data)
+export const creatRecord = (data, sheetId, context) => {
+  return context.$axios.post(`${serviceUrl}/${sheetId}/records`, data)
 }
 
 /**
@@ -36,6 +36,6 @@ export const creatRecord = (data, provider, context) => {
  *
  * @see https://www.easyai.com
  */
-export const updateRecord = (data, provider, context) => {
-  return context.$axios.put(`${serviceUrl}/${provider}/records`, data)
+export const updateRecord = (data, sheetId, context) => {
+  return context.$axios.put(`${serviceUrl}/${sheetId}/records`, data)
 }

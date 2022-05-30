@@ -3,9 +3,10 @@
     :title="title"
     :close-on-click-modal="false"
     :visible.sync="dialogVisible"
+    @close="close"
     width="80%">
     <div class="edit">
-      <el-form size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
+      <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
         <el-form-item v-for="item in fieldList" :prop="item.key">
           <span class="formLabel">{{item.name}}</span>
           <div v-if="item.key=='img'" class="block">
@@ -20,13 +21,13 @@
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
-          <MarkdownEditor v-if="item.key=='content'" v-model="formFields[item.key]"></MarkdownEditor>
+          <MarkdownEditor ref="editor" v-if="item.key=='content'" v-model="formFields[item.key]"></MarkdownEditor>
           <el-input v-if="item.key!='img'&&item.key!='content'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="confirm('formValidate')">确 定</el-button>
+    <el-button type="primary" @click="confirm()">确 定</el-button>
   </span>
     </div>
   </el-dialog>
@@ -34,7 +35,7 @@
 
 <script>
   import { getQiniuKey, getQiniuToken } from '../../../api/qiniu'
-  import { creatRecord } from '../../../api/serve'
+  import { creatRecord, updateRecord } from '../../../api/serve'
   import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
 
   export default {
@@ -42,20 +43,15 @@
     components: { MarkdownEditor },
     data() {
       return {
-        formFields: {},
-        content: '',
+        formFields: {
+          img: ''
+        },
         title: '',
         dialogVisible: false,
         fieldList: '',
-        provider: '',//服务商
-        formValidate: {
-          name: '',
-          description: '',
-          img: ''
-        },
-        ruleValidate: {},
-        dataObj: { token: '', key: '' },
-        articleCategoryId: ''
+        sheetId: '',//服务商
+        recordId: '',
+        dataObj: { token: '', key: '' }
       }
     },
     mounted() {
@@ -63,8 +59,8 @@
       this.getQiniuKey()
     },
     watch: {
-      content(val) {
-
+      'formFields.content'(val) {
+        console.log(val)
       }
     },
 
@@ -88,6 +84,10 @@
         let img = 'https://qiniu.easyapi.com/' + res.key
         file.url = img
         this.formFields.img = img
+        console.log(this.formFields.img)
+      },
+      close() {
+        this.formFields = {}
       },
       confirm(formName) {
         if (this.title == '新增服务商') {
@@ -98,10 +98,26 @@
           }
           obj.fields = data
           list.push(obj)
-          creatRecord(list, this.provider, this).then(res => {
+          creatRecord(list, this.sheetId, this).then(res => {
             if (res.data.code == 1) {
               this.$parent.getRecordList()
               this.dialogVisible = false
+            }
+          })
+        } else {
+          let list = []
+          let obj = {}
+          let data = {
+            ...this.formFields
+          }
+          obj.fields = data
+          obj.recordId = this.recordId
+          list.push(obj)
+          updateRecord(list, this.sheetId, this).then(res => {
+            if (res.data.code == 1) {
+              this.$parent.getRecordList()
+              this.dialogVisible = false
+              this.$message.success('修改成功')
             }
           })
         }

@@ -14,6 +14,10 @@
         type: String,
         default: ''
       },
+      isClear: {
+        type: Boolean,
+        default: false
+      },
       id: {
         type: String,
         required: false,

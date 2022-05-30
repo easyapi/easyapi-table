@@ -80,7 +80,7 @@
       return {
         activeName: 'first',
         fieldList: [],
-        provider: '',
+        sheetId: '',
         providerList: [],
 
         tableList: [],
@@ -101,7 +101,7 @@
       }
     },
     watch: {
-      provider(val) {
+      sheetId(val) {
         if (val) {
           this.getRecordList()
         }
@@ -124,16 +124,17 @@
         this.fieldList = data
       },
       getProvider(data) {
-        this.provider = data
+        this.sheetId = data
       },
       getRecordList() {
         this.providerList = []
         this.loadingData = true
         let params = {}
-        getRecordList(params, this.provider, this).then(res => {
+        getRecordList(params, this.sheetId, this).then(res => {
           if (res.data.code == 1) {
             this.loadingData = false
             for (let fields of res.data.content) {
+              fields.fields.recordId = fields.id
               this.providerList.push(fields.fields)
             }
             this.pagination.total = Number(res.data.totalElements)
@@ -151,6 +152,9 @@
       rowClick(row) {
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
+        this.$refs.child.title = '编辑服务商'
+        this.$refs.child.recordId = row.recordId
+        this.$refs.child.sheetId = this.sheetId
         setTimeout(() => {
           this.$refs.child.formFields = row
         }, 100)
@@ -163,24 +167,7 @@
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.title = '新增服务商'
-        this.$refs.child.provider = this.provider
-      },
-
-
-      //添加分类
-      openCategory() {
-        this.$refs.child.dialogVisible = true
-        this.$refs.child.title = '添加分类'
-        this.$refs.child.formValidate = this.$options.data()
-      },
-      //编辑分类
-      updateArticleCategory(row) {
-        this.$refs.child.dialogVisible = true
-        this.$refs.child.title = '编辑分类'
-        this.$refs.child.articleCategoryId = row.articleCategoryId
-        this.$nextTick(() => {
-          this.$refs.child.formValidate = row
-        })
+        this.$refs.child.sheetId = this.sheetId
       },
       //分页
       fatherSize(data) {
