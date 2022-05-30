@@ -237,12 +237,18 @@
     justify-content: space-between;
   }
 </style>
-<style scoped>
+<style scoped lang="scss">
   /deep/ p img {
     display: none;
   }
 
   .table-img {
     width: 50px;
+  }
+
+  .el-table {
+    /deep/ tbody tr:hover > td {
+      cursor: pointer;
+    }
   }
 </style>
