@@ -26,91 +26,91 @@
         }
       }
     },
-    components: {Item},
+    components: { Item },
     created() {
     },
     mounted() {
-      window.onresize = this.windowResize;
-      let innerWidth = window.innerWidth;
-      this.innerWidth = innerWidth;
+      window.onresize = this.windowResize
+      let innerWidth = window.innerWidth
+      this.innerWidth = innerWidth
       this.setItems()
     },
     methods: {
       windowResize(e) {
-        this.innerWidth = e.target.innerWidth;
+        this.innerWidth = e.target.innerWidth
         this.setItems()
       },
       search() {
-        let obj = {};
+        let obj = {}
         this.items.map(item => {
           if (item.value) {
             obj[item.key] = item.value
           }
-        });
+        })
         this.$emit('search', obj)
       },
       reset() {
-        let items = this.items;
-        let doms = [];
+        let items = this.items
+        let doms = []
         items.map(item => {
           if (item.key) {
-            let dom = this.$refs[item.key];
+            let dom = this.$refs[item.key]
             doms.push(dom)
           }
-        });
+        })
         doms.map(item => {
-          let dom = item[0].$children[0].$children[0];
+          let dom = item[0].$children[0].$children[0]
           if (dom.handleClear) {
             dom.handleClear()
           } else if (dom.reset) {
             dom.reset()
           }
-        });
+        })
         items.forEach(item => {
           item.value = null
-        });
+        })
         this.items = items
       },
       open() {
-        this.allShow = !this.allShow;
+        this.allShow = !this.allShow
         this.setItems()
       },
       event(item) {
-        let obj = {};
+        let obj = {}
         this.items.map(item => {
           if (item.value) {
             obj[item.key] = item.value
           }
-        });
+        })
         this.$emit('event', obj)
       },
       setItems() {
-        let {items, innerWidth, buttons} = this;
+        let { items, innerWidth, buttons } = this
         let index = items.findIndex(item => {
           return item.type === 'buttons'
-        });
+        })
         if (index !== -1) {
           items.splice(index, 1)
         }
-        let width = 0;
+        let width = 0
         if (innerWidth >= 1600) {
-          items.splice(3, 0, {type: 'buttons'});
+          items.splice(3, 0, { type: 'buttons' })
           width = 6
         } else if (innerWidth >= 992) {
-          items.splice(2, 0, {type: 'buttons'});
+          items.splice(2, 0, { type: 'buttons' })
           width = 8
         } else {
-          items.splice(1, 0, {type: 'buttons'});
+          items.splice(1, 0, { type: 'buttons' })
           width = 12
         }
 
         items.forEach((item, index) => {
           if (item.size === 'large') {
-            let befores = items.slice(0, index);
+            let befores = items.slice(0, index)
             let beforeWidth = befores.reduce((a, b) => {
               return a + (b.width || width)
-            }, 0);
-            let used = beforeWidth % 24;
+            }, 0)
+            let used = beforeWidth % 24
             if (24 - used < 12) {
               item.width = 24
             } else {
@@ -128,7 +128,7 @@
               item.show = index <= 1
             }
           }
-        });
+        })
         this.items = items
       }
     }
@@ -138,7 +138,6 @@
   .search-area {
     background-color: #fff;
     background-clip: border-box;
-    margin-bottom: 20px;
     box-sizing: border-box;
     padding: 10px 20px;
     animation: all 1s linear;

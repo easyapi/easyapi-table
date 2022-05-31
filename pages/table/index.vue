@@ -17,6 +17,8 @@
               </el-tabs>
             </div>
             <div class="add">
+              <el-input size="small" style="width: 150px" placeholder="请输入搜索内容"
+                        prefix-icon="el-icon-search" v-model="input2"></el-input>
               <el-button type="primary" size="small" plain @click="addMore">展开更多</el-button>
               <el-button icon="el-icon-menu" size="small" @click="openSearch">高级筛选</el-button>
               <el-button type="primary" size="small" icon="el-icon-plus" @click="addProvider">添加数据</el-button>
@@ -27,13 +29,19 @@
           <div v-if="ifShow">
             <SearchArea :items='searchItems' @search='search' @event='event' @reset='reset'/>
           </div>
+          <div class="mg-tp-10" v-if="ifDetele">
+            <span>已选中{{checkedLength}}项</span>
+            <el-button size="small" type="danger">批量删除</el-button>
+          </div>
           <el-table
             border
+            class="mg-tp-10"
             :data='providerList'
             :header-cell-style="{background:'#eef1f6',color:'#606266'}"
             v-loading='loadingData'
             element-loading-text='数据正在加载中...'
             @row-click="rowClick"
+            @selection-change="handleSelectionChange"
           >
             <template slot='empty'>
               <p>{{ tableText }}</p>
@@ -88,9 +96,10 @@
         sheetId: '',
         providerList: [],
         ifShow: false,
-
+        ifDetele: false,
         tableList: [],
         showHeader: '',
+        checkedLength: '',
         searchItems: [
           { label: '产品类型', type: 'input', key: 'title' },
           { label: '交付方式', type: 'input', key: 'title' },
@@ -164,6 +173,11 @@
         setTimeout(() => {
           this.$refs.child.formFields = row
         }, 100)
+      },
+
+      handleSelectionChange(val) {
+        this.ifDetele = !this.ifDetele
+        this.checkedLength = val.length
       },
 
       /**
@@ -249,6 +263,10 @@
 
   .el-tabs__nav-wrap::after {
     height: 0;
+  }
+
+  .el-button + .el-button {
+    margin-left: 0px;
   }
 
   .el-tabs__active-bar {
