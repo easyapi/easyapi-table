@@ -17,12 +17,13 @@
               </el-tabs>
             </div>
             <div class="add">
+              <el-button type="primary" plain @click="addMore">展开更多</el-button>
               <el-button type="primary" icon="el-icon-plus" @click="addProvider">添加数据</el-button>
             </div>
           </div>
         </div>
         <div class='main-content'>
-          <div>
+          <div v-if="ifShow">
             <SearchArea :items='searchItems' @search='search' @event='event' @reset='reset'/>
           </div>
           <el-table
@@ -82,6 +83,7 @@
         fieldList: [],
         sheetId: '',
         providerList: [],
+        ifShow: false,
 
         tableList: [],
         showHeader: '',
@@ -158,6 +160,13 @@
         setTimeout(() => {
           this.$refs.child.formFields = row
         }, 100)
+      },
+
+      /**
+       *展开更多
+       */
+      addMore() {
+        this.ifShow = !this.ifShow
       },
 
       /**
