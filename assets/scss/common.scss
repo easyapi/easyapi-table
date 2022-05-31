@@ -143,11 +143,13 @@ img {
 
 .main-content {
   margin-top: 10px;
+  height: auto;
 }
 
 .paging {
-  margin-top: 30px;
-  float: right;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 
 .ea-info-btn {
