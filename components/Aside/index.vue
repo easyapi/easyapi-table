@@ -21,7 +21,7 @@
         menuList: [
           {
             title: '常客服务',
-            path: '/table',
+            path: '/changke/changke_provider',
             icon: 'el-icon-s-help',
             serve: 'changke_provider'
           }

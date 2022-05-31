@@ -2,6 +2,19 @@ module.exports = {
   /*
   ** Headers of the page
   */
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.splice(0)
+      routes.push(
+        {
+          path: '/:sheetId/:providerId',
+          name: 'table',
+          component: resolve(__dirname, 'pages/table')
+        }
+      )
+    }
+  },
+
   head: {
     title: '{{ name }} - EasyAPI表格系统控制台',
     meta: [
