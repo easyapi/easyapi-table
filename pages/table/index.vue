@@ -17,8 +17,9 @@
               </el-tabs>
             </div>
             <div class="add">
-              <el-button type="primary" plain @click="addMore">展开更多</el-button>
-              <el-button type="primary" icon="el-icon-plus" @click="addProvider">添加数据</el-button>
+              <el-button type="primary" size="small" plain @click="addMore">展开更多</el-button>
+              <el-button icon="el-icon-menu" size="small" @click="openSearch">高级筛选</el-button>
+              <el-button type="primary" size="small" icon="el-icon-plus" @click="addProvider">添加数据</el-button>
             </div>
           </div>
         </div>
@@ -55,6 +56,7 @@
                     :total-elements='pagination.total' class='paging'></Pagination>
         <div style='clear: both'></div>
         <Edit ref='child'></Edit>
+        <AdvancedSearch ref="searchChild"></AdvancedSearch>
       </div>
     </div>
   </div>
@@ -67,10 +69,12 @@
   import SearchArea from '../../components/SearchArea'
   import Edit from './components/edit.vue'
   import { getRecordList } from '../../api/serve'
+  import AdvancedSearch from './components/advancedSearch'
 
   export default {
     name: '',
     components: {
+      AdvancedSearch,
       Header,
       Aside,
       SearchArea,
@@ -167,6 +171,19 @@
        */
       addMore() {
         this.ifShow = !this.ifShow
+      },
+
+      /**
+       * 高级筛选
+       */
+      openSearch() {
+        this.$refs.searchChild.dialogVisible = true
+        this.fieldList.forEach(item => {
+          this.$refs.searchChild.fieldList.push({
+            label: item.name,
+            value: item.key
+          })
+        })
       },
 
       /**
