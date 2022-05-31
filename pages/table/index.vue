@@ -17,7 +17,7 @@
               </el-tabs>
             </div>
             <div class="add">
-              <el-button type="primary" icon="el-icon-plus" @click="addProvider">添加服务商</el-button>
+              <el-button type="primary" icon="el-icon-plus" @click="addProvider">添加数据</el-button>
             </div>
           </div>
         </div>
