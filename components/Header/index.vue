@@ -30,7 +30,11 @@
       }
     },
     mounted() {
-      this.showHeader = this.comsys.showHeader
+      if (this.$store.state.settings.showHeader == 'true') {
+        this.showHeader = true
+      } else {
+        this.showHeader = false
+      }
     }
   }
 </script>

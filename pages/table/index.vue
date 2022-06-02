@@ -1,9 +1,9 @@
 <template>
   <div class='container'>
     <Header></Header>
-    <div :class="showHeader ? 'content': 'contents'">
+    <div :class="showHeader ? 'content' : 'contents'">
       <Aside @getFieldList="getFieldList" @getProvider="getProvider"></Aside>
-      <div class='main'>
+      <div :class="showSidebar ? 'main' : 'main-left main'">
         <div class='main-top'>
           <div>
             <b>表格系统</b>
@@ -99,6 +99,8 @@
         ifDetele: false,
         tableList: [],
         showHeader: '',
+        showSidebar: '',
+        input2: '',
         checkedLength: '',
         searchItems: [
           { label: '产品类型', type: 'input', key: 'title' },
@@ -235,7 +237,17 @@
     }
     ,
     mounted() {
-      this.showHeader = this.comsys.showHeader
+      console.log(this.$store.state.settings.showHeader)
+      if (this.$store.state.settings.showHeader == 'true') {
+        this.showHeader = true
+      } else {
+        this.showHeader = false
+      }
+      if (this.$store.state.settings.showSidebar == 'true') {
+        this.showSidebar = true
+      } else {
+        this.showSidebar = false
+      }
     }
   }
 </script>

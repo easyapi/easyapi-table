@@ -112,6 +112,14 @@ img {
   margin-left: 210px;
 }
 
+.main-left {
+  margin-left: 0 + px !important;
+}
+
+.main::-webkit-scrollbar {
+  display: none;
+}
+
 .main-top {
   background-color: #ffffff;
   padding: 15px;

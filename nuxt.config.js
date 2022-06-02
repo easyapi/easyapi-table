@@ -4,12 +4,17 @@ module.exports = {
   */
   router: {
     extendRoutes(routes, resolve) {
-      routes.splice(0)
+      // routes.splice(0)
       routes.push(
         {
           path: '/:sheetId/:providerId',
           name: 'table',
           component: resolve(__dirname, 'pages/table')
+        },
+        {
+          path: '/access-token',
+          name: 'AccessToken',
+          component: resolve(__dirname, 'pages/access-token')
         }
       )
     }

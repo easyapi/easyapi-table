@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar">
+  <div v-if="showSidebar" class="sidebar">
     <div class="menu" v-for="(menu, index) in menuList" :key="index" @click="getFields(menu.serve)">
       <nuxt-link :to="menu.path"
                  :class="activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
@@ -18,6 +18,7 @@
     data() {
       return {
         activePath: '',
+        showSidebar: '',
         menuList: [
           {
             title: '常客服务',
@@ -29,7 +30,12 @@
       }
     },
     mounted() {
-      this.activePath = this.$route.path ? `${this.$route.path}` : '/article'
+      if (this.$store.state.settings.showSidebar == 'true') {
+        this.showSidebar = true
+      } else {
+        this.showSidebar = false
+      }
+      this.activePath = this.$route.path ? `${this.$route.path}` : '/:sheetId/:providerId'
       this.getFields('changke_provider')
     },
     methods: {
