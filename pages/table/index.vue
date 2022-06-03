@@ -2,7 +2,7 @@
   <div class='container'>
     <Header></Header>
     <div :class="showHeader ? 'content' : 'contents'">
-      <Aside @getFieldList="getFieldList" @getProvider="getProvider"></Aside>
+      <Aside @getFieldList="getFieldList" @getSheetId="getSheetId"></Aside>
       <div :class="showSidebar ? 'main' : 'main-left main'">
         <div class='main-top'>
           <div>
@@ -29,7 +29,7 @@
           <div v-if="ifShow">
             <SearchArea :items='searchItems' @search='search' @event='event' @reset='reset'/>
           </div>
-          <div class="mg-tp-10" v-if="ifDetele">
+          <div class="mg-tp-10" v-if="ifDelete">
             <span>已选中{{ checkedLength }}项</span>
             <el-button size="small" type="danger">批量删除</el-button>
           </div>
@@ -96,7 +96,7 @@ export default {
       sheetId: '',
       providerList: [],
       ifShow: false,
-      ifDetele: false,
+      ifDelete: false,
       tableList: [],
       showHeader: '',
       showSidebar: '',
@@ -140,7 +140,7 @@ export default {
     getFieldList(data) {
       this.fieldList = data
     },
-    getProvider(data) {
+    getSheetId(data) {
       this.sheetId = data
     },
     getRecordList() {
@@ -178,7 +178,7 @@ export default {
     },
 
     handleSelectionChange(val) {
-      this.ifDetele = !this.ifDetele
+      this.ifDelete = !this.ifDelete
       this.checkedLength = val.length
     },
 

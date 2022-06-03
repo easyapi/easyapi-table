@@ -19,7 +19,7 @@ export default {
     if (this.$route.query.showSidebar) {
       this.$store.state.settings.showSidebar = this.$route.query.showSidebar
     }
-    this.$router.push(this.$route.query.url ? this.$route.query.url : '/:sheetId/:providerId')
+    this.$router.push(this.$route.query.url ? this.$route.query.url : '/:projectId/:sheetId')
   }
 }
 </script>

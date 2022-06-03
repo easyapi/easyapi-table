@@ -31,7 +31,7 @@ export default {
   },
   mounted() {
     this.showSidebar = this.$store.state.settings.showSidebar === 'true';
-    this.activePath = this.$route.path ? `${this.$route.path}` : '/:sheetId/:providerId'
+    this.activePath = this.$route.path ? `${this.$route.path}` : '/:projectId/:sheetId'
     this.getFields('changke_provider')
   },
   methods: {
@@ -41,7 +41,7 @@ export default {
       }
       getFieldList(params, data, this).then(res => {
         this.$emit('getFieldList', res.data.content)
-        this.$emit('getProvider', data)
+        this.$emit('getSheetId', data)
       })
     }
   }

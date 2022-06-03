@@ -6,7 +6,7 @@ module.exports = {
     extendRoutes(routes, resolve) {
       routes.push(
         {
-          path: '/:sheetId/:providerId',
+          path: '/:projectId/:sheetId',
           name: 'table',
           component: resolve(__dirname, 'pages/table')
         },
