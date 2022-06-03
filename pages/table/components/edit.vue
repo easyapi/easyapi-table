@@ -8,7 +8,7 @@
     <div class="edit">
       <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
         <el-form-item v-for="item in fieldList" :prop="item.key">
-          <span class="formLabel">{{item.name}}</span>
+          <span class="formLabel">{{ item.name }}</span>
           <div v-if="item.key=='img'" class="block">
             <el-upload
               :data="dataObj"
@@ -35,147 +35,147 @@
 </template>
 
 <script>
-  import { getQiniuKey, getQiniuToken } from '../../../api/qiniu'
-  import { creatRecord, updateRecord } from '../../../api/serve'
-  import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
+import {getQiniuKey, getQiniuToken} from '../../../api/qiniu'
+import {creatRecord, updateRecord} from '../../../api/table'
+import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
 
-  export default {
-    name: 'addCategory',
-    components: { MarkdownEditor },
-    data() {
-      return {
-        formFields: {
-          img: '',
-          content: ''
-        },
-        title: '',
-        dialogVisible: false,
-        fieldList: '',
-        sheetId: '',//服务商
-        ifChange: '',
-        recordId: '',
-        dataObj: { token: '', key: '' }
-      }
-    },
-    mounted() {
-      this.getQiniuToken()
-      this.getQiniuKey()
-    },
-    watch: {
-      'formFields.content'(val) {
-        console.log(val)
-      }
-    },
+export default {
+  name: 'addCategory',
+  components: {MarkdownEditor},
+  data() {
+    return {
+      formFields: {
+        img: '',
+        content: ''
+      },
+      title: '',
+      dialogVisible: false,
+      fieldList: '',
+      sheetId: '',//服务商
+      ifChange: '',
+      recordId: '',
+      dataObj: {token: '', key: ''}
+    }
+  },
+  mounted() {
+    this.getQiniuToken()
+    this.getQiniuKey()
+  },
+  watch: {
+    'formFields.content'(val) {
+      console.log(val)
+    }
+  },
 
-    methods: {
-      //获取七牛token
-      getQiniuToken() {
-        getQiniuToken(this).then(res => {
-          this.dataObj.token = res.data.content.upToken
-        }).catch(error => {
-          console.error(error.response)
-        })
-      },
-      getQiniuKey() {
-        getQiniuKey(this).then(res => {
-          this.dataObj.key = res.data.content.key
-        }).catch(error => {
-          console.log(error.response)
-        })
-      },
-      handleAvatarSuccess(res, file) {
-        let img = 'https://qiniu.easyapi.com/' + res.key
-        file.url = img
-        this.formFields.img = img
-      },
-      close() {
-        this.formFields = {}
-      },
-      confirm(formName) {
-        if (this.title == '新增服务商') {
-          let list = []
-          let obj = {}
-          let data = {
-            ...this.formFields
-          }
-          obj.fields = data
-          list.push(obj)
-          creatRecord(list, this.sheetId, this).then(res => {
-            if (res.data.code == 1) {
-              this.$parent.getRecordList()
-              this.dialogVisible = false
-            }
-          })
-        } else {
-          let list = []
-          let obj = {}
-          let data = {
-            ...this.formFields
-          }
-          obj.fields = data
-          obj.recordId = this.recordId
-          list.push(obj)
-          updateRecord(list, this.sheetId, this).then(res => {
-            if (res.data.code == 1) {
-              this.$parent.getRecordList()
-              this.dialogVisible = false
-              this.$message.success('修改成功')
-            }
-          })
+  methods: {
+    //获取七牛token
+    getQiniuToken() {
+      getQiniuToken(this).then(res => {
+        this.dataObj.token = res.data.content.upToken
+      }).catch(error => {
+        console.error(error.response)
+      })
+    },
+    getQiniuKey() {
+      getQiniuKey(this).then(res => {
+        this.dataObj.key = res.data.content.key
+      }).catch(error => {
+        console.log(error.response)
+      })
+    },
+    handleAvatarSuccess(res, file) {
+      let img = 'https://qiniu.easyapi.com/' + res.key
+      file.url = img
+      this.formFields.img = img
+    },
+    close() {
+      this.formFields = {}
+    },
+    confirm(formName) {
+      if (this.title === '新增服务商') {
+        let list = []
+        let obj = {}
+        let data = {
+          ...this.formFields
         }
+        obj.fields = data
+        list.push(obj)
+        creatRecord(list, this.sheetId, this).then(res => {
+          if (res.data.code === 1) {
+            this.$parent.getRecordList()
+            this.dialogVisible = false
+          }
+        })
+      } else {
+        let list = []
+        let obj = {}
+        let data = {
+          ...this.formFields
+        }
+        obj.fields = data
+        obj.recordId = this.recordId
+        list.push(obj)
+        updateRecord(list, this.sheetId, this).then(res => {
+          if (res.data.code === 1) {
+            this.$parent.getRecordList()
+            this.dialogVisible = false
+            this.$message.success('修改成功')
+          }
+        })
       }
     }
   }
+}
 </script>
 
 <style lang="scss">
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
 
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
 
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 60px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-  }
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+}
 
-  .avatar {
-    width: 60px;
-    height: 60px;
+.avatar {
+  width: 60px;
+  height: 60px;
+  display: block;
+}
+
+.edit {
+  .el-form--inline .el-form-item {
     display: block;
   }
+}
 
-  .edit {
-    .el-form--inline .el-form-item {
-      display: block;
-    }
-  }
-
-  .el-dialog {
-    display: flex;
-    flex-direction: column;
-    margin: 0 !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-height: calc(100% - 30px);
-    max-width: calc(100% - 30px);
-    overflow-y: auto;
-  }
+.el-dialog {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: calc(100% - 30px);
+  max-width: calc(100% - 30px);
+  overflow-y: auto;
+}
 </style>
 <style scoped>
-  /deep/ p img {
-    display: block !important;
-  }
+/deep/ p img {
+  display: block !important;
+}
 </style>

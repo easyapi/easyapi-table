@@ -1,8 +1,6 @@
 import Cookies from 'js-cookie'
 
-export default function({ $axios, redirect }) {
-  // Cookies.set('authenticationToken', 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6aGFuZzIwMDg0QDEyNi5jb20iLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTY1MjQ5ODU0NX0.-ijFpVcZQmZqNmcwef2C1CqXq8sWppNtZu8CEeZjjbDHv-Tyw7EGCFi5UEmcjTGfjw-i83DVkJ8S72OoVW4bqg')
-
+export default function ({$axios, redirect}) {
   $axios.onRequest((config) => {
     let token = Cookies.get('authenticationToken')
     if (token) {

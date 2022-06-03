@@ -10,4 +10,4 @@ import 'github-markdown-css/github-markdown.css'
 import '@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css'
 
 
-Vue.prototype.codeSyntaxHighlight = [codeSyntaxHighlight, { highlighter: Prism }]
+Vue.prototype.codeSyntaxHighlight = [codeSyntaxHighlight, {highlighter: Prism}]

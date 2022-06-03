@@ -35,94 +35,93 @@
 </template>
 
 <script>
-  export default {
-    name: 'advancedSearch',
-    data() {
-      return {
-        conditionList: [],
-        dialogVisible: false,
-        save: false,
-        fieldList: [],
-        options: [{
-          value: '等于',
-          label: '等于'
-        }, {
-          value: '不等于',
-          label: '不等于'
-        }, {
-          value: '包含',
-          label: '包含'
-        }, {
-          value: '不包含',
-          label: '不包含'
-        }, {
-          value: '开始于',
-          label: '开始于'
-        }, {
-          value: '结束于',
-          label: '结束于'
-        }, {
-          value: '为空',
-          label: '为空'
-        }, {
-          value: '不为空',
-          label: '不为空'
-        }]
-      }
-    },
-    watch: {
-      fieldList(val) {
-        console.log(val)
-        if (val) {
-          this.conditionList.push({
-            fieldValue: val[0].label,
-            value: '等于',
-            checked: false
-          })
-        }
-      }
-    },
-    methods: {
-      detele(index) {
-        this.$confirm('您确定要删除这一条数据?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$delete(this.conditionList, index)
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-      },
-      addMore() {
-        let obj = {
-          fieldValue: '',
+export default {
+  name: 'advancedSearch',
+  data() {
+    return {
+      conditionList: [],
+      dialogVisible: false,
+      save: false,
+      fieldList: [],
+      options: [{
+        value: '等于',
+        label: '等于'
+      }, {
+        value: '不等于',
+        label: '不等于'
+      }, {
+        value: '包含',
+        label: '包含'
+      }, {
+        value: '不包含',
+        label: '不包含'
+      }, {
+        value: '开始于',
+        label: '开始于'
+      }, {
+        value: '结束于',
+        label: '结束于'
+      }, {
+        value: '为空',
+        label: '为空'
+      }, {
+        value: '不为空',
+        label: '不为空'
+      }]
+    }
+  },
+  watch: {
+    fieldList(val) {
+      if (val) {
+        this.conditionList.push({
+          fieldValue: val[0].label,
           value: '等于',
           checked: false
-        }
-        this.conditionList.push(obj)
+        })
       }
     }
+  },
+  methods: {
+    detele(index) {
+      this.$confirm('您确定要删除这一条数据?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$delete(this.conditionList, index)
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    addMore() {
+      let obj = {
+        fieldValue: '',
+        value: '等于',
+        checked: false
+      }
+      this.conditionList.push(obj)
+    }
   }
+}
 </script>
 
 <style scoped>
-  .cursor {
-    cursor: pointer;
-  }
+.cursor {
+  cursor: pointer;
+}
 
-  .align-center {
-    align-items: center;
-  }
+.align-center {
+  align-items: center;
+}
 
-  .mx-15 {
-    margin: 0 15px;
-  }
+.mx-15 {
+  margin: 0 15px;
+}
 </style>

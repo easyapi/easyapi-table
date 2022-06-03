@@ -1,4 +1,4 @@
-import { baseUrl } from './api'
+import {baseUrl} from './api'
 
 /**
  * 获取用户信息
