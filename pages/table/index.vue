@@ -239,7 +239,7 @@
     mounted() {
       this.showHeader = this.$store.state.settings.showHeader === 'true'
       this.showSidebar = this.$store.state.settings.showSidebar === 'true'
-      if (this.$route.params.sheetId == this.$route.params.projectId + '_provider') {
+      if (this.$route.params.sheetId && this.$route.params.projectId) {
         this.sheetId = this.$route.params.sheetId
       } else {
         this.$router.push('/')
