@@ -6,7 +6,7 @@
       <div :class="showSidebar ? 'main' : 'main-left main'">
         <div class='main-top'>
           <div>
-            <b>表格系统</b>
+            <b>{{headline}}</b>
           </div>
           <div class="mg-tp-15 flex-r just-between">
             <div class="tabs">
@@ -100,6 +100,7 @@
         tableList: [],
         showHeader: '',
         showSidebar: '',
+        headline: '',
         input2: '',
         checkedLength: '',
         searchItems: [
@@ -239,6 +240,7 @@
     mounted() {
       this.showHeader = this.$store.state.settings.showHeader === 'true'
       this.showSidebar = this.$store.state.settings.showSidebar === 'true'
+      this.headline = this.$store.state.settings.headline
       if (this.$route.params.sheetId && this.$route.params.projectId) {
         this.sheetId = this.$route.params.sheetId
       } else {

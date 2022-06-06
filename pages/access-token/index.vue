@@ -10,7 +10,6 @@
     methods: {},
     watch: {},
     mounted() {
-      console.log(this.$route.query.url)
       if (this.$route.query.accessToken) {
         localStorage.setItem('accessToken', this.$route.query.accessToken)
       }
@@ -19,6 +18,9 @@
       }
       if (this.$route.query.showSidebar) {
         this.$store.state.settings.showSidebar = this.$route.query.showSidebar
+      }
+      if (this.$route.query.headline) {
+        this.$store.state.settings.headline = this.$route.query.headline
       }
       this.$router.push(this.$route.query.url ? this.$route.query.url : '')
     }
