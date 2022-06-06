@@ -53,8 +53,32 @@
             <template>
               <el-table-column show-overflow-tooltip v-for="(item,index) in fieldList" :label='item.name' :key="index">
                 <template slot-scope="scope">
-                  <span v-if="item.key!='img'" v-html="scope.row[item.key]"></span>
-                  <img class="table-img" v-if="item.key=='img'" :src="scope.row[item.key]+'!icon.jpg'"/>
+                  <span v-if="item.type=='单行文本'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
+                  <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
+                       :src="scope.row[item.key]+'!icon.jpg'"/>
+                  <img v-if="item.type=='附件'&&item.key=='video'"
+                       v-for="url in scope.row[item.key]" @click.stop="showVideo(url.url)" class="table-img"
+                       src="../../assets/images/video.svg">
+                  <el-dialog
+                    title="视频预览"
+                    width="50%"
+                    append-to-body
+                    top="20px"
+                    :visible.sync="dialogVisible"
+                  >
+
+                    <video
+                      width="100%"
+                      autoplay="autoplay"
+                      :src="playvideo"
+                      :poster="playvideo"
+                      controls="controls"
+                      id="video"
+                      preload
+                    ></video>
+                  </el-dialog>
                 </template>
               </el-table-column>
             </template>
@@ -92,6 +116,8 @@
     data() {
       return {
         activeName: 'first',
+        dialogVisible: false,
+        playvideo: '',
         fieldList: [],
         sheetId: '',
         providerList: [],
@@ -135,6 +161,10 @@
       }
     },
     methods: {
+      showVideo(url) {
+        this.dialogVisible = true
+        this.playvideo = url
+      },
       handleClick() {
 
       },
@@ -170,7 +200,7 @@
       rowClick(row) {
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
-        this.$refs.child.title = '编辑服务商'
+        this.$refs.child.title = '编辑'
         this.$refs.child.recordId = row.recordId
         this.$refs.child.sheetId = this.sheetId
         setTimeout(() => {
@@ -209,7 +239,7 @@
       addProvider() {
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
-        this.$refs.child.title = '新增服务商'
+        this.$refs.child.title = '新增'
         // this.$refs.child.ifChange = true
       },
       //分页
@@ -292,12 +322,18 @@
   }
 </style>
 <style scoped lang="scss">
+  #video {
+    width: 100%;
+    height: 500px;
+  }
+
   /deep/ p img {
     display: none;
   }
 
   .table-img {
     width: 50px;
+    height: 50px;
   }
 
   .el-table {
