@@ -71,231 +71,236 @@
 </template>
 
 <script>
-import Header from '../../components/Header/index.vue'
-import Aside from '../../components/Aside/index.vue'
-import Pagination from '../../components/Pagination/index'
-import SearchArea from '../../components/SearchArea'
-import Edit from './components/edit.vue'
-import {getRecordList} from '../../api/table'
-import AdvancedSearch from './components/advancedSearch'
+  import Header from '../../components/Header/index.vue'
+  import Aside from '../../components/Aside/index.vue'
+  import Pagination from '../../components/Pagination/index'
+  import SearchArea from '../../components/SearchArea'
+  import Edit from './components/edit.vue'
+  import { getRecordList } from '../../api/table'
+  import AdvancedSearch from './components/advancedSearch'
 
-export default {
-  name: '',
-  components: {
-    AdvancedSearch,
-    Header,
-    Aside,
-    SearchArea,
-    Pagination,
-    Edit
-  },
-  data() {
-    return {
-      activeName: 'first',
-      fieldList: [],
-      sheetId: '',
-      providerList: [],
-      ifShow: false,
-      ifDelete: false,
-      tableList: [],
-      showHeader: '',
-      showSidebar: '',
-      input2: '',
-      checkedLength: '',
-      searchItems: [
-        {label: '产品类型', type: 'input', key: 'title'},
-        {label: '交付方式', type: 'input', key: 'title'},
-        {label: '产品状态', type: 'input', key: 'title'},
-        {label: '计费方式', type: 'select', key: 'title'}
-      ],
-      pagination: {
-        page: 1,
-        size: 12,
-        total: 0
+  export default {
+    name: '',
+    components: {
+      AdvancedSearch,
+      Header,
+      Aside,
+      SearchArea,
+      Pagination,
+      Edit
+    },
+    data() {
+      return {
+        activeName: 'first',
+        fieldList: [],
+        sheetId: '',
+        providerList: [],
+        ifShow: false,
+        ifDelete: false,
+        tableList: [],
+        showHeader: '',
+        showSidebar: '',
+        input2: '',
+        checkedLength: '',
+        searchItems: [
+          { label: '产品类型', type: 'input', key: 'title' },
+          { label: '交付方式', type: 'input', key: 'title' },
+          { label: '产品状态', type: 'input', key: 'title' },
+          { label: '计费方式', type: 'select', key: 'title' }
+        ],
+        pagination: {
+          page: 1,
+          size: 12,
+          total: 0
+        },
+        loadingData: false,
+        tableText: ''
+      }
+    },
+    watch: {
+      sheetId(val) {
+        if (val) {
+          this.getRecordList()
+        }
+      }
+    },
+    head() {
+      return {
+        title: '数据表格 - EasyAPI服务市场',
+        meta: [
+          { hid: 'description', name: 'description', content: '服务市场场景化服务' },
+          { hid: 'keyword', name: 'keyword', content: '服务市场场景化服务' }
+        ]
+      }
+    },
+    methods: {
+      handleClick() {
+
       },
-      loadingData: false,
-      tableText: ''
-    }
-  },
-  watch: {
-    sheetId(val) {
-      if (val) {
+      getFieldList(data) {
+        this.fieldList = data
+      },
+      getSheetId(data) {
+        this.sheetId = data
+      },
+      getRecordList() {
+        this.providerList = []
+        this.loadingData = true
+        let params = {}
+        getRecordList(params, this.sheetId, this).then(res => {
+          if (res.data.code === 1) {
+            this.loadingData = false
+            for (let fields of res.data.content) {
+              fields.fields.recordId = fields.id
+              this.providerList.push(fields.fields)
+            }
+            this.pagination.total = Number(res.data.totalElements)
+          } else {
+            this.loadingData = false
+            this.tableText = '暂无数据'
+            this.providerList = []
+            this.pagination.total = 0
+          }
+        })
+      },
+      /**
+       * 表格行点击
+       */
+      rowClick(row) {
+        this.$refs.child.dialogVisible = true
+        this.$refs.child.fieldList = this.fieldList
+        this.$refs.child.title = '编辑服务商'
+        this.$refs.child.recordId = row.recordId
+        this.$refs.child.sheetId = this.sheetId
+        setTimeout(() => {
+          this.$refs.child.formFields = row
+        }, 100)
+      },
+
+      handleSelectionChange(val) {
+        this.ifDelete = !this.ifDelete
+        this.checkedLength = val.length
+      },
+
+      /**
+       *展开更多
+       */
+      addMore() {
+        this.ifShow = !this.ifShow
+      },
+
+      /**
+       * 高级筛选
+       */
+      openSearch() {
+        this.$refs.searchChild.dialogVisible = true
+        this.fieldList.forEach(item => {
+          this.$refs.searchChild.fieldList.push({
+            label: item.name,
+            value: item.key
+          })
+        })
+      },
+
+      /**
+       * 新增服务商
+       */
+      addProvider() {
+        this.$refs.child.dialogVisible = true
+        this.$refs.child.fieldList = this.fieldList
+        this.$refs.child.title = '新增服务商'
+        // this.$refs.child.ifChange = true
+      },
+      //分页
+      fatherSize(data) {
+        this.pagination.size = data
         this.getRecordList()
+      },
+      fatherCurrent(data) {
+        this.pagination.page = data
+        this.getRecordList()
+      },
+
+      search(item) {
+        let { title } = item
+        this.title = title
+        this.getArticleList()
+      }
+      ,
+      reset(item) {
+      }
+      ,
+      event(item) {
+        let { title } = item
+        this.title = title
       }
     }
-  },
-  head() {
-    return {
-      title: '数据表格 - EasyAPI服务市场',
-      meta: [
-        {hid: 'description', name: 'description', content: '服务市场场景化服务'},
-        {hid: 'keyword', name: 'keyword', content: '服务市场场景化服务'}
-      ]
-    }
-  },
-  methods: {
-    handleClick() {
-
-    },
-    getFieldList(data) {
-      this.fieldList = data
-    },
-    getSheetId(data) {
-      this.sheetId = data
-    },
-    getRecordList() {
-      this.providerList = []
-      this.loadingData = true
-      let params = {}
-      getRecordList(params, this.sheetId, this).then(res => {
-        if (res.data.code === 1) {
-          this.loadingData = false
-          for (let fields of res.data.content) {
-            fields.fields.recordId = fields.id
-            this.providerList.push(fields.fields)
-          }
-          this.pagination.total = Number(res.data.totalElements)
-        } else {
-          this.loadingData = false
-          this.tableText = '暂无数据'
-          this.providerList = []
-          this.pagination.total = 0
-        }
-      })
-    },
-    /**
-     * 表格行点击
-     */
-    rowClick(row) {
-      this.$refs.child.dialogVisible = true
-      this.$refs.child.fieldList = this.fieldList
-      this.$refs.child.title = '编辑服务商'
-      this.$refs.child.recordId = row.recordId
-      this.$refs.child.sheetId = this.sheetId
-      setTimeout(() => {
-        this.$refs.child.formFields = row
-      }, 100)
-    },
-
-    handleSelectionChange(val) {
-      this.ifDelete = !this.ifDelete
-      this.checkedLength = val.length
-    },
-
-    /**
-     *展开更多
-     */
-    addMore() {
-      this.ifShow = !this.ifShow
-    },
-
-    /**
-     * 高级筛选
-     */
-    openSearch() {
-      this.$refs.searchChild.dialogVisible = true
-      this.fieldList.forEach(item => {
-        this.$refs.searchChild.fieldList.push({
-          label: item.name,
-          value: item.key
-        })
-      })
-    },
-
-    /**
-     * 新增服务商
-     */
-    addProvider() {
-      this.$refs.child.dialogVisible = true
-      this.$refs.child.fieldList = this.fieldList
-      this.$refs.child.title = '新增服务商'
-      // this.$refs.child.ifChange = true
-    },
-    //分页
-    fatherSize(data) {
-      this.pagination.size = data
-      this.getRecordList()
-    },
-    fatherCurrent(data) {
-      this.pagination.page = data
-      this.getRecordList()
-    },
-
-    search(item) {
-      let {title} = item
-      this.title = title
-      this.getArticleList()
-    }
     ,
-    reset(item) {
-    }
-    ,
-    event(item) {
-      let {title} = item
-      this.title = title
+    mounted() {
+      this.showHeader = this.$store.state.settings.showHeader === 'true'
+      this.showSidebar = this.$store.state.settings.showSidebar === 'true'
+      if (this.$route.params.sheetId == this.$route.params.projectId + '_provider') {
+        this.sheetId = this.$route.params.sheetId
+      } else {
+        this.$router.push('/')
+      }
     }
   }
-  ,
-  mounted() {
-    this.showHeader = this.$store.state.settings.showHeader === 'true';
-    this.showSidebar = this.$store.state.settings.showSidebar === 'true';
-  }
-}
 </script>
 
 <style lang='scss'>
-.el-tabs__content {
-  overflow: visible;
-}
+  .el-tabs__content {
+    overflow: visible;
+  }
 
-.el-tabs__item {
-  color: #333333;
-}
+  .el-tabs__item {
+    color: #333333;
+  }
 
-.el-tabs__item.is-active {
-  color: #15cbf3;
-}
+  .el-tabs__item.is-active {
+    color: #15cbf3;
+  }
 
-.el-icon-arrow-left {
-  color: white;
-}
+  .el-icon-arrow-left {
+    color: white;
+  }
 
-.el-icon-arrow-right {
-  color: white;
-}
+  .el-icon-arrow-right {
+    color: white;
+  }
 
-.el-tabs__nav-wrap::after {
-  height: 0;
-}
+  .el-tabs__nav-wrap::after {
+    height: 0;
+  }
 
-.el-button + .el-button {
-  margin-left: 0px;
-}
+  .el-button + .el-button {
+    margin-left: 0px;
+  }
 
-.el-tabs__active-bar {
-  background-color: #15cbf3;
-}
+  .el-tabs__active-bar {
+    background-color: #15cbf3;
+  }
 
-.tabs {
-  width: 50%;
-}
+  .tabs {
+    width: 50%;
+  }
 
-.just-between {
-  justify-content: space-between;
-}
+  .just-between {
+    justify-content: space-between;
+  }
 </style>
 <style scoped lang="scss">
-/deep/ p img {
-  display: none;
-}
-
-.table-img {
-  width: 50px;
-}
-
-.el-table {
-  /deep/ tbody tr:hover > td {
-    cursor: pointer;
+  /deep/ p img {
+    display: none;
   }
-}
+
+  .table-img {
+    width: 50px;
+  }
+
+  .el-table {
+    /deep/ tbody tr:hover > td {
+      cursor: pointer;
+    }
+  }
 </style>

@@ -6,6 +6,11 @@ module.exports = {
     extendRoutes(routes, resolve) {
       routes.push(
         {
+          path: '/',
+          name: 'index',
+          component: resolve(__dirname, 'pages/index')
+        },
+        {
           path: '/:projectId/:sheetId',
           name: 'table',
           component: resolve(__dirname, 'pages/table')
@@ -22,12 +27,12 @@ module.exports = {
   head: {
     title: '{{ name }} - EasyAPI数据表格',
     meta: [
-      {charset: 'utf-8'},
-      {name: 'viewport', content: 'width=device-width, initial-scale=1'},
-      {hid: 'description', name: 'description', content: '{{escape description }}'}
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { hid: 'description', name: 'description', content: '{{escape description }}' }
     ],
     link: [
-      {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'}
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ],
     script: []
   },
@@ -41,10 +46,10 @@ module.exports = {
   plugins: [
     '@/plugins/element-ui',
     '@/plugins/axios',
-    {src: '@/plugins/editor', ssr: false},
-    {src: '@/plugins/nuxt-quill-plugin', ssr: false},
-    {src: '@/plugins/codeSyntaxHighlight', ssr: false},
-    {src: '@/plugins/commom.js', ssr: false}
+    { src: '@/plugins/editor', ssr: false },
+    { src: '@/plugins/nuxt-quill-plugin', ssr: false },
+    { src: '@/plugins/codeSyntaxHighlight', ssr: false },
+    { src: '@/plugins/commom.js', ssr: false }
   ],
   /*
   ** Customize the progress bar color
