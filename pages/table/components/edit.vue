@@ -17,7 +17,7 @@
               :multiple="false"
               :show-file-list="false"
               :on-success="handleAvatarSuccess">
-              <img v-if="formFields[item.key]" :src="formFields[item.key]+'!icon.jpg'" class="avatar">
+              <img v-if="formFields.img" :src="formFields.img+'!icon.jpg'" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
@@ -30,26 +30,20 @@
               :on-success="handleVideoSuccess"
               :before-upload="beforeUploadVideo"
               :show-file-list="false"
-              :headers="headers"
             >
               <video
-                v-if="formFields[item.key] != '' && !videoFlag"
-                :src="formFields[item.key]"
+                v-if="formFields.video"
+                :src="formFields.video"
                 class="video video-avatar"
                 controls="controls">
                 您的浏览器不支持视频播放
               </video>
-              <i v-else-if="formFields[item.key] == '' && !videoFlag"
-                 class="el-icon-plus video-uploader-icon"
-              ></i>
-              <el-progress v-if="videoFlag == true" type="circle"
-                           v-bind:percentage="videoUploadPercent"
-                           style="margin-top: 7px"></el-progress>
+              <i v-else class="el-icon-plus video-uploader-icon"></i>
             </el-upload>
           </div>
-          <MarkdownEditor :ifChange="ifChange" v-if="item.key=='content'"
+          <MarkdownEditor :ifChange="ifChange" v-if="item.type=='富文本'"
                           v-model="formFields[item.key]"></MarkdownEditor>
-          <el-input v-if="item.type=='单行文本'" v-model="formFields[item.key]" placeholder="请输入名称"/>
+          <el-input v-if="item.type=='单行文本'&&item.key!='img'" v-model="formFields[item.key]" placeholder="请输入名称"/>
           <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
@@ -73,7 +67,8 @@
       return {
         formFields: {
           img: '',
-          content: ''
+          content: '',
+          video: ''
         },
         title: '',
         dialogVisible: false,
@@ -114,6 +109,8 @@
         })
       },
       beforeUploadVideo(file) {
+        this.getQiniuToken()
+        this.getQiniuKey()
         var fileSize = file.size / 1024 / 1024 < 50   //控制大小  修改50的值即可
         if (
           [
@@ -145,14 +142,8 @@
         this.isShowUploadVideo = true
         this.videoFlag = false
         this.videoUploadPercent = 0
-
-        console.log(res)
-        //后台上传数据
-        if (res.success == true) {
-          this.videoForm.showVideoPath = res.data.url    //上传成功后端返回视频地址 回显
-        } else {
-          this.$message.error('上传失败！')
-        }
+        let video = 'https://qiniu.easyapi.com/' + res.key
+        this.formFields.video = video
       },
       handleAvatarSuccess(res, file) {
         let img = 'https://qiniu.easyapi.com/' + res.key
@@ -167,11 +158,16 @@
       confirm(formName) {
         if (this.title === '新增') {
           let list = []
+          let video = []
+          video.push({
+            url: this.formFields.video
+          })
           let obj = {}
           let data = {
             ...this.formFields
           }
           obj.fields = data
+          obj.fields.video = video
           list.push(obj)
           creatRecord(list, this.sheetId, this).then(res => {
             if (res.data.code === 1) {

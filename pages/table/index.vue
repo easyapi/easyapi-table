@@ -53,11 +53,12 @@
             <template>
               <el-table-column show-overflow-tooltip v-for="(item,index) in fieldList" :label='item.name' :key="index">
                 <template slot-scope="scope">
-                  <span v-if="item.type=='单行文本'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type=='单行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
-                  <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
-                       :src="scope.row[item.key]+'!icon.jpg'"/>
+                  <img class="table-img" v-if="item.key=='img'"
+                       v-for="url in scope.row[item.key]"
+                       :src="url.url+'!icon.jpg'"/>
                   <img v-if="item.type=='附件'&&item.key=='video'"
                        v-for="url in scope.row[item.key]" @click.stop="showVideo(url.url)" class="table-img"
                        src="../../assets/images/video.svg">
@@ -203,8 +204,15 @@
         this.$refs.child.title = '编辑'
         this.$refs.child.recordId = row.recordId
         this.$refs.child.sheetId = this.sheetId
+        console.log(row)
         setTimeout(() => {
           this.$refs.child.formFields = row
+          row.video.forEach(item => {
+            this.$refs.child.formFields.video = item.url
+          })
+          row.img.forEach(item => {
+            this.$refs.child.formFields.img = item.url
+          })
         }, 100)
       },
 
@@ -239,6 +247,7 @@
       addProvider() {
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
+        console.log(this.fieldList)
         this.$refs.child.title = '新增'
         // this.$refs.child.ifChange = true
       },
