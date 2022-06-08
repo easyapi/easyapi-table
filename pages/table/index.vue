@@ -31,7 +31,7 @@
           </div>
           <div class="mg-tp-10" v-if="ifDelete">
             <span>已选中{{ checkedLength }}项</span>
-            <el-button size="small" type="danger">批量删除</el-button>
+            <el-button @click="batchRemove" size="small" type="danger">批量删除</el-button>
           </div>
           <el-table
             border
@@ -56,7 +56,11 @@
                   <span v-if="item.type=='单行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
-                  <img class="table-img" v-if="item.key=='img'"
+                  <span v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"
+                        v-html="Object.values(about.fields)[0]"></span>
+                  <img class="table-img" v-if="item.type=='单行文本'&&item.key=='img'"
+                       :src="scope.row[item.key]+'!icon.jpg'"/>
+                  <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
                        v-for="url in scope.row[item.key]"
                        :src="url.url+'!icon.jpg'"/>
                   <img v-if="item.type=='附件'&&item.key=='video'"
@@ -69,7 +73,6 @@
                     top="20px"
                     :visible.sync="dialogVisible"
                   >
-
                     <video
                       width="100%"
                       autoplay="autoplay"
@@ -101,7 +104,7 @@
   import Pagination from '../../components/Pagination/index'
   import SearchArea from '../../components/SearchArea'
   import Edit from './components/edit.vue'
-  import { getRecordList } from '../../api/table'
+  import { getRecordList, deleteRecord } from '../../api/table'
   import AdvancedSearch from './components/advancedSearch'
 
   export default {
@@ -142,7 +145,8 @@
           total: 0
         },
         loadingData: false,
-        tableText: ''
+        tableText: '',
+        recordIds: ''
       }
     },
     watch: {
@@ -217,8 +221,31 @@
       },
 
       handleSelectionChange(val) {
-        this.ifDelete = !this.ifDelete
+        let ids = []
+        if (val.length > 0) {
+          this.ifDelete = true
+        } else {
+          this.ifDelete = false
+        }
         this.checkedLength = val.length
+        console.log(val)
+        val.forEach(item => {
+          ids.push(item.recordId)
+        })
+        this.recordIds = ids.toString()
+        console.log(this.recordIds)
+      },
+
+      /**
+       * 删除
+       */
+      batchRemove() {
+        let data = this.recordIds
+        deleteRecord(data, this).then(res => {
+          if (res.data.code === 1) {
+            this.$message.success('删除成功')
+          }
+        })
       },
 
       /**
@@ -320,6 +347,10 @@
 
   .el-tabs__active-bar {
     background-color: #15cbf3;
+  }
+
+  .cell .el-tooltip {
+    color: #67c23a;
   }
 
   .tabs {

@@ -162,9 +162,15 @@
           video.push({
             url: this.formFields.video
           })
+          let img = []
+          img.push({
+            url: this.formFields.img
+          })
           let obj = {}
           let data = {
-            ...this.formFields
+            ...this.formFields,
+            video: video,
+            img: img
           }
           obj.fields = data
           obj.fields.video = video
@@ -177,9 +183,19 @@
           })
         } else {
           let list = []
+          let video = []
+          video.push({
+            url: this.formFields.video
+          })
+          let img = []
+          img.push({
+            url: this.formFields.img
+          })
           let obj = {}
           let data = {
-            ...this.formFields
+            ...this.formFields,
+            video: video,
+            img: img
           }
           obj.fields = data
           obj.recordId = this.recordId

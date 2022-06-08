@@ -1,4 +1,4 @@
-import {tableUrl} from './api'
+import { tableUrl } from './api'
 
 /**
  * 获取数据表格字段列表
@@ -8,7 +8,7 @@ import {tableUrl} from './api'
  * @see https://www.easyai.com
  */
 export const getFieldList = (params, sheetId, context) => {
-  return context.$axios.get(`${tableUrl}/${sheetId}/fields`, {params: {...params}})
+  return context.$axios.get(`${tableUrl}/${sheetId}/fields`, { params: { ...params } })
 }
 
 /**
@@ -19,7 +19,7 @@ export const getFieldList = (params, sheetId, context) => {
  * @see https://www.easyai.com
  */
 export const getRecordList = (params, sheetId, context) => {
-  return context.$axios.get(`${tableUrl}/${sheetId}/records`, {params: {...params}})
+  return context.$axios.get(`${tableUrl}/${sheetId}/records`, { params: { ...params } })
 }
 
 /**
@@ -42,4 +42,15 @@ export const creatRecord = (data, sheetId, context) => {
  */
 export const updateRecord = (data, sheetId, context) => {
   return context.$axios.put(`${tableUrl}/${sheetId}/records`, data)
+}
+
+/**
+ * 删除服务商信息
+ *
+ * @param sheetId 数据表ID
+ *
+ * @see https://www.easyai.com
+ */
+export const deleteRecord = (data, context) => {
+  return context.$axios.delete(`${tableUrl}/records`, data)
 }
