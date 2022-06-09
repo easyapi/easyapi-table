@@ -54,7 +54,7 @@
               <el-table-column show-overflow-tooltip v-for="(item,index) in fieldList" :label='item.name' :key="index">
                 <template slot-scope="scope">
                   <span v-if="item.type=='单行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
-                  <span v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
+                  <span class="rich-text" v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
                   <!--<el-tag type="info" v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"-->
                   <!--@click.stop="showTable(scope.row[item.key])"-->
@@ -400,4 +400,26 @@
       cursor: pointer;
     }
   }
+
+  .rich-text {
+    /* 设置宽高可以解决显示两个省略号的问题*/
+    width: 620px; /*宽高看个人具体情况进行修改*/
+    height: 20px;
+
+    /* 1，强制一行显示 */
+    white-space: wrap;
+
+    /* 2.隐藏溢出的部分 */
+    overflow: hidden;
+
+    /* 3.隐藏的部分省略号显示 */
+    text-overflow: ellipsis;
+
+    display: -webkit-box;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 1; /*行数*/
+  }
 </style>
+

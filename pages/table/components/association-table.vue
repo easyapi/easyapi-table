@@ -5,6 +5,12 @@
     :visible.sync="dialogVisible"
     @close="close"
     width="50%">
+    <el-input
+      class="input"
+      placeholder="搜索你想关联的内容"
+      prefix-icon="el-icon-search"
+      v-model="input2">
+    </el-input>
     <div class="list" :style="styleObject" v-for="(item,index) in fields" @click="choice(item,index)">
       <div class="list-left">
         <h2>{{item.fields.name}}</h2>
@@ -61,6 +67,11 @@
 </script>
 
 <style lang="scss" scoped>
+  .input {
+    width: 50%;
+    margin-bottom: 10px;
+  }
+
   .list {
     background-color: #F3F5F9;
     border: 1px solid #F3F5F9;
