@@ -1,4 +1,4 @@
-import {tableUrl} from './api'
+import { tableUrl } from './api'
 
 /**
  * 获取数据表详情
@@ -8,8 +8,8 @@ import {tableUrl} from './api'
  *
  * @see https://www.easyapi.com
  */
-export const getSheet = (projectId, sheetId, context) => {
-  return context.$axios.get(`${tableUrl}/${projectId}/sheet/${sheetId}`, {params: {}})
+export const getSheet = (params, projectId, sheetId, context) => {
+  return context.$axios.get(`${tableUrl}/${projectId}/sheet/${sheetId}`, { params: { params } })
 }
 
 

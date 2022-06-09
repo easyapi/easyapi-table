@@ -2,7 +2,7 @@
   <div class='container'>
     <Header></Header>
     <div :class="showHeader ? 'content' : 'contents'">
-      <Aside @getFieldList="getFieldList" @getSheetId="getSheetId"></Aside>
+      <Aside @getFieldList="getFieldList" @getSheetId="getSheetId" @getHeadline="getHeadline"></Aside>
       <div :class="showSidebar ? 'main' : 'main-left main'">
         <div class='main-top'>
           <div>
@@ -189,6 +189,9 @@
       getSheetId(data) {
         this.sheetId = data
       },
+      getHeadline(data) {
+        this.headline = data
+      },
       getRecordList() {
         this.providerList = []
         this.loadingData = true
@@ -325,7 +328,6 @@
     mounted() {
       this.showHeader = this.$store.state.settings.showHeader === 'true'
       this.showSidebar = this.$store.state.settings.showSidebar === 'true'
-      this.headline = this.$store.state.settings.headline
       if (this.$route.params.sheetId && this.$route.params.projectId) {
         this.sheetId = this.$route.params.sheetId
       } else {

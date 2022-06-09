@@ -12,6 +12,7 @@
 
 <script>
   import { getFieldList } from '../../api/table'
+  import { getSheet } from '../../api/sheet'
 
   export default {
     name: 'Aside',
@@ -32,16 +33,17 @@
     mounted() {
       this.showSidebar = this.$store.state.settings.showSidebar === 'true'
       this.activePath = this.$route.path ? `${this.$route.path}` : '/:projectId/:sheetId'
-      this.getFields(this.$route.params.sheetId)
+      this.getFields(this.$route.params.projectId, this.$route.params.sheetId)
     },
     methods: {
-      getFields(data) {
+      getFields(projectId, sheetId) {
         let params = {
           size: 50
         }
-        getFieldList(params, data, this).then(res => {
-          this.$emit('getFieldList', res.data.content)
-          this.$emit('getSheetId', data)
+        getSheet(params, projectId, sheetId, this).then(res => {
+          this.$emit('getFieldList', res.data.content.fields)
+          this.$emit('getSheetId', sheetId)
+          this.$emit('getHeadline', res.data.content.name)
         })
       }
     }
