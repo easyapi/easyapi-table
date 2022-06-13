@@ -51,7 +51,8 @@
               width="55">
             </el-table-column>
             <template>
-              <el-table-column show-overflow-tooltip v-for="(item,index) in fieldList" :label='item.name' :key="index">
+              <el-table-column v-for="(item,index) in fieldList" :show-overflow-tooltip="item.type!='富文本'"
+                               :label='item.name' :key="index">
                 <template slot-scope="scope">
                   <span v-if="item.type=='单行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
                   <span class="rich-text" v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
@@ -235,8 +236,6 @@
         this.$refs.child.title = '编辑'
         this.$refs.child.recordId = row.recordId
         this.$refs.child.sheetId = this.sheetId
-        console.log(row)
-        console.log(row.img)
         setTimeout(() => {
           this.$refs.child.formFields = row
           if (row.video) {
@@ -261,12 +260,10 @@
           this.ifDelete = false
         }
         this.checkedLength = val.length
-        console.log(val)
         val.forEach(item => {
           ids.push(item.recordId)
         })
         this.recordIds = ids.toString()
-        console.log(this.recordIds)
       },
 
       /**
