@@ -75,6 +75,7 @@
                     append-to-body
                     top="20px"
                     :visible.sync="dialogVisible"
+                    @close="close"
                   >
                     <video
                       width="100%"
@@ -84,6 +85,7 @@
                       controls="controls"
                       id="video"
                       preload
+                      ref="vueRef"
                     ></video>
                   </el-dialog>
                 </template>
@@ -177,6 +179,9 @@
         this.dialogVisible = true
         this.playvideo = url
       },
+      close() {
+        this.playvideo = ''
+      },
       getName(data) {
         this.name = data
       },
@@ -231,14 +236,20 @@
         this.$refs.child.recordId = row.recordId
         this.$refs.child.sheetId = this.sheetId
         console.log(row)
+        console.log(row.img)
         setTimeout(() => {
           this.$refs.child.formFields = row
-          row.video.forEach(item => {
-            this.$refs.child.formFields.video = item.url
-          })
-          row.img.forEach(item => {
-            this.$refs.child.formFields.img = item.url
-          })
+          if (row.video) {
+            row.video.forEach(item => {
+              this.$refs.child.formFields.video = item.url
+            })
+          }
+          if (row.img) {
+            row.img.forEach(item => {
+              console.log(item)
+              this.$refs.child.formFields.img = item.url
+            })
+          }
         }, 100)
       },
 

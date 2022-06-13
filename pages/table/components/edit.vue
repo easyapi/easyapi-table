@@ -88,7 +88,7 @@
     },
     watch: {
       'formFields.content'(val) {
-        console.log(val)
+
       }
     },
 
