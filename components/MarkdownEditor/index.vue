@@ -14,10 +14,7 @@
         type: String,
         default: ''
       },
-      ifChange: {
-        type: Boolean,
-        default: true
-      },
+
       id: {
         type: String,
         required: false,
@@ -62,16 +59,15 @@
     computed: {},
     watch: {
       value(newValue, preValue) {
-        if (this.value !== '' && this.ifChange) {
+        console.log(newValue)
+        if (this.value !== '') {
           this.$refs.toastuiEditor.invoke('setHTML', this.value)
         }
-        if (this.value == '' && this.ifChange) {
+        if (this.value == '') {
           this.$refs.toastuiEditor.invoke('setHTML', this.value)
         }
       },
-      ifChange(val) {
-        console.log(val)
-      }
+
     },
     mounted() {
       this.initEditor()

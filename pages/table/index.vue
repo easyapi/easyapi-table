@@ -62,13 +62,11 @@
                   <!--v-html="Object.values(about.fields)[0]"></el-tag>-->
                   <el-tag v-if="item.type=='关联表'" @click.stop="showTable(scope.row[item.key])" type="info"
                           v-html="name?name:scope.row[item.key][0].fields.name"></el-tag>
-                  <img class="table-img" v-if="item.type=='单行文本'&&item.key=='img'"
-                       :src="scope.row[item.key]+'!icon.jpg'"/>
                   <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
                        v-for="url in scope.row[item.key]"
                        :src="url.url+'!icon.jpg'"/>
                   <img v-if="item.type=='附件'&&item.key=='video'"
-                       v-for="url in scope.row[item.key]" @click.stop="showVideo(url.url)" class="table-img"
+                       v-for="url in scope.row[item.key]" @click.stop="showVideo(url.url)" class="video-img"
                        src="../../assets/images/video.svg">
                   <el-dialog
                     title="视频预览"
@@ -164,6 +162,9 @@
         if (val) {
           this.getRecordList()
         }
+      },
+      providerList(val) {
+        console.log(val)
       }
     },
     head() {
@@ -231,24 +232,15 @@
        * 表格行点击
        */
       rowClick(row) {
+        let obj = JSON.parse(JSON.stringify(row))
+        console.log(obj)
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.title = '编辑'
-        this.$refs.child.recordId = row.recordId
+        this.$refs.child.recordId = obj.recordId
         this.$refs.child.sheetId = this.sheetId
         setTimeout(() => {
-          this.$refs.child.formFields = row
-          if (row.video) {
-            row.video.forEach(item => {
-              this.$refs.child.formFields.video = item.url
-            })
-          }
-          if (row.img) {
-            row.img.forEach(item => {
-              console.log(item)
-              this.$refs.child.formFields.img = item.url
-            })
-          }
+          this.$refs.child.formFields = obj
         }, 100)
       },
 
@@ -401,6 +393,11 @@
   }
 
   .table-img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .video-img {
     width: 50px;
     height: 50px;
   }

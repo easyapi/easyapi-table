@@ -50,7 +50,8 @@
       return {
         dialogVisible: false,
         fields: [],
-        styleObject: {}
+        styleObject: {},
+        input2: ''
       }
     },
     methods: {
@@ -61,6 +62,9 @@
         }
         this.$emit('getName', item.fields.name)
         this.dialogVisible = false
+      },
+      close() {
+
       }
     }
   }

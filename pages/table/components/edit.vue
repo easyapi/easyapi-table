@@ -9,7 +9,7 @@
       <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
         <el-form-item v-for="item in fieldList" :prop="item.key">
           <span class="formLabel">{{ item.name }}</span>
-          <div v-if="item.key=='img'" class="block">
+          <div v-if="item.type=='附件'&&item.key=='img'" class="block">
             <el-upload
               :data="dataObj"
               class="avatar-uploader"
@@ -17,7 +17,7 @@
               :multiple="false"
               :show-file-list="false"
               :on-success="handleAvatarSuccess">
-              <img v-if="formFields.img" :src="formFields.img+'!icon.jpg'" class="avatar">
+              <img v-if="formFields.img" v-for="url in formFields.img" :src="url.url+'!icon.jpg'" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
@@ -41,7 +41,7 @@
               <i v-else class="el-icon-plus video-uploader-icon"></i>
             </el-upload>
           </div>
-          <MarkdownEditor :ifChange="ifChange" v-if="item.type=='富文本'"
+          <MarkdownEditor v-if="item.type=='富文本'"
                           v-model="formFields[item.key]"></MarkdownEditor>
           <el-input v-if="item.type=='单行文本'&&item.key!='img'" v-model="formFields[item.key]" placeholder="请输入名称"/>
           <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
@@ -66,15 +66,15 @@
     data() {
       return {
         formFields: {
-          img: '',
+          img: [],
           content: '',
           video: ''
         },
+        content: '',
         title: '',
         dialogVisible: false,
         fieldList: '',
         sheetId: '',//服务商
-        ifChange: '',
         recordId: '',
         dataObj: { token: '', key: '' },
         videoFlag: false, //是否显示进度条
@@ -88,7 +88,7 @@
     },
     watch: {
       'formFields.content'(val) {
-
+        console.log(val)
       }
     },
 
