@@ -55,6 +55,7 @@
                                :label='item.name' :key="index">
                 <template slot-scope="scope">
                   <span v-if="item.type=='单行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type=='多行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
                   <span class="rich-text" v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
                   <!--<el-tag type="info" v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"-->

@@ -43,7 +43,14 @@
           </div>
           <MarkdownEditor v-if="item.type=='富文本'"
                           v-model="formFields[item.key]"></MarkdownEditor>
-          <el-input v-if="item.type=='单行文本'&&item.key!='img'" v-model="formFields[item.key]" placeholder="请输入名称"/>
+          <el-input v-if="item.type=='单行文本'&&item.key!='img'" v-model="formFields[item.key]" placeholder="请输入内容"/>
+          <el-input
+            v-if="item.type=='多行文本'&&item.key!='img'"
+            type="textarea"
+            autosize
+            placeholder="请输入内容"
+            v-model="formFields[item.key]">
+          </el-input>
           <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
         </el-form-item>
       </el-form>
