@@ -234,7 +234,6 @@
        */
       rowClick(row) {
         let obj = JSON.parse(JSON.stringify(row))
-        console.log(obj)
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.title = '编辑'

@@ -17,8 +17,9 @@
               :multiple="false"
               :show-file-list="false"
               :on-success="handleAvatarSuccess">
-              <img v-if="formFields.img" v-for="url in formFields.img" :src="url.url+'!icon.jpg'" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <i class="el-icon-plus avatar-uploader-icon border mg-rt-10"></i>
+              <img v-if="url.url" v-for="url in formFields.img" :src="url.url+'!icon.jpg'"
+                   class="avatar border mg-rt-10">
             </el-upload>
           </div>
           <div v-if="item.type=='附件'&&item.key=='video'" class="block">
@@ -52,6 +53,7 @@
             v-model="formFields[item.key]">
           </el-input>
           <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
+          <el-tag v-if="item.type=='关联表'" type="info" v-html="formFields[item.key]"></el-tag>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -75,7 +77,7 @@
         formFields: {
           img: [],
           content: '',
-          video: ''
+          video: []
         },
         content: '',
         title: '',
@@ -90,12 +92,24 @@
       }
     },
     mounted() {
-      this.getQiniuToken()
-      this.getQiniuKey()
+
     },
     watch: {
-      'formFields.content'(val) {
-        console.log(val)
+      'dialogVisible'(val) {
+        if (val) {
+          this.getQiniuToken()
+          this.getQiniuKey()
+        }
+      },
+      'formFields.img'(val) {
+        if (val == null) {
+          this.formFields.img = []
+        }
+      },
+      'formFields.video'(val) {
+        if (val == null) {
+          this.formFields.video = []
+        }
       }
     },
 
@@ -155,7 +169,10 @@
       handleAvatarSuccess(res, file) {
         let img = 'https://qiniu.easyapi.com/' + res.key
         file.url = img
-        this.formFields.img = img
+        let obj = {
+          url: img
+        }
+        this.formFields.img.push(obj)
       }
       ,
       close() {
@@ -165,19 +182,9 @@
       confirm(formName) {
         if (this.title === '新增') {
           let list = []
-          let video = []
-          video.push({
-            url: this.formFields.video
-          })
-          let img = []
-          img.push({
-            url: this.formFields.img
-          })
           let obj = {}
           let data = {
-            ...this.formFields,
-            video: video,
-            img: img
+            ...this.formFields
           }
           obj.fields = data
           obj.fields.video = video
@@ -190,19 +197,9 @@
           })
         } else {
           let list = []
-          let video = []
-          video.push({
-            url: this.formFields.video
-          })
-          let img = []
-          img.push({
-            url: this.formFields.img
-          })
           let obj = {}
           let data = {
-            ...this.formFields,
-            video: video,
-            img: img
+            ...this.formFields
           }
           obj.fields = data
           obj.recordId = this.recordId
@@ -221,7 +218,7 @@
 </script>
 
 <style lang="scss">
-  .avatar-uploader .el-upload {
+  .border {
     border: 1px dashed #d9d9d9;
     cursor: pointer;
     position: relative;
@@ -230,6 +227,10 @@
 
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
+  }
+
+  .avatar-uploader .el-upload {
+    display: flex;
   }
 
   .avatar-uploader-icon {
@@ -270,15 +271,8 @@
     border: 1px dashed #d9d9d9 !important;
   }
 
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9 !important;
-    border-radius: 6px !important;
-    position: relative !important;
-    overflow: hidden !important;
-  }
-
   .avatar-uploader .el-upload:hover {
-    border: 1px dashed #d9d9d9 !important;
+    /*border: 1px dashed #d9d9d9 !important;*/
     border-color: #409eff;
   }
 
