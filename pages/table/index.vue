@@ -58,9 +58,9 @@
                   <span v-if="item.type=='多行文本'&&item.key!='img'" v-html="scope.row[item.key]"></span>
                   <span class="rich-text" v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
-                  <!--<el-tag type="info" v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"-->
-                  <!--@click.stop="showTable(scope.row[item.key])"-->
-                  <!--v-html="Object.values(about.fields)[0]"></el-tag>-->
+                  <el-tag type="info" v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"
+                          @click.stop="showTable(scope.row[item.key])"
+                          v-html="Object.values(about.fields)[0]"></el-tag>
                   <el-tag v-if="item.type=='关联表'" @click.stop="showTable(scope.row[item.key])" type="info"
                           v-html="name?name:scope.row[item.key][0].fields.name"></el-tag>
                   <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
@@ -192,6 +192,7 @@
 
       },
       getFieldList(data) {
+        console.log(data)
         this.fieldList = data
       },
       getSheetId(data) {
@@ -296,7 +297,6 @@
       addProvider() {
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
-        console.log(this.fieldList)
         this.$refs.child.title = '新增'
         // this.$refs.child.ifChange = true
       },
@@ -323,8 +323,7 @@
         let { title } = item
         this.title = title
       }
-    }
-    ,
+    },
     mounted() {
       this.showHeader = this.$store.state.settings.showHeader === 'true'
       this.showSidebar = this.$store.state.settings.showSidebar === 'true'
