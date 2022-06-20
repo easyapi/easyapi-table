@@ -51,6 +51,8 @@ export const updateRecord = (data, sheetId, context) => {
  *
  * @see https://www.easyai.com
  */
-export const deleteRecord = (data, context) => {
-  return context.$axios.delete(`${tableUrl}/records`, data)
+export const deleteRecord = (data, sheetId, context) => {
+  return context.$axios.delete(`${tableUrl}/${sheetId}/records`, {
+    data:data
+  })
 }

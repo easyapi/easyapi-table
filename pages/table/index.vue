@@ -154,7 +154,7 @@
         },
         loadingData: false,
         tableText: '',
-        recordIds: '',
+        recordIds: [],
         name: ''//关联表选中的名字
       }
     },
@@ -246,6 +246,7 @@
       },
 
       handleSelectionChange(val) {
+        this.recordIds = []
         let ids = []
         if (val.length > 0) {
           this.ifDelete = true
@@ -253,10 +254,11 @@
           this.ifDelete = false
         }
         this.checkedLength = val.length
-        val.forEach(item => {
-          ids.push(item.recordId)
-        })
-        this.recordIds = ids.toString()
+        let obj = {}
+        for (let item of val) {
+          obj.recordId = item.recordId
+          this.recordIds.push(obj)
+        }
       },
 
       /**
@@ -264,9 +266,11 @@
        */
       batchRemove() {
         let data = this.recordIds
-        deleteRecord(data, this).then(res => {
+        console.log(data)
+        deleteRecord(data, this.sheetId, this).then(res => {
           if (res.data.code === 1) {
             this.$message.success('删除成功')
+            this.getRecordList()
           }
         })
       },
