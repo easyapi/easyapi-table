@@ -11,7 +11,8 @@
       prefix-icon="el-icon-search"
       v-model="input2">
     </el-input>
-    <div class="list" :style="styleObject" v-for="(item,index) in fields" @click="choice(item,index)">
+    <div class="list" :class="{active : active == index}" :style="styleObject" v-for="(item,index) in fields"
+         @click="choice(item,index)">
       <div class="list-left">
         <h2>{{item.fields.name}}</h2>
         <ul>
@@ -51,15 +52,14 @@
         dialogVisible: false,
         fields: [],
         styleObject: {},
-        input2: ''
+        input2: '',
+        active: ''
       }
     },
     methods: {
-      choice(item) {
-        console.log(item)
-        this.styleObject = {
-          border: '1px solid #a3e6ef'
-        }
+      choice(item, index) {
+        console.log(item, index)
+        this.active = index
         this.$emit('getName', item.fields.name)
         this.dialogVisible = false
       },
@@ -74,6 +74,10 @@
   .input {
     width: 50%;
     margin-bottom: 10px;
+  }
+
+  .active {
+    border: 1px solid #a3e6ef
   }
 
   .list {

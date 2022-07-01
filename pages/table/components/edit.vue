@@ -1,77 +1,89 @@
 <template>
-  <el-dialog
-    :title="title"
-    :close-on-click-modal="false"
-    :visible.sync="dialogVisible"
-    @close="close"
-    width="80%">
-    <div class="edit">
-      <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
-        <el-form-item v-for="item in fieldList" :prop="item.key">
-          <span class="formLabel">{{ item.name }}</span>
-          <div v-if="item.type=='附件'&&item.key=='img'" class="block">
-            <el-upload
-              :data="dataObj"
-              class="avatar-uploader"
-              action="https://upload.qiniup.com/"
-              :multiple="false"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess">
-              <i class="el-icon-plus avatar-uploader-icon border mg-rt-10"></i>
-              <img v-if="url.url" v-for="url in formFields.img" :src="url.url+'!icon.jpg'"
-                   class="avatar border mg-rt-10">
-            </el-upload>
-          </div>
-          <div v-if="item.type=='附件'&&item.key=='video'" class="block">
-            <el-upload
-              class="avatar-uploader"
-              action="https://upload.qiniup.com/"
-              :data="dataObj"
-              :on-progress="uploadVideoProcess"
-              :on-success="handleVideoSuccess"
-              :before-upload="beforeUploadVideo"
-              :show-file-list="false"
-            >
-              <video
-                v-if="formFields.video"
-                :src="formFields.video"
-                class="video video-avatar"
-                controls="controls">
-                您的浏览器不支持视频播放
-              </video>
-              <i v-else class="el-icon-plus video-uploader-icon"></i>
-            </el-upload>
-          </div>
-          <MarkdownEditor v-if="item.type=='富文本'"
-                          v-model="formFields[item.key]"></MarkdownEditor>
-          <el-input v-if="item.type=='单行文本'&&item.key!='img'" v-model="formFields[item.key]" placeholder="请输入内容"/>
-          <el-input
-            v-if="item.type=='多行文本'&&item.key!='img'"
-            type="textarea"
-            autosize
-            placeholder="请输入内容"
-            v-model="formFields[item.key]">
-          </el-input>
-          <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
-          <el-tag v-if="item.type=='关联表'" type="info" v-html="formFields[item.key]"></el-tag>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
+  <div>
+    <el-dialog
+      :title="title"
+      :close-on-click-modal="false"
+      :visible.sync="dialogVisible"
+      @close="close"
+      width="80%">
+      <div class="edit">
+        <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
+          <el-form-item v-for="item in fieldList" :prop="item.key">
+            <span class="formLabel">{{ item.name }}</span>
+            <div v-if="item.type=='附件'&&item.key=='img'" class="block">
+              <el-upload
+                :data="dataObj"
+                class="avatar-uploader"
+                action="https://upload.qiniup.com/"
+                :multiple="false"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess">
+                <i class="el-icon-plus avatar-uploader-icon border mg-rt-10"></i>
+                <img v-if="url.url" v-for="url in formFields.img" :src="url.url+'!icon.jpg'"
+                     class="avatar border mg-rt-10">
+              </el-upload>
+            </div>
+            <div v-if="item.type=='附件'&&item.key=='video'" class="block">
+              <el-upload
+                class="avatar-uploader"
+                action="https://upload.qiniup.com/"
+                :data="dataObj"
+                :on-progress="uploadVideoProcess"
+                :on-success="handleVideoSuccess"
+                :before-upload="beforeUploadVideo"
+                :show-file-list="false"
+              >
+                <video
+                  v-if="formFields.video"
+                  :src="formFields.video"
+                  class="video video-avatar"
+                  controls="controls">
+                  您的浏览器不支持视频播放
+                </video>
+                <i v-else class="el-icon-plus video-uploader-icon"></i>
+              </el-upload>
+            </div>
+            <MarkdownEditor v-if="item.type=='富文本'"
+                            v-model="formFields[item.key]"></MarkdownEditor>
+            <el-input v-if="item.type=='单行文本'&&item.key!='img'" v-model="formFields[item.key]" placeholder="请输入内容"/>
+            <el-input
+              v-if="item.type=='多行文本'&&item.key!='img'"
+              type="textarea"
+              autosize
+              placeholder="请输入内容"
+              v-model="formFields[item.key]">
+            </el-input>
+            <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
+            <div v-if="item.type=='关联表'">
+              <el-tag v-if="title=='编辑'" class="tag" v-for="about in formFields[item.key]" type="info"
+                      @click="showTable(about.sheetId)"
+                      v-html="name?name:Object.values(about.fields)[0]"></el-tag>
+              <!--<el-tag v-if="item.type=='关联表'" @click.stop="showTable(formFields[item.key])" type="info"-->
+              <!--v-html="name?name:formFields[item.key][0].fields.name"></el-tag>-->
+              <el-tag class="tag" type="info" @click="showTable(formFields[item.key])">+添加关联表</el-tag>
+            </div>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="confirm()">确 定</el-button>
   </span>
-    </div>
-  </el-dialog>
+      </div>
+    </el-dialog>
+    <AssociationTable ref="tableChild" @getName="getName"></AssociationTable>
+  </div>
 </template>
 
 <script>
   import { getQiniuKey, getQiniuToken } from '../../../api/qiniu'
-  import { creatRecord, updateRecord } from '../../../api/table'
+  import { creatRecord, updateRecord, getRecordList } from '../../../api/table'
   import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
+  import AssociationTable from '../components/association-table'
+
 
   export default {
     name: 'addCategory',
-    components: { MarkdownEditor },
+    components: { MarkdownEditor, AssociationTable },
     data() {
       return {
         formFields: {
@@ -88,7 +100,8 @@
         dataObj: { token: '', key: '' },
         videoFlag: false, //是否显示进度条
         videoUploadPercent: '', //进度条的进度，
-        isShowUploadVideo: false //显示上传按钮
+        isShowUploadVideo: false, //显示上传按钮
+        name: ''//关联表选中的名字
       }
     },
     mounted() {
@@ -152,6 +165,22 @@
           return false
         }
         this.isShowUploadVideo = false
+      },
+      /**
+       * 展示关联表
+       */
+      showTable(val) {
+        console.log(val)
+        let params = {}
+        getRecordList(params, val, this).then(res => {
+          if (res.data.code === 1) {
+            this.$refs.tableChild.dialogVisible = true
+            this.$refs.tableChild.fields = res.data.content
+          }
+        })
+      },
+      getName(data) {
+        this.name = data
       },
       //进度条
       uploadVideoProcess(event, file, fileList) {    //注意在data中添加对应的变量名
@@ -295,4 +324,10 @@
   /deep/ p img {
     display: block !important;
   }
+
+  .tag {
+    display: inline-block;
+    cursor: pointer;
+  }
+
 </style>

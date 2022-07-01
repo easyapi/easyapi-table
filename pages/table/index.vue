@@ -59,10 +59,8 @@
                   <span class="rich-text" v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
                   <el-tag type="info" v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"
-                          @click.stop="showTable(scope.row[item.key])"
+                          @click.stop="showTable(about.sheetId)"
                           v-html="Object.values(about.fields)[0]"></el-tag>
-                  <el-tag v-if="item.type=='关联表'" @click.stop="showTable(scope.row[item.key])" type="info"
-                          v-html="name?name:scope.row[item.key][0].fields.name"></el-tag>
                   <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
                        v-for="url in scope.row[item.key]"
                        :src="url.url+'!icon.jpg'"/>
@@ -98,7 +96,6 @@
         <div style='clear: both'></div>
         <Edit ref='child'></Edit>
         <AdvancedSearch ref="searchChild"></AdvancedSearch>
-        <AssociationTable ref="tableChild" @getName="getName"></AssociationTable>
       </div>
     </div>
   </div>
@@ -112,12 +109,11 @@
   import Edit from './components/edit.vue'
   import { getRecordList, deleteRecord } from '../../api/table'
   import AdvancedSearch from './components/advancedSearch'
-  import AssociationTable from './components/association-table'
+
 
   export default {
     name: '',
     components: {
-      AssociationTable,
       AdvancedSearch,
       Header,
       Aside,
@@ -155,7 +151,6 @@
         loadingData: false,
         tableText: '',
         recordIds: [],
-        name: ''//关联表选中的名字
       }
     },
     watch: {
@@ -184,9 +179,6 @@
       },
       close() {
         this.playvideo = ''
-      },
-      getName(data) {
-        this.name = data
       },
       handleClick() {
 
@@ -220,15 +212,6 @@
             this.pagination.total = 0
           }
         })
-      },
-      /**
-       * 展示关联表
-       */
-      showTable(val) {
-        console.log(val)
-        this.$refs.tableChild.dialogVisible = true
-        this.$refs.tableChild.fields = val
-        console.log(this.$refs.tableChild.fields)
       },
       /**
        * 表格行点击
