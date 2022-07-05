@@ -53,14 +53,14 @@
         fields: [],
         styleObject: {},
         input2: '',
-        active: ''
+        active: '',
       }
     },
     methods: {
       choice(item, index) {
         console.log(item, index)
         this.active = index
-        this.$emit('getName', item.fields.name)
+        this.$emit('getItem', item)
         this.dialogVisible = false
       },
       close() {

@@ -59,7 +59,6 @@
                   <span class="rich-text" v-if="item.type=='富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type=='数字'" v-html="scope.row[item.key]"></span>
                   <el-tag type="info" v-if="item.type=='关联表'" v-for="about in scope.row[item.key]"
-                          @click.stop="showTable(about.sheetId)"
                           v-html="Object.values(about.fields)[0]"></el-tag>
                   <img class="table-img" v-if="item.type=='附件'&&item.key=='img'"
                        v-for="url in scope.row[item.key]"
@@ -150,7 +149,7 @@
         },
         loadingData: false,
         tableText: '',
-        recordIds: [],
+        recordIds: []
       }
     },
     watch: {
@@ -184,7 +183,6 @@
 
       },
       getFieldList(data) {
-        console.log(data)
         this.fieldList = data
       },
       getSheetId(data) {
@@ -282,6 +280,7 @@
        * 新增服务商
        */
       addProvider() {
+        console.log(this.fieldList)
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.title = '新增'

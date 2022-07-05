@@ -55,12 +55,23 @@
             </el-input>
             <el-input v-if="item.type=='数字'" v-model="formFields[item.key]" placeholder="请输入名称"/>
             <div v-if="item.type=='关联表'">
-              <el-tag v-if="title=='编辑'" class="tag" v-for="about in formFields[item.key]" type="info"
-                      @click="showTable(about.sheetId)"
-                      v-html="name?name:Object.values(about.fields)[0]"></el-tag>
+              <el-tag class="tag" v-for="about in formFields[item.key]" type="info"
+                      @click="showTable(item.key,item,'修改')"
+                      v-html="about.fields.name"></el-tag>
+              <!--<el-tag class="tag" v-for="about in list" type="info"-->
+              <!--@click="showTable(item.key,item,'修改')"-->
+              <!--v-html="about.fields.name"></el-tag>-->
+              <!--<el-tag v-if="title=='编辑'" class="tag" v-for="about in formFields[item.key]" type="info"-->
+              <!--@click="showTable(item.key,formFields[item.key],'修改')"-->
+              <!--v-html="name?name:Object.values(about.fields)[0]"></el-tag>-->
               <!--<el-tag v-if="item.type=='关联表'" @click.stop="showTable(formFields[item.key])" type="info"-->
               <!--v-html="name?name:formFields[item.key][0].fields.name"></el-tag>-->
-              <el-tag class="tag" type="info" @click="showTable(formFields[item.key])">+添加关联表</el-tag>
+              <el-tag v-if="item.property.many&&title=='编辑'" class="tag" type="info"
+                      @click="showTable(item.key,item,'新增')">+添加
+              </el-tag>
+              <el-tag v-if="title=='新增'&&list.length<1" class="tag" type="info"
+                      @click="showTable(item.key,item,'新增')">+添加
+              </el-tag>
             </div>
           </el-form-item>
         </el-form>
@@ -70,7 +81,7 @@
   </span>
       </div>
     </el-dialog>
-    <AssociationTable ref="tableChild" @getName="getName"></AssociationTable>
+    <AssociationTable ref="tableChild" @getItem="getItem"></AssociationTable>
   </div>
 </template>
 
@@ -89,7 +100,8 @@
         formFields: {
           img: [],
           content: '',
-          video: []
+          video: [],
+          building: ''
         },
         content: '',
         title: '',
@@ -101,7 +113,9 @@
         videoFlag: false, //是否显示进度条
         videoUploadPercent: '', //进度条的进度，
         isShowUploadVideo: false, //显示上传按钮
-        name: ''//关联表选中的名字
+        name: '',//关联表选中的名字,
+        key: '',//记录关联表数据
+        list: []
       }
     },
     mounted() {
@@ -169,18 +183,31 @@
       /**
        * 展示关联表
        */
-      showTable(val) {
+      showTable(val, formFields, data) {
+        console.log(this.formFields)
         console.log(val)
+        console.log(formFields)
+        console.log(data)
+        this.key = val
+        this.type = data
+        let sheetId = formFields.property.sheet_id
         let params = {}
-        getRecordList(params, val, this).then(res => {
+        getRecordList(params, sheetId, this).then(res => {
           if (res.data.code === 1) {
             this.$refs.tableChild.dialogVisible = true
             this.$refs.tableChild.fields = res.data.content
           }
         })
       },
-      getName(data) {
-        this.name = data
+      getItem(data) {
+        if (this.type == '修改') {
+          this.formFields[this.key] = this.formFields[this.key].map(item => {
+            return item.id != data.id ? data : item
+          })
+        } else {
+          this.formFields[this.key] = []
+          this.formFields[this.key].push(data)
+        }
       },
       //进度条
       uploadVideoProcess(event, file, fileList) {    //注意在data中添加对应的变量名
@@ -216,7 +243,10 @@
             ...this.formFields
           }
           obj.fields = data
-          obj.fields.video = video
+          obj.fields[this.key] = obj.fields[this.key].map(item => {
+            return item.id
+          })
+          // obj.fields.video = video
           list.push(obj)
           creatRecord(list, this.sheetId, this).then(res => {
             if (res.data.code === 1) {
@@ -231,6 +261,10 @@
             ...this.formFields
           }
           obj.fields = data
+          obj.fields[this.key] = obj.fields[this.key].map(item => {
+            return item.id
+          })
+          // obj.fields[this.key].push(this.formFields[this.key].id)
           obj.recordId = this.recordId
           list.push(obj)
           updateRecord(list, this.sheetId, this).then(res => {
