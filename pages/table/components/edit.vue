@@ -253,7 +253,6 @@
           })
           // obj.fields.video = video
           list.push(obj)
-          console.log(list)
           creatRecord(list, this.sheetId, this).then(res => {
             if (res.data.code === 1) {
               this.$parent.getRecordList()
@@ -273,8 +272,6 @@
           // obj.fields[this.key].push(this.formFields[this.key].id)
           obj.recordId = this.recordId
           list.push(obj)
-          console.log(list)
-          return
           updateRecord(list, this.sheetId, this).then(res => {
             if (res.data.code === 1) {
               this.$parent.getRecordList()
