@@ -21,7 +21,7 @@
                         prefix-icon="el-icon-search" v-model="input2"></el-input>
               <el-button type="primary" size="small" plain @click="addMore">展开更多</el-button>
               <el-button icon="el-icon-menu" size="small" @click="openSearch">高级筛选</el-button>
-              <el-button type="primary" size="small" icon="el-icon-plus" @click="addProvider">添加数据</el-button>
+              <el-button type="primary" size="small" icon="el-icon-plus" @click="addProvider(sheetId)">添加数据</el-button>
             </div>
           </div>
         </div>
@@ -279,11 +279,12 @@
       /**
        * 新增服务商
        */
-      addProvider() {
+      addProvider(sheetId) {
         console.log(this.fieldList)
         this.$refs.child.dialogVisible = true
         this.$refs.child.fieldList = this.fieldList
         this.$refs.child.title = '新增'
+        this.$refs.child.sheetId = sheetId
         // this.$refs.child.ifChange = true
       },
       //分页
