@@ -248,9 +248,9 @@
             ...this.formFields
           }
           obj.fields = data
-          obj.fields[this.key] = obj.fields[this.key].map(item => {
+          obj.fields[this.key] ? obj.fields[this.key] = obj.fields[this.key].map(item => {
             return item.id
-          })
+          }) : ''
           // obj.fields.video = video
           list.push(obj)
           creatRecord(list, this.sheetId, this).then(res => {
