@@ -3,56 +3,66 @@ import { tableUrl } from './api'
 /**
  * 获取数据表格字段列表
  *
- * @param sheetId 数据表ID
+ * @param teamUrl EasyAPI团队URL
+ * @param projectCode EasyAPI项目编码
+ * @param sheetCode 数据表编码
  *
- * @see https://www.easyai.com
+ * @see https://www.easyapi.com
  */
-export const getFieldList = (params, sheetId, context) => {
-  return context.$axios.get(`${tableUrl}/${sheetId}/fields`, { params: { ...params } })
+export const getFieldList = (params, teamUrl, projectCode, sheetCode, context) => {
+  return context.$axios.get(`${tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/fields`, { params: { ...params } })
 }
 
 /**
- * 获取服务商列表
+ * 获取记录列表
  *
- * @param sheetId 数据表ID
+ * @param teamUrl EasyAPI团队URL
+ * @param projectCode EasyAPI项目编码
+ * @param sheetCode 数据表编码
  *
- * @see https://www.easyai.com
+ * @see https://www.easyapi.com
  */
-export const getRecordList = (params, sheetId, context) => {
-  return context.$axios.get(`${tableUrl}/${sheetId}/records`, { params: { ...params } })
+export const getRecordList = (params, teamUrl, projectCode, sheetCode, context) => {
+  return context.$axios.get(`${tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, { params: { ...params } })
 }
 
 /**
- * 添加服务商信息
+ * 创建记录
  *
- * @param sheetId 数据表ID
+ * @param teamUrl EasyAPI团队URL
+ * @param projectCode EasyAPI项目编码
+ * @param sheetCode 数据表编码
  *
- * @see https://www.easyai.com
+ * @see https://www.easyapi.com
  */
-export const creatRecord = (data, sheetId, context) => {
-  return context.$axios.post(`${tableUrl}/${sheetId}/records`, data)
+export const creatRecord = (data, teamUrl, projectCode, sheetCode, context) => {
+  return context.$axios.post(`${tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
 }
 
 /**
- * 修改服务商信息
+ * 修改记录
  *
- * @param sheetId 数据表ID
+ * @param teamUrl EasyAPI团队URL
+ * @param projectCode EasyAPI项目编码
+ * @param sheetCode 数据表编码
  *
- * @see https://www.easyai.com
+ * @see https://www.easyapi.com
  */
-export const updateRecord = (data, sheetId, context) => {
-  return context.$axios.put(`${tableUrl}/${sheetId}/records`, data)
+export const updateRecord = (data, teamUrl, projectCode, sheetCode, context) => {
+  return context.$axios.put(`${tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
 }
 
 /**
- * 删除服务商信息
+ * 删除记录
  *
- * @param sheetId 数据表ID
+ * @param teamUrl EasyAPI团队URL
+ * @param projectCode EasyAPI项目编码
+ * @param sheetCode 数据表编码
  *
- * @see https://www.easyai.com
+ * @see https://www.easyapi.com
  */
-export const deleteRecord = (data, sheetId, context) => {
-  return context.$axios.delete(`${tableUrl}/${sheetId}/records`, {
-    data:data
+export const deleteRecord = (data, teamUrl, projectCode, sheetCode, context) => {
+  return context.$axios.delete(`${tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, {
+    data: data
   })
 }

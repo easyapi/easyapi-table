@@ -1,7 +1,7 @@
 module.exports = {
   /*
-  ** Headers of the page
-  */
+   ** Headers of the page
+   */
   router: {
     extendRoutes(routes, resolve) {
       routes.push(
@@ -31,9 +31,7 @@ module.exports = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '{{escape description }}' }
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ],
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     script: []
   },
   css: [
@@ -52,11 +50,9 @@ module.exports = {
     { src: '@/plugins/commom.js', ssr: false }
   ],
   /*
-  ** Customize the progress bar color
-  */
-  modules: [
-    '@nuxtjs/axios'
-  ],
+   ** Customize the progress bar color
+   */
+  modules: ['@nuxtjs/axios'],
   axios: {},
   loading: {
     color: '#3B8070'
@@ -65,12 +61,11 @@ module.exports = {
     scss: './assets/scss/variables.scss'
   },
   /*
-  ** Build configuration
-  */
+   ** Build configuration
+   */
   build: {
     transpile: [/^element-ui/],
-    extend(config, ctx) {
-    },
+    extend(config, ctx) {},
     maxChunkSize: 300000, // 单个包最大尺寸
     extractCSS: true // 单独提取CSS
   },
