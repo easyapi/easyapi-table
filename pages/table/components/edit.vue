@@ -11,8 +11,8 @@
                   :data="dataObj"
                   action="https://upload.qiniup.com/"
                   :on-success="handleAvatarSuccess"
-                  @click="aaa()"
                   list-type="picture-card"
+                  :file-list="fileList"
                   :on-remove="handleRemove">
                   <i class="el-icon-plus"></i>
                   <!--<img v-if="url.url" v-for="url in formFields.img" :src="url.url + '!icon.jpg'" class="avatar border mg-rt-10" />-->
@@ -98,6 +98,7 @@ export default {
         video: [],
         building: ''
       },
+      fileList: [], //图片回显
       disabled: false,
       content: '',
       title: '',
@@ -122,6 +123,7 @@ export default {
       if (val) {
         // this.getQiniuToken()
         // this.getQiniuKey()
+        console.log(this.fieldList, 222)
         for (let a of this.fieldList) {
           if (a.type == '关联表') {
             this.key = a.key
@@ -137,6 +139,12 @@ export default {
     'formFields.video'(val) {
       if (val == null) {
         this.formFields.video = []
+      }
+    },
+    formFields(val) {
+      console.log(val)
+      if (val) {
+        this.fileList = val.img
       }
     }
   },
@@ -257,7 +265,9 @@ export default {
         list.push(obj)
         creatRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
-            this.$parent.getRecordList()
+            setTimeout(() => {
+              this.$parent.getRecordList()
+            }, 500)
             this.dialogVisible = false
           }
         })
@@ -269,11 +279,13 @@ export default {
         }
         obj.fields = data
         obj.fields[this.key] = obj.fields[this.key].map(item => {
-          return item.id
+          return item.recordId
         })
         // obj.fields[this.key].push(this.formFields[this.key].id)
         obj.recordId = this.recordId
         list.push(obj)
+        console.log(list)
+        return
         updateRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
             this.$parent.getRecordList()

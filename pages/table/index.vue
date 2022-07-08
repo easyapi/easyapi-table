@@ -246,11 +246,17 @@ export default {
     batchRemove() {
       let data = this.recordIds
       console.log(data)
-      deleteRecord(data, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
-        if (res.data.code === 1) {
-          this.$message.success('删除成功')
-          this.getRecordList()
-        }
+      this.$confirm('是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRecord(data, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
+          if (res.data.code === 1) {
+            this.$message.success('删除成功')
+            this.getRecordList()
+          }
+        })
       })
     },
 
