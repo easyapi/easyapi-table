@@ -141,7 +141,7 @@ export default {
     }
   },
   watch: {
-    sheetCode(val) {
+    teamUrl(val) {
       if (val) {
         this.getRecordList()
       }
@@ -172,9 +172,11 @@ export default {
       this.fieldList = data
     },
     getTeamUrl(data) {
+      console.log(data)
       this.teamUrl = data
     },
     getProjectCode(data) {
+      console.log(data)
       this.projectCode = data
     },
     getSheetCode(data) {
@@ -184,6 +186,7 @@ export default {
       this.headline = data
     },
     getRecordList() {
+      console.log(this.projectCode)
       this.providerList = []
       this.loadingData = true
       let params = {}
@@ -307,7 +310,7 @@ export default {
   mounted() {
     this.showHeader = this.$store.state.settings.showHeader === 'true'
     this.showSidebar = this.$store.state.settings.showSidebar === 'true'
-    if (this.$route.params.sheetCode && this.$route.params.projectId) {
+    if (this.$route.params.sheetCode && this.$route.params.projectCode) {
       this.sheetCode = this.$route.params.sheetCode
     } else {
       this.$router.push('/')

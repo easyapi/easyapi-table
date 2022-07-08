@@ -11,7 +11,7 @@ module.exports = {
           component: resolve(__dirname, 'pages/index')
         },
         {
-          path: '/:projectId/:sheetId',
+          path: '/:teamUrl/:projectCode/:sheetCode',
           name: 'table',
           component: resolve(__dirname, 'pages/table')
         },
