@@ -6,19 +6,28 @@
           <el-form-item v-for="item in fieldList" :prop="item.key">
             <span class="formLabel">{{ item.name }}</span>
             <div v-if="item.type == '附件' && item.key == 'img'" class="block">
-              <el-upload
-                :data="dataObj"
-                class="avatar-uploader"
-                action="https://upload.qiniup.com/"
-                :multiple="false"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess">
-                <img v-if="formFields.img" :src="formFields.img + '!icon.jpg'" class="avatar" />
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                <!--<i class="el-icon-plus avatar-uploader-icon border mg-rt-10"></i>-->
-                <!--<img v-if="url.url" v-for="url in formFields.img" :src="url.url+'!icon.jpg'"-->
-                <!--class="avatar border mg-rt-10">-->
-              </el-upload>
+              <div @click="getKeyAndToken">
+                <el-upload
+                  :data="dataObj"
+                  action="https://upload.qiniup.com/"
+                  :on-success="handleAvatarSuccess"
+                  @click="aaa()"
+                  list-type="picture-card"
+                  :on-remove="handleRemove">
+                  <i class="el-icon-plus"></i>
+                  <!--<img v-if="url.url" v-for="url in formFields.img" :src="url.url + '!icon.jpg'" class="avatar border mg-rt-10" />-->
+                </el-upload>
+              </div>
+              <!--<el-upload-->
+              <!--:data="dataObj"-->
+              <!--class="avatar-uploader"-->
+              <!--action="https://upload.qiniup.com/"-->
+              <!--:multiple="false"-->
+              <!--:show-file-list="false"-->
+              <!--:on-success="handleAvatarSuccess">-->
+              <!--<i class="el-icon-plus avatar-uploader-icon border mg-rt-10"></i>-->
+              <!--<img v-if="url.url" v-for="url in formFields.img" :src="url.url + '!icon.jpg'" class="avatar border mg-rt-10" />-->
+              <!--</el-upload>-->
             </div>
             <div v-if="item.type == '附件' && item.key == 'video'" class="block">
               <el-upload
@@ -89,6 +98,7 @@ export default {
         video: [],
         building: ''
       },
+      disabled: false,
       content: '',
       title: '',
       dialogVisible: false,
@@ -110,8 +120,8 @@ export default {
   watch: {
     dialogVisible(val) {
       if (val) {
-        this.getQiniuToken()
-        this.getQiniuKey()
+        // this.getQiniuToken()
+        // this.getQiniuKey()
         for (let a of this.fieldList) {
           if (a.type == '关联表') {
             this.key = a.key
@@ -132,6 +142,10 @@ export default {
   },
 
   methods: {
+    getKeyAndToken() {
+      this.getQiniuToken()
+      this.getQiniuKey()
+    },
     //获取七牛token
     getQiniuToken() {
       getQiniuToken(this)
@@ -171,15 +185,11 @@ export default {
      * 展示关联表
      */
     showTable(val, formFields, data) {
-      console.log(this.formFields)
-      console.log(val)
-      console.log(formFields)
-      console.log(data)
       this.key = val
       this.type = data
       let sheetCode = formFields.property.sheet_id
       let params = {}
-      getRecordList(params, sheetCode, this).then(res => {
+      getRecordList(params, this.teamUrl, this.projectCode, sheetCode, this).then(res => {
         if (res.data.code === 1) {
           this.$refs.tableChild.dialogVisible = true
           this.$refs.tableChild.fields = res.data.content
@@ -187,10 +197,13 @@ export default {
       })
     },
     getItem(data) {
+      console.log(data)
       if (this.type == '修改') {
+        console.log(this.formFields[this.key])
         this.formFields[this.key] = this.formFields[this.key].map(item => {
-          return item.id != data.id ? data : item
+          return item.recordId != data.recordId ? data : item
         })
+        console.log(this.formFields[this.key])
       } else {
         this.formFields[this.key] = []
         this.formFields[this.key].push(data)
@@ -211,12 +224,18 @@ export default {
       this.formFields.video = video
     },
     handleAvatarSuccess(res, file) {
+      console.log(res)
       let img = 'https://qiniu.easyapi.com/' + res.key
       file.url = img
       let obj = {
         url: img
       }
       this.formFields.img.push(obj)
+      console.log(this.formFields.img)
+    },
+    handleRemove(res, file) {
+      this.formFields.img.splice(this.formFields.img.findIndex(item => item.url === res.url))
+      console.log(this.formFields.img)
     },
     close() {
       this.formFields = {}
@@ -231,7 +250,7 @@ export default {
         obj.fields = data
         obj.fields[this.key]
           ? (obj.fields[this.key] = obj.fields[this.key].map(item => {
-              return item.id
+              return item.recordId
             }))
           : ''
         // obj.fields.video = video
@@ -274,6 +293,24 @@ export default {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+}
+
+.el-upload--picture-card {
+  width: 60px;
+  height: 60px;
+}
+
+.el-upload--picture-card i {
+  font-size: 28px;
+  color: #8c939d;
+  margin-bottom: 20px;
+  position: relative;
+  top: -38px;
+}
+
+.el-upload-list--picture-card .el-upload-list__item {
+  width: 60px;
+  height: 60px;
 }
 
 .avatar-uploader .el-upload:hover {

@@ -224,6 +224,7 @@ export default {
     },
 
     handleSelectionChange(val) {
+      console.log(val)
       this.recordIds = []
       let ids = []
       if (val.length > 0) {
