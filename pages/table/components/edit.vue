@@ -216,6 +216,7 @@ export default {
         this.formFields[this.key] = []
         this.formFields[this.key].push(data)
       }
+      console.log(this.formFields[this.key])
     },
     //进度条
     uploadVideoProcess(event, file, fileList) {
@@ -285,7 +286,6 @@ export default {
         obj.recordId = this.recordId
         list.push(obj)
         console.log(list)
-        return
         updateRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
             this.$parent.getRecordList()
