@@ -5,7 +5,7 @@ export default {
   useDefaultHTMLSanitizer: true,
   usageStatistics: false,
   hideModeSwitch: false,
-  // placeholder: '请输入描述',
+  placeholder: '',
   toolbarItems: [
     'heading',
     'bold',

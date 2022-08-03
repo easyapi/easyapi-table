@@ -7,8 +7,6 @@ export default {
   data() {
     return {}
   },
-  methods: {},
-  watch: {},
   mounted() {
     if (this.$route.query.accessToken) {
       localStorage.setItem('accessToken', this.$route.query.accessToken)

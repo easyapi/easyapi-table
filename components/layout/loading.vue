@@ -1,7 +1,7 @@
 <template>
-  <div id='LoadWrap' class='loading-wrapper'>
-    <img src='../../assets/images/loading.png' v-show='(this.page < this.totalPages-1)'/>
-    <span>{{ this.totalPages && (this.page < this.totalPages - 1) ? '正在加载...' : '已经到底了！！！' }}</span>
+  <div id="LoadWrap" class="loading-wrapper">
+    <img src="../../assets/images/loading.png" v-show="this.page < this.totalPages - 1" />
+    <span>{{ this.totalPages && this.page < this.totalPages - 1 ? '正在加载...' : '已经到底了！！！' }}</span>
   </div>
 </template>
 
@@ -10,22 +10,26 @@ export default {
   props: ['method', 'totalPages'],
   data() {
     return {
-      page: 0,
+      page: 0
     }
   },
   methods: {
     scroll() {
-      window.addEventListener('scroll', () => {
-        if (this.page >= this.totalPages - 1) {
-          return
-        }
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (this.page >= this.totalPages - 1) {
+            return
+          }
 
-        let topDistance = document.getElementById('LoadWrap').getBoundingClientRect().top
-        if (topDistance < 730) {
-          this.page++;
-          this.method(this.page)
-        }
-      }, false)
+          let topDistance = document.getElementById('LoadWrap').getBoundingClientRect().top
+          if (topDistance < 730) {
+            this.page++
+            this.method(this.page)
+          }
+        },
+        false
+      )
     }
   },
   mounted() {

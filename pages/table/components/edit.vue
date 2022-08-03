@@ -5,7 +5,7 @@
         <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
           <el-form-item v-for="item in fieldList" :prop="item.key">
             <span class="formLabel">{{ item.name }}</span>
-            <div v-if="item.type == '附件' && item.key == 'img'" class="block">
+            <div v-if="item.type === '附件' && item.key === 'img'" class="block">
               <div @click="getKeyAndToken">
                 <el-upload
                   :data="dataObj"
@@ -15,21 +15,10 @@
                   :file-list="fileList"
                   :on-remove="handleRemove">
                   <i class="el-icon-plus"></i>
-                  <!--<img v-if="url.url" v-for="url in formFields.img" :src="url.url + '!icon.jpg'" class="avatar border mg-rt-10" />-->
                 </el-upload>
               </div>
-              <!--<el-upload-->
-              <!--:data="dataObj"-->
-              <!--class="avatar-uploader"-->
-              <!--action="https://upload.qiniup.com/"-->
-              <!--:multiple="false"-->
-              <!--:show-file-list="false"-->
-              <!--:on-success="handleAvatarSuccess">-->
-              <!--<i class="el-icon-plus avatar-uploader-icon border mg-rt-10"></i>-->
-              <!--<img v-if="url.url" v-for="url in formFields.img" :src="url.url + '!icon.jpg'" class="avatar border mg-rt-10" />-->
-              <!--</el-upload>-->
             </div>
-            <div v-if="item.type == '附件' && item.key == 'video'" class="block">
+            <div v-if="item.type === '附件' && item.key === 'video'" class="block">
               <el-upload
                 class="avatar-uploader"
                 action="https://upload.qiniup.com/"
@@ -42,32 +31,24 @@
                 <i v-else class="el-icon-plus video-uploader-icon"></i>
               </el-upload>
             </div>
-            <MarkdownEditor v-if="item.type == '富文本'" v-model="formFields[item.key]"></MarkdownEditor>
-            <el-input v-if="item.type == '单行文本' && item.key != 'img'" v-model="formFields[item.key]" placeholder="请输入内容" />
+            <MarkdownEditor v-if="item.type === '富文本'" v-model="formFields[item.key]"></MarkdownEditor>
+            <el-input v-if="item.type === '单行文本' && item.key !== 'img'" v-model="formFields[item.key]" placeholder="请输入内容" />
             <el-input
-              v-if="item.type == '多行文本' && item.key != 'img'"
+              v-if="item.type === '多行文本' && item.key !== 'img'"
               type="textarea"
               autosize
               placeholder="请输入内容"
               v-model="formFields[item.key]"></el-input>
-            <el-input v-if="item.type == '数字'" v-model="formFields[item.key]" placeholder="请输入名称" />
-            <div v-if="item.type == '关联表'">
+            <el-input v-if="item.type === '数字'" v-model="formFields[item.key]" placeholder="请输入名称" />
+            <div v-if="item.type === '关联表'">
               <el-tag
                 class="tag"
                 v-for="about in formFields[item.key]"
                 type="info"
                 @click="showTable(item.key, item, '修改')"
                 v-html="about.fields.name"></el-tag>
-              <!--<el-tag class="tag" v-for="about in list" type="info"-->
-              <!--@click="showTable(item.key,item,'修改')"-->
-              <!--v-html="about.fields.name"></el-tag>-->
-              <!--<el-tag v-if="title=='编辑'" class="tag" v-for="about in formFields[item.key]" type="info"-->
-              <!--@click="showTable(item.key,formFields[item.key],'修改')"-->
-              <!--v-html="name?name:Object.values(about.fields)[0]"></el-tag>-->
-              <!--<el-tag v-if="item.type=='关联表'" @click.stop="showTable(formFields[item.key])" type="info"-->
-              <!--v-html="name?name:formFields[item.key][0].fields.name"></el-tag>-->
-              <el-tag v-if="item.property.many && title == '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
-              <el-tag v-if="title == '新增' && list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
+              <el-tag v-if="item.property.many && title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
+              <el-tag v-if="title === '新增' && list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
             </div>
           </el-form-item>
         </el-form>
@@ -117,15 +98,11 @@ export default {
       list: []
     }
   },
-  mounted() {},
   watch: {
     dialogVisible(val) {
       if (val) {
-        // this.getQiniuToken()
-        // this.getQiniuKey()
-        console.log(this.fieldList, 222)
         for (let a of this.fieldList) {
-          if (a.type == '关联表') {
+          if (a.type === '关联表') {
             this.key = a.key
           }
         }
@@ -142,7 +119,6 @@ export default {
       }
     },
     formFields(val) {
-      console.log(val)
       if (val) {
         this.fileList = val.img
       }
@@ -154,7 +130,9 @@ export default {
       this.getQiniuToken()
       this.getQiniuKey()
     },
-    //获取七牛token
+    /**
+     * 获取七牛token
+     */
     getQiniuToken() {
       getQiniuToken(this)
         .then(res => {
@@ -178,7 +156,7 @@ export default {
       this.getQiniuKey()
       var fileSize = file.size / 1024 / 1024 < 50 //控制大小  修改50的值即可
       if (
-        ['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) == -1 //控制格式
+        ['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) === -1 //控制格式
       ) {
         layer.msg('请上传正确的视频格式')
         return false
@@ -205,26 +183,26 @@ export default {
       })
     },
     getItem(data) {
-      console.log(data)
-      if (this.type == '修改') {
-        console.log(this.formFields[this.key])
+      if (this.type === '修改') {
         this.formFields[this.key] = this.formFields[this.key].map(item => {
-          return item.recordId != data.recordId ? data : item
+          return item.recordId !== data.recordId ? data : item
         })
-        console.log(this.formFields[this.key])
       } else {
         this.formFields[this.key] = []
         this.formFields[this.key].push(data)
       }
-      console.log(this.formFields[this.key])
     },
-    //进度条
+    /**
+     * 进度条
+     */
     uploadVideoProcess(event, file, fileList) {
       //注意在data中添加对应的变量名
       this.videoFlag = true
       this.videoUploadPercent = file.percentage.toFixed(0) * 1
     },
-    //上传成功回调
+    /**
+     * 上传成功回调
+     */
     handleVideoSuccess(res, file) {
       this.isShowUploadVideo = true
       this.videoFlag = false
@@ -233,7 +211,6 @@ export default {
       this.formFields.video = video
     },
     handleAvatarSuccess(res, file) {
-      console.log(res)
       let img = 'https://qiniu.easyapi.com/' + res.key
       file.url = img
       let obj = {
@@ -262,7 +239,6 @@ export default {
               return item.recordId
             }))
           : ''
-        // obj.fields.video = video
         list.push(obj)
         creatRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
@@ -282,10 +258,8 @@ export default {
         obj.fields[this.key] = obj.fields[this.key].map(item => {
           return item.recordId
         })
-        // obj.fields[this.key].push(this.formFields[this.key].id)
         obj.recordId = this.recordId
         list.push(obj)
-        console.log(list)
         updateRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
             this.$parent.getRecordList()
@@ -372,7 +346,6 @@ export default {
 }
 
 .avatar-uploader .el-upload:hover {
-  /*border: 1px dashed #d9d9d9 !important;*/
   border-color: #409eff;
 }
 

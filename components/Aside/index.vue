@@ -32,10 +32,6 @@ export default {
   mounted() {
     this.showSidebar = this.$store.state.settings.showSidebar === 'true'
     this.activePath = this.$route.path ? `${this.$route.path}` : '/:teamUrl/:projectCode/:sheetCode'
-    // localStorage.setItem('teamUrl', this.$route.params.teamUrl)
-    // localStorage.setItem('projectCode', this.$route.params.projectCode)
-    // localStorage.setItem('sheetCode', this.$route.params.sheetCode)
-    console.log(this.$route.params.teamUrl, 111)
     this.getFields(this.$route.params.teamUrl, this.$route.params.projectCode, this.$route.params.sheetCode)
   },
   methods: {

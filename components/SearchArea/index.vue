@@ -11,8 +11,7 @@
         @open="open"
         @search="search"
         @reset="reset"
-        :ref="item.key"
-      />
+        :ref="item.key" />
     </el-row>
   </div>
 </template>
@@ -23,16 +22,16 @@ export default {
   props: {
     items: {
       type: Array,
-      default: [],
-    },
+      default: []
+    }
   },
   data() {
     return {
       innerWidth: null,
       allShow: false,
       buttons: {
-        type: 'buttons',
-      },
+        type: 'buttons'
+      }
     }
   },
   components: { Item },
@@ -49,24 +48,24 @@ export default {
       this.setItems()
     },
     search() {
-      let obj = {}
-      this.items.map((item) => {
+      let params = {}
+      this.items.map(item => {
         if (item.value) {
-          obj[item.key] = item.value
+          params[item.key] = item.value
         }
       })
-      this.$emit('search', obj)
+      this.$emit('search', params)
     },
     reset() {
       let items = this.items
       let doms = []
-      items.map((item) => {
+      items.map(item => {
         if (item.key) {
           let dom = this.$refs[item.key]
           doms.push(dom)
         }
       })
-      doms.map((item) => {
+      doms.map(item => {
         let dom = item[0].$children[0].$children[0]
         if (dom.handleClear) {
           dom.handleClear()
@@ -74,7 +73,7 @@ export default {
           dom.reset()
         }
       })
-      items.forEach((item) => {
+      items.forEach(item => {
         item.value = null
       })
       this.items = items
@@ -84,17 +83,17 @@ export default {
       this.setItems()
     },
     event(item) {
-      let obj = {}
-      this.items.map((item) => {
+      let params = {}
+      this.items.map(item => {
         if (item.value) {
-          obj[item.key] = item.value
+          params[item.key] = item.value
         }
       })
-      this.$emit('event', obj)
+      this.$emit('event', params)
     },
     setItems() {
       let { items, innerWidth, buttons } = this
-      let index = items.findIndex((item) => {
+      let index = items.findIndex(item => {
         return item.type === 'buttons'
       })
       if (index !== -1) {
@@ -138,8 +137,8 @@ export default {
         }
       })
       this.items = items
-    },
-  },
+    }
+  }
 }
 </script>
 <style scoped>
