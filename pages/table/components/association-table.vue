@@ -30,7 +30,7 @@
 
 <script>
 export default {
-  name: 'association-table',
+  name: 'AssociationTable',
   data() {
     return {
       dialogVisible: false,

@@ -80,8 +80,8 @@
           :total-elements="pagination.total"
           class="paging"></Pagination>
         <div style="clear: both"></div>
-        <Edit ref="child"></Edit>
-        <AdvancedSearch ref="searchChild"></AdvancedSearch>
+        <edit ref="child"></edit>
+        <advanced-search ref="searchChild"></advanced-search>
       </div>
     </div>
   </div>
@@ -94,7 +94,7 @@ import Pagination from '../../components/Pagination/index'
 import SearchArea from '../../components/SearchArea'
 import Edit from './components/edit.vue'
 import { getRecordList, deleteRecord } from '../../api/table'
-import AdvancedSearch from './components/advancedSearch'
+import AdvancedSearch from './components/advanced-search'
 
 export default {
   name: '',

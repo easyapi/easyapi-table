@@ -29,7 +29,7 @@
 
 <script>
 export default {
-  name: 'advancedSearch',
+  name: 'AdvancedSearch',
   data() {
     return {
       conditionList: [],

@@ -69,7 +69,7 @@ import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
 import AssociationTable from '../components/association-table'
 
 export default {
-  name: 'addCategory',
+  name: 'Edit',
   components: { MarkdownEditor, AssociationTable },
   data() {
     return {
