@@ -42,7 +42,6 @@ export default {
   },
   methods: {
     choice(item, index) {
-      console.log(item, index)
       this.active = index
       this.$emit('getItem', item)
       this.dialogVisible = false

@@ -59,11 +59,10 @@ export default {
   computed: {},
   watch: {
     value(newValue, preValue) {
-      console.log(newValue)
       if (this.value !== '') {
         this.$refs.toastuiEditor.invoke('setHTML', this.value)
       }
-      if (this.value == '') {
+      if (this.value === '') {
         this.$refs.toastuiEditor.invoke('setHTML', this.value)
       }
     }

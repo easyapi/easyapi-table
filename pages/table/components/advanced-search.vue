@@ -12,7 +12,7 @@
         <el-option v-for="child in options" :key="child.value" :label="child.label" :value="child.value"></el-option>
       </el-select>
       <el-input style="width: 400px" size="small" placeholder="多个条件请用；隔开"></el-input>
-      <i @click="detele(index)" class="el-icon-delete-solid cursor mg-lf-15"></i>
+      <i @click="deleteRecord(index)" class="el-icon-delete-solid cursor mg-lf-15"></i>
       <el-checkbox class="mg-lf-15" v-model="item.checked">外露</el-checkbox>
     </div>
     <p @click="addMore" class="mg-tp-15 cursor">
@@ -84,7 +84,7 @@ export default {
     }
   },
   methods: {
-    detele(index) {
+    deleteRecord(index) {
       this.$confirm('您确定要删除这一条数据?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

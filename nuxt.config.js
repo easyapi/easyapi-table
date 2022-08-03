@@ -4,24 +4,11 @@ module.exports = {
    */
   router: {
     extendRoutes(routes, resolve) {
-      routes.push(
-        {
-          path: '/:teamUrl/:projectCode/:sheetCode',
-          name: 'table',
-          component: resolve(__dirname, 'pages/table')
-        },
-        {
-          path: '/',
-          redirect: '/',
-          name: 'index',
-          component: resolve(__dirname, 'pages/index')
-        },
-        {
-          path: '/access-token',
-          name: 'AccessToken',
-          component: resolve(__dirname, 'pages/access-token')
-        }
-      )
+      routes.push({
+        path: '/:teamUrl/:projectCode/:sheetCode',
+        name: 'table',
+        component: resolve(__dirname, 'pages/table')
+      })
     }
   },
 
@@ -66,8 +53,7 @@ module.exports = {
    */
   build: {
     transpile: [/^element-ui/],
-    extend(config, ctx) {
-    },
+    extend(config, ctx) {},
     maxChunkSize: 300000, // 单个包最大尺寸
     extractCSS: true // 单独提取CSS
   },

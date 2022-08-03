@@ -147,9 +147,6 @@ export default {
         .then(res => {
           this.dataObj.key = res.data.content.key
         })
-        .catch(error => {
-          console.log(error.response)
-        })
     },
     beforeUploadVideo(file) {
       this.getQiniuToken()
@@ -217,11 +214,9 @@ export default {
         url: img
       }
       this.formFields.img.push(obj)
-      console.log(this.formFields.img)
     },
     handleRemove(res, file) {
       this.formFields.img.splice(this.formFields.img.findIndex(item => item.url === res.url))
-      console.log(this.formFields.img)
     },
     close() {
       this.formFields = {}
