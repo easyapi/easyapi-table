@@ -9,10 +9,6 @@ const user = {
     photo: '',
     mobile: '',
     email: '',
-    team: '',
-    teamName: '',
-    teamImg: '',
-    userTeam: '',
     token: Cookies.get('authenticationToken')
   },
 
@@ -35,27 +31,20 @@ const user = {
     SET_EMAIL: (state, email) => {
       state.email = email
     },
-    SET_TEAM: (state, team) => {
-      state.team = team
-    },
-    SET_TEAM_NAME: (state, teamName) => {
-      state.teamName = teamName
-    },
-    SET_TEAM_IMG: (state, teamImg) => {
-      state.teamImg = teamImg
-    },
-    SET_USER_TEAM: (state, userTeam) => {
-      state.userTeam = userTeam
-    },
     SET_TOKEN: (state, token) => {
       state.token = token
     }
   },
 
   actions: {
-    // 用户名登录
+    /**
+     * 用户名登录
+     */
     LoginByUsername({ commit }, userInfo) {},
-    // 获取用户信息
+
+    /**
+     * 获取用户信息
+     */
     GetUserInfo({ commit }) {
       getUser()
         .then(res => {
@@ -66,10 +55,6 @@ const user = {
           commit('SET_PHOTO', userInfoData.photo)
           commit('SET_MOBILE', userInfoData.mobile)
           commit('SET_EMAIL', userInfoData.email)
-          commit('SET_TEAM', userInfoData.team)
-          commit('SET_TEAM_NAME', userInfoData.team.name)
-          commit('SET_TEAM_IMG', userInfoData.team.img || '')
-          commit('SET_USER_TEAM', userInfoData.userTeam)
         })
         .catch(error => {
           // Cookies.remove('authenticationToken')
