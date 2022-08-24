@@ -1,4 +1,4 @@
-import './index.scss'
+import './_sheetCode.scss'
 
 import Header from '../../../components/Header'
 import Aside from '../../../components/Aside'
@@ -9,7 +9,7 @@ import { getRecordList, deleteRecord } from '../../../api/table'
 import AdvancedSearch from './components/advanced-search'
 
 export default {
-  name: '',
+  name: 'RecordList',
   components: {
     AdvancedSearch,
     Header,

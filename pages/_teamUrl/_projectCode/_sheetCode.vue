@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import Index from './index'
+import _SheetCode from './_sheetCode'
 
-export default Index
+export default _SheetCode
 </script>
