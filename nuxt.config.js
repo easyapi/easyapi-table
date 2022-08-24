@@ -2,16 +2,6 @@ module.exports = {
   /*
    ** Headers of the page
    */
-  router: {
-    extendRoutes(routes, resolve) {
-      routes.push({
-        path: '/:teamUrl/:projectCode/:sheetCode',
-        name: 'table',
-        component: resolve(__dirname, 'pages/table')
-      })
-    }
-  },
-
   head: {
     title: '{{ name }} - EasyAPI数据表格',
     meta: [

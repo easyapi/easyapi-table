@@ -64,7 +64,7 @@
                     v-for="url in scope.row[item.key]"
                     @click.stop="showVideo(url.url)"
                     class="video-img"
-                    src="../../assets/images/video.svg" />
+                    src="../../../assets/images/video.svg" />
                   <el-dialog title="视频预览" width="50%" append-to-body top="20px" :visible.sync="dialogVisible" @close="close">
                     <video width="100%" autoplay="autoplay" :src="playvideo" :poster="playvideo" controls="controls" id="video" preload ref="vueRef"></video>
                   </el-dialog>

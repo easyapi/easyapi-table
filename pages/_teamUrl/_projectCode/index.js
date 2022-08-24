@@ -1,11 +1,11 @@
 import './index.scss'
 
-import Header from '../../components/Header/index.vue'
-import Aside from '../../components/Aside/index.vue'
-import Pagination from '../../components/Pagination/index'
-import SearchArea from '../../components/SearchArea'
+import Header from '../../../components/Header'
+import Aside from '../../../components/Aside'
+import Pagination from '../../../components/Pagination'
+import SearchArea from '../../../components/SearchArea'
 import Edit from './components/edit.vue'
-import { getRecordList, deleteRecord } from '../../api/table'
+import { getRecordList, deleteRecord } from '../../../api/table'
 import AdvancedSearch from './components/advanced-search'
 
 export default {

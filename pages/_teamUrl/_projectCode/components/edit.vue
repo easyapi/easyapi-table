@@ -63,10 +63,10 @@
 </template>
 
 <script>
-import { getQiniuKey, getQiniuToken } from '../../../api/qiniu'
-import { creatRecord, updateRecord, getRecordList } from '../../../api/table'
-import MarkdownEditor from '../../../components/MarkdownEditor/index.vue'
-import AssociationTable from '../components/association-table'
+import { getQiniuKey, getQiniuToken } from '../../../../api/qiniu'
+import { creatRecord, updateRecord, getRecordList } from '../../../../api/table'
+import MarkdownEditor from '../../../../components/MarkdownEditor'
+import AssociationTable from './association-table'
 
 export default {
   name: 'Edit',
