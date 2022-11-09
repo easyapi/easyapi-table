@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="关联表" :close-on-click-modal="false" :visible.sync="dialogVisible" @close="close" width="50%">
     <el-input class="input" placeholder="搜索你想关联的内容" prefix-icon="el-icon-search" v-model="input2"></el-input>
-    <div class="list" :class="{ active: active === index }" :style="styleObject" v-for="(item, index) in fields" @click="choice(item, index)">
+    <div class="list" :class="{ active: active === index }" :style="styleObject" v-for="(item, index) in fields" :key="index" @click="choice(item, index)">
       <div class="list-left">
         <h2>{{ item.fields.name }}</h2>
         <ul>
@@ -23,7 +23,7 @@
           </li>
         </ul>
       </div>
-      <el-image v-for="img in item.fields.img" class="list-right" style="width: 100px; height: 100px" :src="img.url" fit="cover"></el-image>
+      <el-image v-for="img in item.fields.img" :key="img" class="list-right" style="width: 100px; height: 100px" :src="img.url" fit="cover"></el-image>
     </div>
   </el-dialog>
 </template>

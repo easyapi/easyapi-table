@@ -57,14 +57,19 @@
                   <span v-if="item.type === '多行文本' && item.key !== 'img'" v-html="scope.row[item.key]"></span>
                   <span class="rich-text" v-if="item.type === '富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type === '数字'" v-html="scope.row[item.key]"></span>
-                  <el-tag type="info" v-if="item.type === '关联表'" v-for="about in scope.row[item.key]" v-html="Object.values(about.fields)[0]"></el-tag>
-                  <img class="table-img" v-if="item.type === '附件' && item.key === 'img'" v-for="url in scope.row[item.key]" :src="url.url + '!icon.jpg'" />
-                  <img
-                    v-if="item.type === '附件' && item.key === 'video'"
-                    v-for="url in scope.row[item.key]"
-                    @click.stop="showVideo(url.url)"
-                    class="video-img"
-                    src="../../../assets/images/video.svg" />
+                  <div v-for="about in scope.row[item.key]" :key="about">
+                    <el-tag type="info" v-if="item.type === '关联表'" v-html="Object.values(about.fields)[0]"></el-tag>
+                  </div>
+                  <div v-for="url in scope.row[item.key]" :src="url.url + '!icon.jpg'" :key="url">
+                    <img class="table-img" v-if="item.type === '附件' && item.key === 'img'" />
+                  </div>
+                  <div v-for="url in scope.row[item.key]" :key="url">
+                    <img
+                      v-if="item.type === '附件' && item.key === 'video'"
+                      @click.stop="showVideo(url.url)"
+                      class="video-img"
+                      src="../../../assets/images/video.svg" />
+                  </div>
                   <el-dialog title="视频预览" width="50%" append-to-body top="20px" :visible.sync="dialogVisible" @close="close">
                     <video width="100%" autoplay="autoplay" :src="playvideo" :poster="playvideo" controls="controls" id="video" preload ref="vueRef"></video>
                   </el-dialog>

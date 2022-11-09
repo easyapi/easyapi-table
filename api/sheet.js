@@ -23,5 +23,5 @@ export const getSheet = (params, teamUrl, projectCode, sheetCode, context) => {
  * @see https://www.easyapi.com
  */
 export const getSheetById = (params, teamUrl, projectCode, sheetId, context) => {
-  return context.$axios.get(`${tableUrl}/${teamUrl}/${projectCode}/sheet/id-${sheetCode}`, { params: { params } })
+  return context.$axios.get(`${tableUrl}/${teamUrl}/${projectCode}/sheet/id-${sheetId}`, { params: { params } })
 }

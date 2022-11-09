@@ -3,7 +3,7 @@
     <el-dialog :title="title" :close-on-click-modal="false" :visible.sync="dialogVisible" @close="close" width="80%">
       <div class="edit">
         <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
-          <el-form-item v-for="item in fieldList" :prop="item.key">
+          <el-form-item v-for="item in fieldList" :key="item" :prop="item.key">
             <span class="formLabel">{{ item.name }}</span>
             <div v-if="item.type === '附件' && item.key === 'img'" class="block">
               <div @click="getKeyAndToken">
@@ -44,6 +44,7 @@
               <el-tag
                 class="tag"
                 v-for="about in formFields[item.key]"
+                :key="about"
                 type="info"
                 @click="showTable(item.key, item, '修改')"
                 v-html="about.fields.name"></el-tag>
@@ -65,6 +66,7 @@
 <script>
 import { getQiniuKey, getQiniuToken } from '../../../../api/qiniu'
 import { creatRecord, updateRecord, getRecordList } from '../../../../api/table'
+import { getSheetById } from '../../../../api/sheet'
 import MarkdownEditor from '../../../../components/MarkdownEditor'
 import AssociationTable from './association-table'
 
@@ -143,10 +145,9 @@ export default {
         })
     },
     getQiniuKey() {
-      getQiniuKey(this)
-        .then(res => {
-          this.dataObj.key = res.data.content.key
-        })
+      getQiniuKey(this).then(res => {
+        this.dataObj.key = res.data.content.key
+      })
     },
     beforeUploadVideo(file) {
       this.getQiniuToken()
@@ -170,16 +171,22 @@ export default {
     showTable(val, formFields, data) {
       this.key = val
       this.type = data
-      let sheetCode = formFields.property.sheet_id
+      let sheetId = formFields.property.sheet_id
       let params = {}
-      getRecordList(params, this.teamUrl, this.projectCode, sheetCode, this).then(res => {
-        if (res.data.code === 1) {
-          this.$refs.tableChild.dialogVisible = true
-          this.$refs.tableChild.fields = res.data.content
+      getSheetById(params, this.teamUrl, this.projectCode, sheetId, this).then(res => {
+        if (res.data.code == 1) {
+          let sheetCode = res.data.content.code
+          getRecordList(params, this.teamUrl, this.projectCode, sheetCode, this).then(res => {
+            if (res.data.code === 1) {
+              this.$refs.tableChild.dialogVisible = true
+              this.$refs.tableChild.fields = res.data.content
+            }
+          })
         }
       })
     },
     getItem(data) {
+      console.log(data)
       if (this.type === '修改') {
         this.formFields[this.key] = this.formFields[this.key].map(item => {
           return item.recordId !== data.recordId ? data : item
@@ -360,7 +367,7 @@ export default {
 }
 </style>
 <style scoped>
-/deep/ p img {
+p img {
   display: block !important;
 }
 

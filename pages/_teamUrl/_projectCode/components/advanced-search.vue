@@ -4,7 +4,7 @@
       筛选条件
       <i class="el-icon-question"></i>
     </p>
-    <div class="flex-r mg-tp-15 align-center" v-for="(item, index) in conditionList">
+    <div class="flex-r mg-tp-15 align-center" v-for="(item, index) in conditionList" :key="index">
       <el-select size="small" v-model="item.fieldValue" placeholder="请选择要筛选的字段名">
         <el-option v-for="field in fieldList" :key="field.value" :label="field.label" :value="field.value"></el-option>
       </el-select>
