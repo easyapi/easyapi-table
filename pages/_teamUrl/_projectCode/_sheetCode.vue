@@ -53,16 +53,19 @@
             <template>
               <el-table-column v-for="(item, index) in fieldList" :show-overflow-tooltip="item.type !== '富文本'" :label="item.name" :key="index">
                 <template slot-scope="scope">
-                  <span v-if="item.type === '单行文本' && item.key !== 'img'" v-html="scope.row[item.key]"></span>
-                  <span v-if="item.type === '多行文本' && item.key !== 'img'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type === '单选'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type === '单行文本'" v-html="scope.row[item.key]"></span>
+                  <span v-if="item.type === '多行文本'" v-html="scope.row[item.key]"></span>
                   <span class="rich-text" v-if="item.type === '富文本'" v-html="scope.row[item.key]"></span>
                   <span v-if="item.type === '数字'" v-html="scope.row[item.key]"></span>
                   <div v-for="about in scope.row[item.key]" :key="about">
                     <el-tag type="info" v-if="item.type === '关联表'" v-html="Object.values(about.fields)[0]"></el-tag>
                   </div>
+
                   <div v-for="url in scope.row[item.key]" :src="url.url + '!icon.jpg'" :key="url">
-                    <img class="table-img" v-if="item.type === '附件' && item.key === 'img'" />
+                    <img class="table-img" v-if="item.type === '附件' && item.key === 'imgs'" />
                   </div>
+
                   <div v-for="url in scope.row[item.key]" :key="url">
                     <img
                       v-if="item.type === '附件' && item.key === 'video'"

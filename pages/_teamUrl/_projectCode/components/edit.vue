@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-dialog :title="title" :close-on-click-modal="false" :visible.sync="dialogVisible" @close="close" width="80%">
+    <el-dialog :title="title" :close-on-click-modal="false" custom-class="edit-dialog" :visible.sync="dialogVisible" @close="close" width="80%">
       <div class="edit">
-        <el-form ref="form" size="mini" :model="formFields" label-width="120px" label-position="top" :inline="true">
-          <el-form-item v-for="item in fieldList" :key="item" :prop="item.key">
-            <span class="formLabel">{{ item.name }}</span>
-            <div v-if="item.type === '附件' && item.key === 'img'" class="block">
+        <el-form ref="form" size="small" :model="formFields" label-width="120px" label-position="right" :inline="true">
+          <el-form-item v-for="item in fieldList" :key="item" :prop="item.key" :label="item.name + ':'">
+            <!-- 附件：图片 -->
+            <div v-if="item.type === '附件' && item.key === 'imgs'" class="block">
               <div @click="getKeyAndToken">
                 <el-upload
                   :data="dataObj"
@@ -18,6 +18,7 @@
                 </el-upload>
               </div>
             </div>
+            <!-- 附件：视频 -->
             <div v-if="item.type === '附件' && item.key === 'video'" class="block">
               <el-upload
                 class="avatar-uploader"
@@ -31,15 +32,15 @@
                 <i v-else class="el-icon-plus video-uploader-icon"></i>
               </el-upload>
             </div>
+            <!-- 富文本 -->
             <MarkdownEditor v-if="item.type === '富文本'" v-model="formFields[item.key]"></MarkdownEditor>
-            <el-input v-if="item.type === '单行文本' && item.key !== 'img'" v-model="formFields[item.key]" placeholder="请输入内容" />
-            <el-input
-              v-if="item.type === '多行文本' && item.key !== 'img'"
-              type="textarea"
-              autosize
-              placeholder="请输入内容"
-              v-model="formFields[item.key]"></el-input>
-            <el-input v-if="item.type === '数字'" v-model="formFields[item.key]" placeholder="请输入名称" />
+            <!-- 单行文本 -->
+            <el-input v-if="item.type === '单行文本'" v-model="formFields[item.key]" placeholder="请输入内容" />
+            <!-- 多行文本 -->
+            <el-input v-if="item.type === '多行文本'" type="textarea" :rows="4" placeholder="请输入内容" v-model="formFields[item.key]" />
+            <!-- 数字 -->
+            <el-input v-if="item.type === '数字'" v-model="formFields[item.key]" placeholder="请输入内容" />
+            <!-- 关联表 -->
             <div v-if="item.type === '关联表'">
               <el-tag
                 class="tag"
@@ -51,9 +52,17 @@
               <el-tag v-if="item.property.many && title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
               <el-tag v-if="title === '新增' && list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
             </div>
+            <!-- 单选 -->
+            <el-select v-if="item.type === '单选'" v-model="formFields[item.key]">
+              <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+            <!-- 日期 -->
+            <el-date-picker v-if="item.type === '日期'" v-model="formFields[item.key]" type="datetime" placeholder="选择日期时间" />
+            <!-- 电话 -->
+            <el-input v-if="item.type === '电话'" v-model="formFields[item.key]" type="number" placeholder="请输入号码" />
           </el-form-item>
         </el-form>
-        <span slot="footer" class="dialog-footer">
+        <span slot="footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="confirm()">确 定</el-button>
         </span>
@@ -105,6 +114,7 @@ export default {
       if (val) {
         for (let a of this.fieldList) {
           if (a.type === '关联表') {
+            console.log(this.key, 789789)
             this.key = a.key
           }
         }
@@ -257,10 +267,14 @@ export default {
           ...this.formFields
         }
         obj.fields = data
-        obj.fields[this.key] = obj.fields[this.key].map(item => {
-          return item.recordId
-        })
-        obj.recordId = this.recordId
+        if (this.key) {
+          obj.fields[this.key] = obj.fields[this.key].map(item => {
+            return item.recordId
+          })
+
+          obj.recordId = this.recordId
+        }
+
         list.push(obj)
         updateRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
@@ -276,94 +290,100 @@ export default {
 </script>
 
 <style lang="scss">
-.border {
-  border: 1px dashed #d9d9d9;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
+.edit-dialog {
+  .border {
+    border: 1px dashed #d9d9d9;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
 
-.el-upload--picture-card {
-  width: 60px;
-  height: 60px;
-}
+  .el-upload--picture-card {
+    width: 60px;
+    height: 60px;
+  }
 
-.el-upload--picture-card i {
-  font-size: 28px;
-  color: #8c939d;
-  margin-bottom: 20px;
-  position: relative;
-  top: -38px;
-}
+  .el-upload--picture-card i {
+    font-size: 28px;
+    color: #8c939d;
+    margin-bottom: 20px;
+    position: relative;
+    top: -38px;
+  }
 
-.el-upload-list--picture-card .el-upload-list__item {
-  width: 60px;
-  height: 60px;
-}
+  .el-upload-list--picture-card .el-upload-list__item {
+    width: 60px;
+    height: 60px;
+  }
 
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
 
-.avatar-uploader .el-upload {
-  display: flex;
-}
+  .avatar-uploader .el-upload {
+    display: flex;
+  }
 
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 60px;
-  height: 60px;
-  line-height: 60px;
-  text-align: center;
-}
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+  }
 
-.avatar {
-  width: 60px;
-  height: 60px;
-  display: block;
-}
-
-.edit {
-  .el-form--inline .el-form-item {
+  .avatar {
+    width: 60px;
+    height: 60px;
     display: block;
   }
-}
 
-.el-dialog {
-  display: flex;
-  flex-direction: column;
-  margin: 0 !important;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-height: calc(100% - 30px);
-  max-width: calc(100% - 30px);
-  overflow-y: auto;
-}
+  .edit {
+    .el-form--inline .el-form-item {
+      display: block;
+    }
+  }
 
-.video-uploader-icon {
-  border: 1px dashed #d9d9d9 !important;
-}
+  .el-dialog {
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+    overflow-y: auto;
+  }
 
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
+  .video-uploader-icon {
+    border: 1px dashed #d9d9d9 !important;
+  }
 
-.video-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 300px;
-  height: 178px;
-  line-height: 178px;
-  text-align: center;
-}
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
 
-.video {
-  width: 300px;
-  height: 178px;
-  display: block;
+  .video-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 300px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+
+  .video {
+    width: 300px;
+    height: 178px;
+    display: block;
+  }
+  .el-input,
+  .el-textarea__inner {
+    width: 300px !important;
+  }
 }
 </style>
 <style scoped>
