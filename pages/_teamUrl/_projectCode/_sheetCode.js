@@ -49,7 +49,8 @@ export default {
       },
       loadingData: false,
       tableText: '',
-      recordIds: []
+      recordIds: [],
+      detailList: []
     }
   },
   watch: {
@@ -99,9 +100,10 @@ export default {
       getRecordList(params, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
         if (res.data.code === 1) {
           this.loadingData = false
-          for (let record of res.data.content) {
-            this.recordList.push(record.fields)
-          }
+          this.recordList = res.data.content
+          // for (let record of res.data.content) {
+          //   this.recordList.push(record.fields)
+          // }
           this.pagination.total = Number(res.data.totalElements)
         } else {
           this.loadingData = false
@@ -124,7 +126,7 @@ export default {
       this.$refs.child.projectCode = this.projectCode
       this.$refs.child.sheetCode = this.sheetCode
       setTimeout(() => {
-        this.$refs.child.formFields = record
+        this.$refs.child.formFields = record.fields
       }, 100)
     },
 

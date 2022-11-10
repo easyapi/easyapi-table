@@ -122,7 +122,7 @@ export default {
     },
     'formFields.img'(val) {
       if (val == null) {
-        this.formFields.img = []
+        this.formFields.imgs = []
       }
     },
     'formFields.video'(val) {
@@ -230,10 +230,10 @@ export default {
       let obj = {
         url: img
       }
-      this.formFields.img.push(obj)
+      this.formFields.imgs.push(obj)
     },
     handleRemove(res, file) {
-      this.formFields.img.splice(this.formFields.img.findIndex(item => item.url === res.url))
+      this.formFields.imgs.splice(this.formFields.imgs.findIndex(item => item.url === res.url))
     },
     close() {
       this.formFields = {}
@@ -271,10 +271,8 @@ export default {
           obj.fields[this.key] = obj.fields[this.key].map(item => {
             return item.recordId
           })
-
-          obj.recordId = this.recordId
         }
-
+        obj.recordId = this.recordId
         list.push(obj)
         updateRecord(list, this.teamUrl, this.projectCode, this.sheetCode, this).then(res => {
           if (res.data.code === 1) {
