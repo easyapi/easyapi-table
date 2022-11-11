@@ -63,7 +63,7 @@
                   </div>
 
                   <div v-for="url in scope.row.fields[item.key]" :src="url.url + '!icon.jpg'" :key="url">
-                    <img class="table-img" v-if="item.type === '附件' && item.key === 'imgs'" />
+                    <img class="table-img" v-if="item.type === '附件' && item.key === 'imgs'" :src="url" />
                   </div>
 
                   <div v-for="url in scope.row.fields[item.key]" :key="url">
