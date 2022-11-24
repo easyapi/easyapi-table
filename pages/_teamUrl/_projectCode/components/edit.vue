@@ -4,8 +4,8 @@
       <div class="edit">
         <el-form ref="form" size="small" :model="formFields" label-width="120px" label-position="right" :inline="true">
           <el-form-item v-for="item in fieldList" :key="item" :prop="item.key" :label="item.name + ':'">
-            <!-- 附件：图片 -->
-            <div v-if="item.type === '附件' && item.key === 'imgs'" class="block">
+            <!-- 图片 -->
+            <div v-if="item.type === '附件'" class="block">
               <div @click="getKeyAndToken">
                 <el-upload
                   :data="dataObj"
@@ -18,8 +18,8 @@
                 </el-upload>
               </div>
             </div>
-            <!-- 附件：视频 -->
-            <div v-if="item.type === '附件' && item.key === 'video'" class="block">
+            <!-- 视频 -->
+            <div v-if="item.type === '视频'" class="block">
               <el-upload
                 class="avatar-uploader"
                 action="https://upload.qiniup.com/"
