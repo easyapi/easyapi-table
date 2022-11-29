@@ -304,7 +304,7 @@ watch(
                   <img
                     v-if="item.type === '附件' && item.key === 'video'"
                     class="video-img"
-                    src="../../../assets/images/video.svg"
+                    src="../../../assets/svg/video.svg"
                     @click.stop="showVideo(url.url)"
                   >
                 </div>
