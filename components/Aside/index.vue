@@ -1,18 +1,8 @@
-<template>
-  <div v-if="state.showSidebar" class="sidebar">
-    <div class="menu" v-for="(menu, index) in state.menuList" :key="index" @click="getFields(menu.serve)">
-      <nuxt-link :to="menu.path" :class="state.activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
-        <i :class="menu.icon"></i>
-        <span>{{ menu.title }}</span>
-      </nuxt-link>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { reactive, onMounted } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { sheet } from '../../api/sheet'
 import { settingStore } from '@/stores/setting'
+const emit = defineEmits(['getFieldList', 'getTeamUrl', 'getProjectCode', 'getSheetCode', 'getHeadline'])
 const route = useRoute()
 const store = settingStore()
 
@@ -24,18 +14,16 @@ const state = reactive({
       title: '常客服务',
       path: '/changke/changke_provider',
       icon: 'el-icon-s-help',
-      serve: 'changke_provider'
-    }
-  ]
+      serve: 'changke_provider',
+    },
+  ],
 })
 
-const emit = defineEmits(['getFieldList', 'getTeamUrl', 'getProjectCode', 'getSheetCode', 'getHeadline'])
-
 function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
-  let params = {
-    size: 50
+  const params = {
+    size: 50,
   }
-  sheet.getSheet(params, teamUrl, projectCode, sheetCode).then(res => {
+  sheet.getSheet(params, teamUrl, projectCode, sheetCode).then((res) => {
     emit('getFieldList', res.content.fields)
     emit('getTeamUrl', teamUrl)
     emit('getProjectCode', projectCode)
@@ -50,6 +38,17 @@ onMounted(() => {
   getFields(route.params.teamUrl, route.params.projectCode, route.params.sheetCode)
 })
 </script>
+
+<template>
+  <div v-if="state.showSidebar" class="sidebar">
+    <div v-for="(menu, index) in state.menuList" :key="index" class="menu" @click="getFields(menu.serve)">
+      <nuxt-link :to="menu.path" :class="state.activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
+        <i :class="menu.icon" />
+        <span>{{ menu.title }}</span>
+      </nuxt-link>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .sidebar {

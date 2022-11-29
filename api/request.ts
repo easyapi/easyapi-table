@@ -1,23 +1,23 @@
+import { ElMessage } from 'element-plus'
+
 const baseUrl = 'https://account-api.easyapi.com'
 const tableUrl = 'https://table-api.easyapi.com'
-
-import { ElMessage } from 'element-plus'
 
 const get = async (url: string, params = {}): Promise<ApiResponse> => {
   try {
     const token = useCookie('robotToken')
     const res = await $fetch<ApiResponse>(url, {
       headers: {
-        Authorization: token.value ? `Bearer ${token.value}` : ''
+        Authorization: token.value ? `Bearer ${token.value}` : '',
       },
       method: 'GET',
-      params: params
+      params,
     })
     return res
-  } catch (error) {
+  } catch (error: any) {
     ElMessage({
       type: 'error',
-      message: error.data.message
+      message: error.data.message,
     })
     return error.data
   }
@@ -28,37 +28,36 @@ const post = async (url: string, data = {}): Promise<ApiResponse> => {
     const token = useCookie('robotToken')
     const res = await $fetch<ApiResponse>(url, {
       headers: {
-        Authorization: token.value ? `Bearer ${token.value}` : ''
+        Authorization: token.value ? `Bearer ${token.value}` : '',
       },
       method: 'POST',
-      body: data
+      body: data,
     })
     return res
-  } catch (error) {
+  } catch (error: any) {
     ElMessage({
       type: 'error',
-      message: error.data.message
+      message: error.data.message,
     })
     return error.data
   }
 }
 
 const put = async (url: string, data = {}): Promise<ApiResponse> => {
-  const router = useRouter()
   try {
     const token = useCookie('robotToken')
     const res = await $fetch<ApiResponse>(url, {
       headers: {
-        Authorization: token.value ? `Bearer ${token.value}` : ''
+        Authorization: token.value ? `Bearer ${token.value}` : '',
       },
       method: 'PUT',
-      body: data
+      body: data,
     })
     return res
-  } catch (error) {
+  } catch (error: any) {
     ElMessage({
       type: 'error',
-      message: error.data.message
+      message: error.data.message,
     })
     return error.data
   }
@@ -69,16 +68,16 @@ const del = async (url: string, data = {}): Promise<ApiResponse> => {
     const token = useCookie('robotToken')
     const res = await $fetch<ApiResponse>(url, {
       headers: {
-        Authorization: token.value ? `Bearer ${token.value}` : ''
+        Authorization: token.value ? `Bearer ${token.value}` : '',
       },
       method: 'DELETE',
-      body: data
+      body: data,
     })
     return res
-  } catch (error) {
+  } catch (error: any) {
     ElMessage({
       type: 'error',
-      message: error.data.message
+      message: error.data.message,
     })
     return error.data
   }

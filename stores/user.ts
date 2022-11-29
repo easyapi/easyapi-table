@@ -4,7 +4,7 @@ export const userStore = defineStore('user', {
   state() {
     return {
       showLogin: false,
-      isLogin: false
+      isLogin: false,
     }
-  }
+  },
 })

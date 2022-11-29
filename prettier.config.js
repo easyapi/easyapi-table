@@ -12,5 +12,5 @@ module.exports = {
   arrowParens: 'avoid',
   htmlWhitespaceSensitivity: 'ignore',
   vueIndentScriptAndStyle: false,
-  endOfLine: 'lf'
+  endOfLine: 'lf',
 }

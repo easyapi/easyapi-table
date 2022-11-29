@@ -64,5 +64,5 @@ export const table = {
    */
   deleteRecord(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
     return http.del(`${http.tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
-  }
+  },
 }

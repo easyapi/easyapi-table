@@ -1,7 +1,30 @@
+<script>
+export default {
+  name: 'AssociationTable',
+  data() {
+    return {
+      dialogVisible: false,
+      fields: [],
+      styleObject: {},
+      input2: '',
+      active: '',
+    }
+  },
+  methods: {
+    choice(item, index) {
+      this.active = index
+      this.$emit('getItem', item)
+      this.dialogVisible = false
+    },
+    close() {},
+  },
+}
+</script>
+
 <template>
-  <el-dialog title="关联表" :close-on-click-modal="false" :visible.sync="dialogVisible" @close="close" width="50%">
-    <el-input class="input" placeholder="搜索你想关联的内容" prefix-icon="el-icon-search" v-model="input2"></el-input>
-    <div class="list" :class="{ active: active === index }" :style="styleObject" v-for="(item, index) in fields" :key="index" @click="choice(item, index)">
+  <el-dialog v-model:visible="dialogVisible" title="关联表" :close-on-click-modal="false" width="50%" @close="close">
+    <el-input v-model="input2" class="input" placeholder="搜索你想关联的内容" prefix-icon="el-icon-search" />
+    <div v-for="(item, index) in fields" :key="index" class="list" :class="{ active: active === index }" :style="styleObject" @click="choice(item, index)">
       <div class="list-left">
         <h2>{{ item.fields.name }}</h2>
         <ul>
@@ -23,33 +46,10 @@
           </li>
         </ul>
       </div>
-      <el-image v-for="img in item.fields.img" :key="img" class="list-right" style="width: 100px; height: 100px" :src="img.url" fit="cover"></el-image>
+      <el-image v-for="img in item.fields.img" :key="img" class="list-right" style="width: 100px; height: 100px" :src="img.url" fit="cover" />
     </div>
   </el-dialog>
 </template>
-
-<script>
-export default {
-  name: 'AssociationTable',
-  data() {
-    return {
-      dialogVisible: false,
-      fields: [],
-      styleObject: {},
-      input2: '',
-      active: ''
-    }
-  },
-  methods: {
-    choice(item, index) {
-      this.active = index
-      this.$emit('getItem', item)
-      this.dialogVisible = false
-    },
-    close() {}
-  }
-}
-</script>
 
 <style scoped>
 .input {

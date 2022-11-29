@@ -1,97 +1,13 @@
-<template>
-  <div>
-    <el-dialog
-      :title="state.title"
-      :close-on-click-modal="false"
-      :append-to-body="true"
-      custom-class="edit-dialog"
-      v-model="state.dialogVisible"
-      @close="close"
-      width="80%">
-      <div class="edit">
-        <el-form ref="form" :model="state.formFields" label-width="100px" :inline="true">
-          <el-form-item v-for="item in state.fieldList" :key="item" :prop="item.key" :label="item.name + ':'">
-            <!-- 图片 -->
-            <div v-if="item.type === '附件'" class="block">
-              <div @click="getKeyAndToken">
-                <el-upload
-                  :data="state.dataObj"
-                  action="https://upload.qiniup.com/"
-                  :on-success="handleAvatarSuccess"
-                  list-type="picture-card"
-                  :file-list="fileList"
-                  :on-remove="handleRemove">
-                  <i class="el-icon-plus"></i>
-                </el-upload>
-              </div>
-            </div>
-            <!-- 视频 -->
-            <div v-if="item.type === '视频'" class="block">
-              <el-upload
-                class="avatar-uploader"
-                action="https://upload.qiniup.com/"
-                :data="state.dataObj"
-                :on-progress="uploadVideoProcess"
-                :on-success="handleVideoSuccess"
-                :before-upload="beforeUploadVideo"
-                :show-file-list="false">
-                <video v-if="state.formFields.video" :src="state.formFields.video" class="video video-avatar" controls="controls">
-                  您的浏览器不支持视频播放
-                </video>
-                <i v-else class="el-icon-plus video-uploader-icon"></i>
-              </el-upload>
-            </div>
-            <!-- 富文本 -->
-            <!-- <MarkdownEditor v-if="item.type === '富文本'" v-model="state.formFields[item.key]"></MarkdownEditor> -->
-            <!-- 单行文本 -->
-            <el-input v-if="item.type === '单行文本'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
-            <!-- 多行文本 -->
-            <el-input v-if="item.type === '多行文本'" type="textarea" :rows="4" placeholder="请输入内容" v-model="state.formFields[item.key]" />
-            <!-- 数字 -->
-            <el-input v-if="item.type === '数字'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
-            <!-- 关联表 -->
-            <div v-if="item.type === '关联表'">
-              <el-tag
-                class="tag"
-                v-for="about in state.formFields[item.key]"
-                :key="about"
-                type="info"
-                @click="showTable(item.key, item, '修改')"
-                v-html="about.fields.name"></el-tag>
-              <el-tag v-if="item.property.many && state.title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
-              <el-tag v-if="state.title === '新增' && state.list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
-            </div>
-            <!-- 单选 -->
-            <el-select v-if="item.type === '单选'" v-model="state.formFields[item.key]">
-              <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-            <!-- 日期 -->
-            <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" type="datetime" placeholder="选择日期时间" />
-            <!-- 电话 -->
-            <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" type="number" placeholder="请输入号码" />
-          </el-form-item>
-        </el-form>
-      </div>
-      <template #footer>
-        <el-button @click="state.dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirm()">确 定</el-button>
-      </template>
-    </el-dialog>
-    <AssociationTable ref="tableChild" @getItem="getItem"></AssociationTable>
-  </div>
-</template>
-
 <script setup lang="ts">
+import { defineExpose, reactive, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import AssociationTable from './association-table.vue'
 import { qiniu } from '@/api/qiniu'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
-import AssociationTable from './association-table.vue'
-import { reactive, watch } from 'vue'
-import { defineExpose } from 'vue'
-import { ElMessage } from 'element-plus'
 
 defineExpose({
-  getParentData
+  getParentData,
 })
 
 const state = reactive({
@@ -100,9 +16,9 @@ const state = reactive({
     content: '',
     video: [],
     building: '',
-    imgs: [] as any
+    imgs: [] as any,
   },
-  fileList: [], //图片回显
+  fileList: [], // 图片回显
   disabled: false,
   content: '',
   title: '',
@@ -110,16 +26,16 @@ const state = reactive({
   fieldList: '',
   teamUrl: '',
   projectCode: '',
-  sheetCode: '', //服务商
+  sheetCode: '', // 服务商
   recordId: '',
   dataObj: { token: '', key: '' },
-  videoFlag: false, //是否显示进度条
-  videoUploadPercent: 0, //进度条的进度，
-  isShowUploadVideo: false, //显示上传按钮
-  name: '', //关联表选中的名字,
-  key: '', //记录关联表数据
+  videoFlag: false, // 是否显示进度条
+  videoUploadPercent: 0, // 进度条的进度，
+  isShowUploadVideo: false, // 显示上传按钮
+  name: '', // 关联表选中的名字,
+  key: '', // 记录关联表数据
   list: [],
-  type: ''
+  type: '',
 })
 
 function getKeyAndToken() {
@@ -142,32 +58,32 @@ function getParentData(data: any) {
  * 获取七牛token
  */
 function getQiniuToken() {
-  qiniu.getQiniuToken().then(res => {
+  qiniu.getQiniuToken().then((res) => {
     state.dataObj.token = res.content.upToken
   })
 }
 function getQiniuKey() {
-  qiniu.getQiniuKey().then(res => {
+  qiniu.getQiniuKey().then((res) => {
     state.dataObj.key = res.content.key
   })
 }
 function beforeUploadVideo(file: any) {
   getQiniuToken()
   getQiniuKey()
-  var fileSize = file.size / 1024 / 1024 < 50 //控制大小  修改50的值即可
+  const fileSize = file.size / 1024 / 1024 < 50 // 控制大小  修改50的值即可
   if (
-    ['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) === -1 //控制格式
+    !['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].includes(file.type) // 控制格式
   ) {
     ElMessage({
       type: 'error',
-      message: '请上传正确的视频格式'
+      message: '请上传正确的视频格式',
     })
     return false
   }
   if (!fileSize) {
     ElMessage({
       type: 'error',
-      message: '视频大小不能超过50MB'
+      message: '视频大小不能超过50MB',
     })
     return false
   }
@@ -179,12 +95,12 @@ function beforeUploadVideo(file: any) {
 function showTable(val: any, formFields: any, data: any) {
   state.key = val
   state.type = data
-  let sheetId = formFields.property.sheet_id
-  let params = {}
-  sheet.getSheetById(params, state.teamUrl, state.projectCode, sheetId).then(res => {
+  const sheetId = formFields.property.sheet_id
+  const params = {}
+  sheet.getSheetById(params, state.teamUrl, state.projectCode, sheetId).then((res) => {
     if (res.code == 1) {
-      let sheetCode = res.content.code
-      table.getRecordList(params, state.teamUrl, state.projectCode, sheetCode).then(res => {
+      const sheetCode = res.content.code
+      table.getRecordList(params, state.teamUrl, state.projectCode, sheetCode).then((res) => {
         if (res.code === 1) {
           // this.$refs.tableChild.dialogVisible = true
           // this.$refs.tableChild.fields = res.content
@@ -207,7 +123,7 @@ function getItem(data: any) {
  * 进度条
  */
 function uploadVideoProcess(event: any, file: any, fileList: any) {
-  //注意在data中添加对应的变量名
+  // 注意在data中添加对应的变量名
   state.videoFlag = true
   state.videoUploadPercent = file.percentage.toFixed(0) * 1
 }
@@ -218,14 +134,14 @@ function handleVideoSuccess(res: any, file: any) {
   state.isShowUploadVideo = true
   state.videoFlag = false
   state.videoUploadPercent = 0
-  let video = 'https://qiniu.easyapi.com/' + res.key
+  const video = `https://qiniu.easyapi.com/${res.key}`
   state.formFields.video = video
 }
 function handleAvatarSuccess(res: any, file: any) {
-  let img = 'https://qiniu.easyapi.com/' + res.key
+  const img = `https://qiniu.easyapi.com/${res.key}`
   file.url = img
-  let obj = {
-    url: img
+  const obj = {
+    url: img,
   }
   state.formFields.imgs.push(obj)
 }
@@ -237,10 +153,10 @@ function close() {
 }
 function confirm(formName: any) {
   if (state.title === '新增') {
-    let list = []
-    let obj = {}
-    let data = {
-      ...state.formFields
+    const list = []
+    const obj = {}
+    const data = {
+      ...state.formFields,
     }
     obj.fields = data
     obj.fields[state.key]
@@ -249,7 +165,7 @@ function confirm(formName: any) {
         }))
       : ''
     list.push(obj)
-    table.creatRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+    table.creatRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
       if (res.code === 1) {
         setTimeout(() => {
           // this.$parent.getRecordList()
@@ -258,10 +174,10 @@ function confirm(formName: any) {
       }
     })
   } else {
-    let list = []
-    let obj = {}
-    let data = {
-      ...state.formFields
+    const list = []
+    const obj = {}
+    const data = {
+      ...state.formFields,
     }
     obj.fields = data
     if (state.key) {
@@ -271,13 +187,13 @@ function confirm(formName: any) {
     }
     obj.recordId = state.recordId
     list.push(obj)
-    table.updateRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+    table.updateRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
       if (res.code === 1) {
         // this.$parent.getRecordList()
         state.dialogVisible = false
         ElMessage({
           type: 'success',
-          message: '修改成功'
+          message: '修改成功',
         })
       }
     })
@@ -286,48 +202,139 @@ function confirm(formName: any) {
 
 watch(
   () => state.dialogVisible,
-  value => {
+  (value) => {
     if (value) {
-      for (let a of state.fieldList) {
-        if (a.type === '关联表') {
+      for (const a of state.fieldList) {
+        if (a.type === '关联表')
           state.key = a.key
-        }
       }
     }
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
   () => state.formFields.img,
-  value => {
-    if (value == null) {
+  (value) => {
+    if (value == null)
       state.formFields.imgs = []
-    }
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
   () => state.formFields.video,
-  value => {
-    if (value == null) {
+  (value) => {
+    if (value == null)
       state.formFields.video = []
-    }
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
   () => state.formFields.video,
-  value => {
-    if (value) {
+  (value) => {
+    if (value)
       state.fileList = value.img
-    }
   },
-  { deep: true }
+  { deep: true },
 )
 </script>
+
+<template>
+  <div>
+    <el-dialog
+      v-model="state.dialogVisible"
+      :title="state.title"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+      custom-class="edit-dialog"
+      width="80%"
+      @close="close"
+    >
+      <div class="edit">
+        <el-form ref="form" :model="state.formFields" label-width="100px" :inline="true">
+          <el-form-item v-for="item in state.fieldList" :key="item" :prop="item.key" :label="`${item.name}:`">
+            <!-- 图片 -->
+            <div v-if="item.type === '附件'" class="block">
+              <div @click="getKeyAndToken">
+                <el-upload
+                  :data="state.dataObj"
+                  action="https://upload.qiniup.com/"
+                  :on-success="handleAvatarSuccess"
+                  list-type="picture-card"
+                  :file-list="fileList"
+                  :on-remove="handleRemove"
+                >
+                  <i class="el-icon-plus" />
+                </el-upload>
+              </div>
+            </div>
+            <!-- 视频 -->
+            <div v-if="item.type === '视频'" class="block">
+              <el-upload
+                class="avatar-uploader"
+                action="https://upload.qiniup.com/"
+                :data="state.dataObj"
+                :on-progress="uploadVideoProcess"
+                :on-success="handleVideoSuccess"
+                :before-upload="beforeUploadVideo"
+                :show-file-list="false"
+              >
+                <video v-if="state.formFields.video" :src="state.formFields.video" class="video video-avatar" controls="controls">
+                  您的浏览器不支持视频播放
+                </video>
+                <i v-else class="el-icon-plus video-uploader-icon" />
+              </el-upload>
+            </div>
+            <!-- 富文本 -->
+            <!-- <MarkdownEditor v-if="item.type === '富文本'" v-model="state.formFields[item.key]"></MarkdownEditor> -->
+            <!-- 单行文本 -->
+            <el-input v-if="item.type === '单行文本'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
+            <!-- 多行文本 -->
+            <el-input v-if="item.type === '多行文本'" v-model="state.formFields[item.key]" type="textarea" :rows="4" placeholder="请输入内容" />
+            <!-- 数字 -->
+            <el-input v-if="item.type === '数字'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
+            <!-- 关联表 -->
+            <div v-if="item.type === '关联表'">
+              <el-tag
+                v-for="about in state.formFields[item.key]"
+                :key="about"
+                class="tag"
+                type="info"
+                @click="showTable(item.key, item, '修改')"
+                v-html="about.fields.name"
+              />
+              <el-tag v-if="item.property.many && state.title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">
+                +添加
+              </el-tag>
+              <el-tag v-if="state.title === '新增' && state.list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">
+                +添加
+              </el-tag>
+            </div>
+            <!-- 单选 -->
+            <el-select v-if="item.type === '单选'" v-model="state.formFields[item.key]">
+              <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+            <!-- 日期 -->
+            <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" type="datetime" placeholder="选择日期时间" />
+            <!-- 电话 -->
+            <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" type="number" placeholder="请输入号码" />
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <el-button @click="state.dialogVisible = false">
+          取 消
+        </el-button>
+        <el-button type="primary" @click="confirm()">
+          确 定
+        </el-button>
+      </template>
+    </el-dialog>
+    <AssociationTable ref="tableChild" @getItem="getItem" />
+  </div>
+</template>
 
 <style>
 .edit-dialog .border {
@@ -422,6 +429,7 @@ watch(
   width: 300px !important;
 }
 </style>
+
 <style scoped>
 p img {
   display: block !important;

@@ -6,13 +6,13 @@ export const qiniu = {
    *
    */
   getQiniuKey(): Promise<ApiResponse> {
-    return http.get(`https://api.easyapi.com/qiniu/key`)
+    return http.get('https://api.easyapi.com/qiniu/key')
   },
 
   /**
    * 获取七牛空间TOKEN
    */
   getQiniuToken(): Promise<ApiResponse> {
-    return http.get(`https://api.easyapi.com/qiniu/upload-token`)
-  }
+    return http.get('https://api.easyapi.com/qiniu/upload-token')
+  },
 }

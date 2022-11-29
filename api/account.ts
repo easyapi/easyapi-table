@@ -7,5 +7,5 @@ export const account = {
    */
   getUser(): Promise<ApiResponse> {
     return http.get(`${http.baseUrl}/account`)
-  }
+  },
 }

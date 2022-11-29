@@ -33,5 +33,5 @@ export const sheet = {
    */
   getSheetById(params: any, teamUrl: string, projectCode: string, sheetId: string): Promise<ApiResponse> {
     return http.get(`${http.tableUrl}/${teamUrl}/${projectCode}/sheet/id-${sheetId}`, params)
-  }
+  },
 }
