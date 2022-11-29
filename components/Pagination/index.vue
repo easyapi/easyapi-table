@@ -12,21 +12,25 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['totalPages', 'size', 'totalElements'],
-  data() {
-    return {}
-  },
-  methods: {
-    handleSizeChange(val) {
-      this.$emit('fatherSize', val)
-    },
-    handleCurrentChange(val) {
-      this.$emit('fatherCurrent', val)
-    }
-  }
+<script setup lang="ts">
+interface Props {
+  totalPages: number
+  size: number
+  totalElements: number
+}
+const prop = withDefaults(defineProps<Props>(), {
+  totalPages: 0,
+  size: 10,
+  totalElements: 0
+})
+
+const emit = defineEmits(['fatherSize', 'fatherCurrent'])
+
+function handleSizeChange(val: any) {
+  emit('fatherSize', val)
+}
+
+function handleCurrentChange(val: any) {
+  emit('fatherCurrent', val)
 }
 </script>
-
-<style scoped></style>

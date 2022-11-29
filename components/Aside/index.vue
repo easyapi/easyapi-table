@@ -1,7 +1,7 @@
 <template>
-  <div v-if="showSidebar" class="sidebar">
-    <div class="menu" v-for="(menu, index) in menuList" :key="index" @click="getFields(menu.serve)">
-      <nuxt-link :to="menu.path" :class="activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
+  <div v-if="state.showSidebar" class="sidebar">
+    <div class="menu" v-for="(menu, index) in state.menuList" :key="index" @click="getFields(menu.serve)">
+      <nuxt-link :to="menu.path" :class="state.activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
         <i :class="menu.icon"></i>
         <span>{{ menu.title }}</span>
       </nuxt-link>
@@ -9,49 +9,49 @@
   </div>
 </template>
 
-<script>
-import { getFieldList } from '../../api/table'
-import { getSheet } from '../../api/sheet'
+<script setup lang="ts">
+import { reactive, onMounted } from 'vue'
+import { sheet } from '../../api/sheet'
+import { settingStore } from '@/stores/setting'
+const route = useRoute()
+const store = settingStore()
 
-export default {
-  name: 'Aside',
-  data() {
-    return {
-      activePath: '',
-      showSidebar: '',
-      menuList: [
-        {
-          title: '常客服务',
-          path: '/changke/changke_provider',
-          icon: 'el-icon-s-help',
-          serve: 'changke_provider'
-        }
-      ]
+const state = reactive({
+  activePath: '',
+  showSidebar: false,
+  menuList: [
+    {
+      title: '常客服务',
+      path: '/changke/changke_provider',
+      icon: 'el-icon-s-help',
+      serve: 'changke_provider'
     }
-  },
-  mounted() {
-    this.showSidebar = this.$store.state.settings.showSidebar === 'true'
-    this.activePath = this.$route.path ? `${this.$route.path}` : '/:teamUrl/:projectCode/:sheetCode'
-    this.getFields(this.$route.params.teamUrl, this.$route.params.projectCode, this.$route.params.sheetCode)
-  },
-  methods: {
-    getFields(teamUrl, projectCode, sheetCode) {
-      let params = {
-        size: 50
-      }
-      getSheet(params, teamUrl, projectCode, sheetCode, this).then(res => {
-        this.$emit('getFieldList', res.data.content.fields)
-        this.$emit('getTeamUrl', teamUrl)
-        this.$emit('getProjectCode', projectCode)
-        this.$emit('getSheetCode', sheetCode)
-        this.$emit('getHeadline', res.data.content.name)
-      })
-    }
+  ]
+})
+
+const emit = defineEmits(['getFieldList', 'getTeamUrl', 'getProjectCode', 'getSheetCode', 'getHeadline'])
+
+function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
+  let params = {
+    size: 50
   }
+  sheet.getSheet(params, teamUrl, projectCode, sheetCode).then(res => {
+    emit('getFieldList', res.content.fields)
+    emit('getTeamUrl', teamUrl)
+    emit('getProjectCode', projectCode)
+    emit('getSheetCode', sheetCode)
+    emit('getHeadline', res.content.name)
+  })
 }
+
+onMounted(() => {
+  state.showSidebar = store.showSidebar === 'true'
+  state.activePath = route.path ? `${route.path}` : '/:teamUrl/:projectCode/:sheetCode'
+  getFields(route.params.teamUrl, route.params.projectCode, route.params.sheetCode)
+})
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .sidebar {
   position: absolute;
   top: 10px;
@@ -74,15 +74,15 @@ export default {
   height: 56px;
   display: flex;
   align-items: center;
+}
 
-  i {
-    font-size: 18px;
-    margin-right: 10px;
-  }
+.menu-item i {
+  font-size: 18px;
+  margin-right: 10px;
+}
 
-  span {
-    font-size: 14px;
-  }
+.menu-item span {
+  font-size: 14px;
 }
 
 .menu-item_active {

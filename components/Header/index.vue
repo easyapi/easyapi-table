@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showHeader" class="header">
+  <div v-if="state.showHeader" class="header">
     <div class="header-title">
       <p>API CMS</p>
       <div>
@@ -7,7 +7,7 @@
           <span class="el-dropdown-link">
             <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
           </span>
-          <el-dropdown-menu slot="dropdown">
+          <el-dropdown-menu>
             <el-dropdown-item icon="el-icon-plus">黄金糕</el-dropdown-item>
             <el-dropdown-item icon="el-icon-circle-plus">狮子头</el-dropdown-item>
             <el-dropdown-item icon="el-icon-circle-plus-outline">螺蛳粉</el-dropdown-item>
@@ -20,25 +20,23 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Header',
-  data() {
-    return {
-      showHeader: true,
-      isActive: true
-    }
-  },
-  mounted() {
-    this.showHeader = this.$store.state.settings.showHeader === 'true'
-  }
-}
+<script setup lang="ts">
+import { reactive, onMounted } from 'vue'
+import { settingStore } from '@/stores/setting'
+const store = settingStore()
+const state = reactive({
+  showHeader: true
+})
+
+onMounted(() => {
+  state.showHeader = store.showHeader === 'true'
+})
 </script>
 
 <style>
 .header {
   width: 100%;
-  background: #0000;
+  background: #fff;
   height: 50px;
 }
 
