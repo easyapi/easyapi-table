@@ -1,118 +1,136 @@
 <template>
-  <el-dialog title="高级筛选" :visible.sync="dialogVisible" width="50%">
+  <el-dialog title="高级筛选" append-to-body v-model="state.dialogVisible" width="50%">
     <p>
       筛选条件
       <i class="el-icon-question"></i>
     </p>
-    <div class="flex-r mg-tp-15 align-center" v-for="(item, index) in conditionList" :key="index">
-      <el-select size="small" v-model="item.fieldValue" placeholder="请选择要筛选的字段名">
+    <div class="flex-r mg-tp-15 align-center" v-for="(item, index) in state.conditionList" :key="index">
+      <el-select v-model="item.fieldValue" placeholder="请选择要筛选的字段名">
         <el-option v-for="field in fieldList" :key="field.value" :label="field.label" :value="field.value"></el-option>
       </el-select>
-      <el-select class="mx-15" v-if="item.fieldValue" size="small" v-model="item.value">
+      <el-select class="mx-15" v-if="item.fieldValue" v-model="item.value">
         <el-option v-for="child in options" :key="child.value" :label="child.label" :value="child.value"></el-option>
       </el-select>
-      <el-input style="width: 400px" size="small" placeholder="多个条件请用；隔开"></el-input>
+      <el-input style="width: 400px" placeholder="多个条件请用；隔开"></el-input>
       <i @click="deleteRecord(index)" class="el-icon-delete-solid cursor mg-lf-15"></i>
       <el-checkbox class="mg-lf-15" v-model="item.checked">外露</el-checkbox>
     </div>
     <p @click="addMore" class="mg-tp-15 cursor">
-      <i class="el-icon-plus"></i>
+      <el-icon :size="15">
+        <plus />
+      </el-icon>
+
       添加筛选条件
     </p>
-    <el-checkbox class="mg-tp-15" v-model="save">保存为场景</el-checkbox>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-    </span>
+    <el-checkbox class="mg-tp-15" v-model="state.save">保存为场景</el-checkbox>
+    <template #footer class="dialog-footer">
+      <el-button @click="state.dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="state.dialogVisible = false">确 定</el-button>
+    </template>
   </el-dialog>
 </template>
 
-<script>
-export default {
-  name: 'AdvancedSearch',
-  data() {
-    return {
-      conditionList: [],
-      dialogVisible: false,
-      save: false,
-      fieldList: [],
-      options: [
-        {
-          value: '等于',
-          label: '等于'
-        },
-        {
-          value: '不等于',
-          label: '不等于'
-        },
-        {
-          value: '包含',
-          label: '包含'
-        },
-        {
-          value: '不包含',
-          label: '不包含'
-        },
-        {
-          value: '开始于',
-          label: '开始于'
-        },
-        {
-          value: '结束于',
-          label: '结束于'
-        },
-        {
-          value: '为空',
-          label: '为空'
-        },
-        {
-          value: '不为空',
-          label: '不为空'
-        }
-      ]
-    }
-  },
-  watch: {
-    fieldList(val) {
-      if (val) {
-        this.conditionList.push({
-          fieldValue: val[0].label,
-          value: '等于',
-          checked: false
-        })
-      }
-    }
-  },
-  methods: {
-    deleteRecord(index) {
-      this.$confirm('您确定要删除这一条数据?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          this.$delete(this.conditionList, index)
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+<script setup lang="ts">
+import { Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { reactive, watch, defineExpose } from 'vue'
+
+defineExpose({
+  getParentData
+})
+
+const state = reactive({
+  conditionList: [] as any,
+  dialogVisible: false,
+  save: false,
+  fieldList: [] as any,
+  options: [
+    {
+      value: '等于',
+      label: '等于'
     },
-    addMore() {
-      let obj = {
-        fieldValue: '',
-        value: '等于',
-        checked: false
-      }
-      this.conditionList.push(obj)
+    {
+      value: '不等于',
+      label: '不等于'
+    },
+    {
+      value: '包含',
+      label: '包含'
+    },
+    {
+      value: '不包含',
+      label: '不包含'
+    },
+    {
+      value: '开始于',
+      label: '开始于'
+    },
+    {
+      value: '结束于',
+      label: '结束于'
+    },
+    {
+      value: '为空',
+      label: '为空'
+    },
+    {
+      value: '不为空',
+      label: '不为空'
     }
+  ]
+})
+
+watch(
+  () => state.fieldList,
+  value => {
+    state.conditionList.push({
+      fieldValue: value[0].label,
+      value: '等于',
+      checked: false
+    })
+  },
+  { deep: true }
+)
+
+function getParentData(data: any) {
+  state.dialogVisible = data.dialogVisible
+  data.fieldList.forEach((item: any) => {
+    state.fieldList.push({
+      label: item.name,
+      value: item.key
+    })
+  })
+}
+
+function deleteRecord(index: any) {
+  ElMessageBox.confirm('您确定要删除这一条数据?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      console.log(index)
+      state.conditionList.splice(index, 1)
+      ElMessage({
+        type: 'success',
+        message: '删除成功!'
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '已取消删除'
+      })
+    })
+}
+
+function addMore() {
+  const obj = {
+    fieldValue: '',
+    value: '等于',
+    checked: false
   }
+  state.conditionList.push(obj)
 }
 </script>
 

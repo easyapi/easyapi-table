@@ -271,13 +271,10 @@ function addMore() {
  * 高级筛选
  */
 function openSearch() {
-  // searchChild.value?.dialogVisible = true
-  // state.fieldList.forEach(item => {
-  //   searchChild.value?.fieldList.push({
-  //     label: item.name,
-  //     value: item.key
-  //   })
-  // })
+  searchChild.value?.getParentData({
+    dialogVisible: true,
+    fieldList: state.fieldList
+  })
 }
 /**
  * 新增服务商
