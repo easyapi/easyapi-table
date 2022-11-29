@@ -155,7 +155,7 @@ const state = reactive({
   },
   loadingData: false,
   tableText: '',
-  recordIds: [],
+  recordIds: [] as any,
   detailList: []
 })
 

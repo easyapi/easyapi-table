@@ -1,8 +1,15 @@
 <template>
   <div>
-    <el-dialog :title="state.title" :close-on-click-modal="false" custom-class="edit-dialog" v-model="state.dialogVisible" @close="close" width="80%">
+    <el-dialog
+      :title="state.title"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+      custom-class="edit-dialog"
+      v-model="state.dialogVisible"
+      @close="close"
+      width="80%">
       <div class="edit">
-        <el-form ref="form" size="small" :model="state.formFields" label-width="120px" label-position="right" :inline="true">
+        <el-form ref="form" :model="state.formFields" label-width="100px" :inline="true">
           <el-form-item v-for="item in state.fieldList" :key="item" :prop="item.key" :label="item.name + ':'">
             <!-- 图片 -->
             <div v-if="item.type === '附件'" class="block">
@@ -35,7 +42,7 @@
               </el-upload>
             </div>
             <!-- 富文本 -->
-            <!-- <MarkdownEditor v-if="item.type === '富文本'" v-model="formFields[item.key]"></MarkdownEditor> -->
+            <!-- <MarkdownEditor v-if="item.type === '富文本'" v-model="state.formFields[item.key]"></MarkdownEditor> -->
             <!-- 单行文本 -->
             <el-input v-if="item.type === '单行文本'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
             <!-- 多行文本 -->
@@ -52,7 +59,7 @@
                 @click="showTable(item.key, item, '修改')"
                 v-html="about.fields.name"></el-tag>
               <el-tag v-if="item.property.many && state.title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
-              <el-tag v-if="state.title === '新增' && list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
+              <el-tag v-if="state.title === '新增' && state.list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
             </div>
             <!-- 单选 -->
             <el-select v-if="item.type === '单选'" v-model="state.formFields[item.key]">
@@ -64,11 +71,11 @@
             <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" type="number" placeholder="请输入号码" />
           </el-form-item>
         </el-form>
-        <template footer>
-          <el-button @click="state.dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirm()">确 定</el-button>
-        </template>
       </div>
+      <template #footer>
+        <el-button @click="state.dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirm()">确 定</el-button>
+      </template>
     </el-dialog>
     <AssociationTable ref="tableChild" @getItem="getItem"></AssociationTable>
   </div>
@@ -78,7 +85,6 @@
 import { qiniu } from '@/api/qiniu'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
-// import MarkdownEditor from '../../../../components/MarkdownEditor'
 import AssociationTable from './association-table.vue'
 import { reactive, watch } from 'vue'
 import { defineExpose } from 'vue'
@@ -94,7 +100,7 @@ const state = reactive({
     content: '',
     video: [],
     building: '',
-    imgs: []
+    imgs: [] as any
   },
   fileList: [], //图片回显
   disabled: false,
@@ -112,7 +118,8 @@ const state = reactive({
   isShowUploadVideo: false, //显示上传按钮
   name: '', //关联表选中的名字,
   key: '', //记录关联表数据
-  list: []
+  list: [],
+  type: ''
 })
 
 function getKeyAndToken() {
@@ -128,7 +135,7 @@ function getParentData(data: any) {
   state.projectCode = state.projectCode
   state.sheetCode = state.sheetCode
   setTimeout(() => {
-    state.formFields = state.formFields
+    state.formFields = data.formFields
   }, 100)
 }
 /**
@@ -151,11 +158,17 @@ function beforeUploadVideo(file: any) {
   if (
     ['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) === -1 //控制格式
   ) {
-    layer.msg('请上传正确的视频格式')
+    ElMessage({
+      type: 'error',
+      message: '请上传正确的视频格式'
+    })
     return false
   }
   if (!fileSize) {
-    layer.msg('视频大小不能超过50MB')
+    ElMessage({
+      type: 'error',
+      message: '视频大小不能超过50MB'
+    })
     return false
   }
   state.isShowUploadVideo = false
@@ -182,7 +195,7 @@ function showTable(val: any, formFields: any, data: any) {
 }
 function getItem(data: any) {
   if (state.type === '修改') {
-    state.formFields[state.key] = state.formFields[state.key].map(item => {
+    state.formFields[state.key] = state.formFields[state.key].map((item: any) => {
       return item.recordId !== data.recordId ? data : item
     })
   } else {
@@ -217,7 +230,7 @@ function handleAvatarSuccess(res: any, file: any) {
   state.formFields.imgs.push(obj)
 }
 function handleRemove(res: any, file: any) {
-  state.formFields.imgs.splice(state.formFields.imgs.findIndex(item => item.url === res.url))
+  state.formFields.imgs.splice(state.formFields.imgs.findIndex((item: any) => item.url === res.url))
 }
 function close() {
   state.formFields = {}
@@ -231,7 +244,7 @@ function confirm(formName: any) {
     }
     obj.fields = data
     obj.fields[state.key]
-      ? (obj.fields[state.key] = obj.fields[state.key].map(item => {
+      ? (obj.fields[state.key] = obj.fields[state.key].map((item: any) => {
           return item.recordId
         }))
       : ''
@@ -252,14 +265,14 @@ function confirm(formName: any) {
     }
     obj.fields = data
     if (state.key) {
-      obj.fields[state.key] = obj.fields[state.key].map(item => {
+      obj.fields[state.key] = obj.fields[state.key].map((item: any) => {
         return item.recordId
       })
     }
     obj.recordId = state.recordId
     list.push(obj)
     table.updateRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
-      if (res.data.code === 1) {
+      if (res.code === 1) {
         // this.$parent.getRecordList()
         state.dialogVisible = false
         ElMessage({
@@ -366,7 +379,7 @@ watch(
 }
 
 .edit-dialog .edit .el-form--inline .el-form-item {
-  display: block;
+  display: flex;
 }
 
 .edit-dialog .el-dialog {
@@ -415,7 +428,6 @@ p img {
 }
 
 .tag {
-  display: inline-block;
   cursor: pointer;
 }
 </style>
