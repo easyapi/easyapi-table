@@ -1,46 +1,25 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-import { sheet } from '../../api/sheet'
-import { settingStore } from '@/stores/setting'
-const emit = defineEmits(['getFieldList', 'getTeamUrl', 'getProjectCode', 'getSheetCode', 'getHeadline'])
 const route = useRoute()
-const store = settingStore()
-
 const state = reactive({
   activePath: '',
-  showSidebar: false,
   menuList: [
     {
       title: '常客服务',
       path: '/changke/changke_provider',
       icon: 'el-icon-s-help',
-      serve: 'changke_provider',
-    },
-  ],
+      serve: 'changke_provider'
+    }
+  ]
 })
 
-function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
-  const params = {
-    size: 50,
-  }
-  sheet.getSheet(params, teamUrl, projectCode, sheetCode).then((res) => {
-    emit('getFieldList', res.content.fields)
-    emit('getTeamUrl', teamUrl)
-    emit('getProjectCode', projectCode)
-    emit('getSheetCode', sheetCode)
-    emit('getHeadline', res.content.name)
-  })
-}
-
 onMounted(() => {
-  state.showSidebar = store.showSidebar === 'true'
   state.activePath = route.path ? `${route.path}` : '/:teamUrl/:projectCode/:sheetCode'
-  getFields(route.params.teamUrl, route.params.projectCode, route.params.sheetCode)
 })
 </script>
 
 <template>
-  <div v-if="state.showSidebar" class="sidebar">
+  <div class="sidebar">
     <div v-for="(menu, index) in state.menuList" :key="index" class="menu" @click="getFields(menu.serve)">
       <nuxt-link :to="menu.path" :class="state.activePath === menu.path ? 'menu-item menu-item_active' : 'menu-item'">
         <i :class="menu.icon" />
@@ -54,7 +33,7 @@ onMounted(() => {
 .sidebar {
   position: absolute;
   top: 10px;
-  left: 10px;
+  left: 0;
   bottom: 10px;
   overflow: auto;
   padding-top: 20px;

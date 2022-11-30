@@ -5,20 +5,21 @@ import AssociationTable from './association-table.vue'
 import { qiniu } from '@/api/qiniu'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
+const tableChild = ref<InstanceType<typeof AssociationTable>>()
 
 defineExpose({
-  getParentData,
+  getParentData
 })
 
 const state = reactive({
   formFields: {
-    img: [],
+    img: [] as any,
     content: '',
-    video: [],
+    video: [] as any,
     building: '',
-    imgs: [] as any,
+    imgs: [] as any
   },
-  fileList: [], // 图片回显
+  fileList: [] as any, // 图片回显
   disabled: false,
   content: '',
   title: '',
@@ -34,8 +35,8 @@ const state = reactive({
   isShowUploadVideo: false, // 显示上传按钮
   name: '', // 关联表选中的名字,
   key: '', // 记录关联表数据
-  list: [],
-  type: '',
+  list: [] as any,
+  type: '' as any
 })
 
 function getKeyAndToken() {
@@ -48,8 +49,8 @@ function getParentData(data: any) {
   state.title = data.title
   state.recordId = data.recordId
   state.teamUrl = data.teamUrl
-  state.projectCode = state.projectCode
-  state.sheetCode = state.sheetCode
+  state.projectCode = data.projectCode
+  state.sheetCode = data.sheetCode
   setTimeout(() => {
     state.formFields = data.formFields
   }, 100)
@@ -58,12 +59,12 @@ function getParentData(data: any) {
  * 获取七牛token
  */
 function getQiniuToken() {
-  qiniu.getQiniuToken().then((res) => {
+  qiniu.getQiniuToken().then(res => {
     state.dataObj.token = res.content.upToken
   })
 }
 function getQiniuKey() {
-  qiniu.getQiniuKey().then((res) => {
+  qiniu.getQiniuKey().then(res => {
     state.dataObj.key = res.content.key
   })
 }
@@ -76,14 +77,14 @@ function beforeUploadVideo(file: any) {
   ) {
     ElMessage({
       type: 'error',
-      message: '请上传正确的视频格式',
+      message: '请上传正确的视频格式'
     })
     return false
   }
   if (!fileSize) {
     ElMessage({
       type: 'error',
-      message: '视频大小不能超过50MB',
+      message: '视频大小不能超过50MB'
     })
     return false
   }
@@ -97,13 +98,15 @@ function showTable(val: any, formFields: any, data: any) {
   state.type = data
   const sheetId = formFields.property.sheet_id
   const params = {}
-  sheet.getSheetById(params, state.teamUrl, state.projectCode, sheetId).then((res) => {
+  sheet.getSheetById(params, state.teamUrl, state.projectCode, sheetId).then(res => {
     if (res.code == 1) {
       const sheetCode = res.content.code
-      table.getRecordList(params, state.teamUrl, state.projectCode, sheetCode).then((res) => {
+      table.getRecordList(params, state.teamUrl, state.projectCode, sheetCode).then(res => {
         if (res.code === 1) {
-          // this.$refs.tableChild.dialogVisible = true
-          // this.$refs.tableChild.fields = res.content
+          tableChild.value?.getParentData({
+            dialogVisible: true,
+            fields: res.content
+          })
         }
       })
     }
@@ -141,7 +144,7 @@ function handleAvatarSuccess(res: any, file: any) {
   const img = `https://qiniu.easyapi.com/${res.key}`
   file.url = img
   const obj = {
-    url: img,
+    url: img
   }
   state.formFields.imgs.push(obj)
 }
@@ -149,14 +152,14 @@ function handleRemove(res: any, file: any) {
   state.formFields.imgs.splice(state.formFields.imgs.findIndex((item: any) => item.url === res.url))
 }
 function close() {
-  state.formFields = {}
+  state.formFields = {} as any
 }
 function confirm(formName: any) {
   if (state.title === '新增') {
     const list = []
     const obj = {}
     const data = {
-      ...state.formFields,
+      ...state.formFields
     }
     obj.fields = data
     obj.fields[state.key]
@@ -165,11 +168,8 @@ function confirm(formName: any) {
         }))
       : ''
     list.push(obj)
-    table.creatRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+    table.creatRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
       if (res.code === 1) {
-        setTimeout(() => {
-          // this.$parent.getRecordList()
-        }, 500)
         state.dialogVisible = false
       }
     })
@@ -177,7 +177,7 @@ function confirm(formName: any) {
     const list = []
     const obj = {}
     const data = {
-      ...state.formFields,
+      ...state.formFields
     }
     obj.fields = data
     if (state.key) {
@@ -187,13 +187,12 @@ function confirm(formName: any) {
     }
     obj.recordId = state.recordId
     list.push(obj)
-    table.updateRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+    table.updateRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
       if (res.code === 1) {
-        // this.$parent.getRecordList()
         state.dialogVisible = false
         ElMessage({
           type: 'success',
-          message: '修改成功',
+          message: '修改成功'
         })
       }
     })
@@ -202,42 +201,38 @@ function confirm(formName: any) {
 
 watch(
   () => state.dialogVisible,
-  (value) => {
+  value => {
     if (value) {
       for (const a of state.fieldList) {
-        if (a.type === '关联表')
-          state.key = a.key
+        if (a.type === '关联表') state.key = a.key
       }
     }
   },
-  { deep: true },
+  { deep: true }
 )
 
 watch(
   () => state.formFields.img,
-  (value) => {
-    if (value == null)
-      state.formFields.imgs = []
+  value => {
+    if (value == null) state.formFields.imgs = []
   },
-  { deep: true },
+  { deep: true }
 )
 
 watch(
   () => state.formFields.video,
-  (value) => {
-    if (value == null)
-      state.formFields.video = []
+  value => {
+    if (value == null) state.formFields.video = []
   },
-  { deep: true },
+  { deep: true }
 )
 
 watch(
   () => state.formFields.video,
-  (value) => {
-    if (value)
-      state.fileList = value.img
+  value => {
+    if (value) state.fileList = value.img
   },
-  { deep: true },
+  { deep: true }
 )
 </script>
 
@@ -250,8 +245,7 @@ watch(
       :append-to-body="true"
       custom-class="edit-dialog"
       width="80%"
-      @close="close"
-    >
+      @close="close">
       <div class="edit">
         <el-form ref="form" :model="state.formFields" label-width="100px" :inline="true">
           <el-form-item v-for="item in state.fieldList" :key="item" :prop="item.key" :label="`${item.name}:`">
@@ -264,8 +258,7 @@ watch(
                   :on-success="handleAvatarSuccess"
                   list-type="picture-card"
                   :file-list="fileList"
-                  :on-remove="handleRemove"
-                >
+                  :on-remove="handleRemove">
                   <i class="el-icon-plus" />
                 </el-upload>
               </div>
@@ -279,8 +272,7 @@ watch(
                 :on-progress="uploadVideoProcess"
                 :on-success="handleVideoSuccess"
                 :before-upload="beforeUploadVideo"
-                :show-file-list="false"
-              >
+                :show-file-list="false">
                 <video v-if="state.formFields.video" :src="state.formFields.video" class="video video-avatar" controls="controls">
                   您的浏览器不支持视频播放
                 </video>
@@ -303,14 +295,9 @@ watch(
                 class="tag"
                 type="info"
                 @click="showTable(item.key, item, '修改')"
-                v-html="about.fields.name"
-              />
-              <el-tag v-if="item.property.many && state.title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">
-                +添加
-              </el-tag>
-              <el-tag v-if="state.title === '新增' && state.list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">
-                +添加
-              </el-tag>
+                v-html="about.fields.name" />
+              <el-tag v-if="item.property.many && state.title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
+              <el-tag v-if="state.title === '新增' && state.list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
             </div>
             <!-- 单选 -->
             <el-select v-if="item.type === '单选'" v-model="state.formFields[item.key]">
@@ -324,12 +311,8 @@ watch(
         </el-form>
       </div>
       <template #footer>
-        <el-button @click="state.dialogVisible = false">
-          取 消
-        </el-button>
-        <el-button type="primary" @click="confirm()">
-          确 定
-        </el-button>
+        <el-button @click="state.dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirm()">确 定</el-button>
       </template>
     </el-dialog>
     <AssociationTable ref="tableChild" @getItem="getItem" />

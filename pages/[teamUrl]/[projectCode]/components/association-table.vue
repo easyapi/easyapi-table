@@ -1,30 +1,43 @@
-<script>
-export default {
-  name: 'AssociationTable',
-  data() {
-    return {
-      dialogVisible: false,
-      fields: [],
-      styleObject: {},
-      input2: '',
-      active: '',
-    }
-  },
-  methods: {
-    choice(item, index) {
-      this.active = index
-      this.$emit('getItem', item)
-      this.dialogVisible = false
-    },
-    close() {},
-  },
+<script setup lang="ts">
+import { reactive, defineExpose } from 'vue'
+const emit = defineEmits(['getItem'])
+
+defineExpose({
+  getParentData
+})
+
+const state = reactive({
+  dialogVisible: false,
+  fields: [] as any,
+  styleObject: {} as any,
+  input2: '',
+  active: ''
+})
+
+function choice(item: any, index: any) {
+  state.active = index
+  emit('getItem', item)
+  state.dialogVisible = false
+}
+
+function close() {}
+
+function getParentData(data: any) {
+  state.dialogVisible = data.dialogVisible
+  state.fields = data.fields
 }
 </script>
 
 <template>
-  <el-dialog v-model:visible="dialogVisible" title="关联表" :close-on-click-modal="false" width="50%" @close="close">
-    <el-input v-model="input2" class="input" placeholder="搜索你想关联的内容" prefix-icon="el-icon-search" />
-    <div v-for="(item, index) in fields" :key="index" class="list" :class="{ active: active === index }" :style="styleObject" @click="choice(item, index)">
+  <el-dialog v-model="state.dialogVisible" title="关联表" append-to-body :close-on-click-modal="false" width="50%" @close="close">
+    <el-input v-model="state.input2" class="input" placeholder="搜索你想关联的内容" prefix-icon="el-icon-search" />
+    <div
+      v-for="(item, index) in state.fields"
+      :key="index"
+      class="list"
+      :class="{ active: state.active === index }"
+      :style="styleObject"
+      @click="choice(item, index)">
       <div class="list-left">
         <h2>{{ item.fields.name }}</h2>
         <ul>
