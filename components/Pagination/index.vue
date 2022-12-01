@@ -26,7 +26,7 @@ function handleCurrentChange(val: any) {
     <el-pagination
       background
       :current-page="prop.totalPages"
-      :page-sizes="[12, 24, 36, 48]"
+      :page-sizes="[10, 20, 30, 40]"
       :page-size="prop.size"
       layout="total, sizes, prev, pager, next, jumper"
       :total="prop.totalElements"

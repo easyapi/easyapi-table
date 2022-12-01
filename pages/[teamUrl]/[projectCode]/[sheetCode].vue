@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Menu, Search } from '@element-plus/icons-vue'
+import { Menu, Plus, Search } from '@element-plus/icons-vue'
 import Edit from './components/edit.vue'
 import AdvancedSearch from './components/advanced-search.vue'
 import Pagination from '@/components/Pagination'
@@ -27,7 +27,7 @@ onMounted(() => {
 
 useHead({
   title: '数据表格 - EasyAPI服务市场',
-  meta: [{ name: 'description', content: 'EasyAPI数据表格' }]
+  meta: [{ name: 'description', content: 'EasyAPI数据表格' }],
 })
 
 const state = reactive({
@@ -49,17 +49,17 @@ const state = reactive({
     { label: '产品类型', type: 'input', key: 'title' },
     { label: '交付方式', type: 'input', key: 'title' },
     { label: '产品状态', type: 'input', key: 'title' },
-    { label: '计费方式', type: 'select', key: 'title' }
+    { label: '计费方式', type: 'select', key: 'title' },
   ],
   pagination: {
     page: 1,
-    size: 12,
-    total: 0
+    size: 10,
+    total: 0,
   },
   loadingData: false,
   tableText: '',
   recordIds: [] as any,
-  detailList: []
+  detailList: [],
 })
 
 function showVideo(url: any) {
@@ -75,9 +75,9 @@ function handleClick() {}
 
 function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
   const params = {
-    size: 50
+    size: 50,
   }
-  sheet.getSheet(params, teamUrl, projectCode, sheetCode).then(res => {
+  sheet.getSheet(params, teamUrl, projectCode, sheetCode).then((res) => {
     if (res.code == 1) {
       state.fieldList = res.content.fields
       state.headline = res.content.name
@@ -88,8 +88,11 @@ function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
 function getRecordList() {
   state.recordList = []
   state.loadingData = true
-  const params = {}
-  table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+  const params = {
+    size: state.pagination.size,
+    page: state.pagination.page - 1,
+  }
+  table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
     if (res.code === 1) {
       state.loadingData = false
       state.recordList = res.content
@@ -116,7 +119,7 @@ function rowClick(row: any) {
     teamUrl: state.teamUrl,
     projectCode: state.projectCode,
     sheetCode: state.sheetCode,
-    formFields: record.fields
+    formFields: record.fields,
   })
 }
 
@@ -125,7 +128,7 @@ function handleSelectionChange(val: any) {
   state.ifDelete = val.length > 0
   state.checkedLength = val.length
   const obj = {
-    recordId: ''
+    recordId: '',
   }
   for (const item of val) {
     obj.recordId = item.recordId
@@ -141,13 +144,13 @@ function batchRemove() {
   ElMessageBox.confirm('是否继续?', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
   }).then(() => {
-    table.deleteRecord(data, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+    table.deleteRecord(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
       if (res.code === 1) {
         ElMessage({
           type: 'success',
-          message: '删除成功'
+          message: '删除成功',
         })
         getRecordList()
       }
@@ -168,7 +171,7 @@ function addMore() {
 function openSearch() {
   searchChild.value?.getParentData({
     dialogVisible: true,
-    fieldList: state.fieldList
+    fieldList: state.fieldList,
   })
 }
 /**
@@ -183,7 +186,7 @@ function addProvider(teamUrl: any, projectCode: any, sheetCode: any) {
     teamUrl,
     projectCode,
     sheetCode,
-    formFields: []
+    formFields: [],
   })
 }
 /**
@@ -207,10 +210,10 @@ function event() {}
 
 watch(
   () => state.teamUrl,
-  value => {
+  (value) => {
     getRecordList()
   },
-  { deep: true }
+  { deep: true },
 )
 </script>
 
@@ -230,7 +233,9 @@ watch(
         </div>
         <div class="add">
           <el-input v-model="state.input2" class="mr-3" style="width: 150px" placeholder="请输入搜索内容" :prefix-icon="Search" />
-          <el-button type="primary" plain @click="addMore">展开更多</el-button>
+          <el-button type="primary" plain @click="addMore">
+            展开更多
+          </el-button>
           <el-button @click="openSearch">
             <el-icon :size="15">
               <Menu />
@@ -252,7 +257,9 @@ watch(
       </div>
       <div v-if="state.ifDelete" class="mt-4 flex items-center">
         <span class="mr-4">已选中{{ state.checkedLength }}项</span>
-        <el-button type="danger" @click="batchRemove">批量删除</el-button>
+        <el-button type="danger" @click="batchRemove">
+          批量删除
+        </el-button>
       </div>
       <el-table
         v-loading="state.loadingData"
@@ -262,7 +269,8 @@ watch(
         :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
         element-loading-text="数据正在加载中..."
         @row-click="rowClick"
-        @selection-change="handleSelectionChange">
+        @selection-change="handleSelectionChange"
+      >
         <template #empty>
           <p>{{ state.tableText }}</p>
         </template>
@@ -279,11 +287,11 @@ watch(
             </div>
 
             <div v-for="url in scope.row.fields[item.key]" :key="url" :src="`${url.url}!icon.jpg`">
-              <img v-if="item.type === '附件' && item.key === 'imgs'" class="table-img" :src="url" />
+              <img v-if="item.type === '附件' && item.key === 'imgs'" class="table-img" :src="url">
             </div>
 
             <div v-for="url in scope.row.fields[item.key]" :key="url">
-              <img v-if="item.type === '附件' && item.key === 'video'" class="video-img" src="../../../assets/svg/video.svg" @click.stop="showVideo(url.url)" />
+              <img v-if="item.type === '附件' && item.key === 'video'" class="video-img" src="../../../assets/svg/video.svg" @click.stop="showVideo(url.url)">
             </div>
             <el-dialog v-model="dialogVisible" title="视频预览" width="50%" append-to-body top="20px" @close="close">
               <video id="video" ref="vueRef" width="100%" autoplay="autoplay" :src="playvideo" :poster="playvideo" controls="controls" preload />
@@ -292,7 +300,13 @@ watch(
         </el-table-column>
       </el-table>
     </div>
-    <Pagination :size="state.pagination.size" :total-elements="state.pagination.total" class="paging" @fatherSize="fatherSize" @fatherCurrent="fatherCurrent" />
+    <Pagination
+      :size="state.pagination.size"
+      :total-elements="state.pagination.total"
+      class="paging"
+      @father-size="fatherSize"
+      @father-current="fatherCurrent"
+    />
     <div style="clear: both" />
     <Edit ref="child" />
     <AdvancedSearch ref="searchChild" />
@@ -342,5 +356,4 @@ watch(
   height: 0;
 }
 </style>
-
 
