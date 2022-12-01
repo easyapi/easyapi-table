@@ -1,43 +1,75 @@
 <script setup lang="ts">
 import { reactive, defineExpose } from 'vue'
-const emit = defineEmits(['getItem'])
+import { sheet } from '@/api/sheet'
+import { table } from '@/api/table'
+import { Search } from '@element-plus/icons-vue'
 
-defineExpose({
-  getParentData
-})
+const emit = defineEmits(['getItem'])
 
 const state = reactive({
   dialogVisible: false,
   fields: [] as any,
-  styleObject: {} as any,
-  input2: '',
-  active: ''
+  search: '',
+  pagination: {
+    page: 1,
+    size: 10,
+    total: 0
+  },
+  teamUrl: '',
+  projectCode: '',
+  sheetId: '',
+  sheetCode: ''
 })
 
+function getRecordList() {
+  let params = {
+    page: state.pagination.page - 1,
+    size: state.pagination.size
+  }
+  table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+    if (res.code === 1) {
+      state.fields = res.content
+      state.pagination.total = res.totalElements
+    } else {
+      state.fields = []
+      state.pagination.total = 0
+    }
+  })
+}
+
+function getSheetById() {
+  sheet.getSheetById({}, state.teamUrl, state.projectCode, state.sheetId).then(res => {
+    if (res.code == 1) {
+      state.sheetCode = res.content.code
+      getRecordList()
+    }
+  })
+}
+
 function choice(item: any, index: any) {
-  state.active = index
   emit('getItem', item)
   state.dialogVisible = false
 }
 
-function close() {}
-
 function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
-  state.fields = data.fields
+  state.teamUrl = data.teamUrl
+  state.projectCode = data.projectCode
+  state.sheetId = data.sheetId
+  getSheetById()
 }
+
+defineExpose({
+  getParentData
+})
 </script>
 
 <template>
-  <el-dialog v-model="state.dialogVisible" title="关联表" append-to-body :close-on-click-modal="false" width="50%" @close="close">
-    <el-input v-model="state.input2" class="input" placeholder="搜索你想关联的内容" prefix-icon="el-icon-search" />
-    <div
-      v-for="(item, index) in state.fields"
-      :key="index"
-      class="list"
-      :class="{ active: state.active === index }"
-      :style="styleObject"
-      @click="choice(item, index)">
+  <el-dialog v-model="state.dialogVisible" title="关联表" append-to-body :close-on-click-modal="false" width="50%">
+    <div class="w-44 mb-4">
+      <el-input v-model="state.search" placeholder="搜索你想关联的内容" :prefix-icon="Search" />
+    </div>
+    <div v-for="(item, index) in state.fields" :key="index" class="list" @click="choice(item, index)">
       <div class="list-left">
         <h2>{{ item.fields.name }}</h2>
         <ul>
@@ -65,15 +97,6 @@ function getParentData(data: any) {
 </template>
 
 <style scoped>
-.input {
-  width: 50%;
-  margin-bottom: 10px;
-}
-
-.active {
-  border: 1px solid #a3e6ef;
-}
-
 .list {
   background-color: #f3f5f9;
   border: 1px solid #f3f5f9;

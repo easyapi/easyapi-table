@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { defineExpose, reactive, watch } from 'vue'
+import { defineExpose, reactive, watch, shallowRef, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import AssociationTable from './association-table.vue'
 import { qiniu } from '@/api/qiniu'
 import { table } from '@/api/table'
-import { sheet } from '@/api/sheet'
+
+const editorRef = shallowRef()
+const toolbarConfig = {}
+const editorConfig = { placeholder: '请输入内容...' }
 const tableChild = ref<InstanceType<typeof AssociationTable>>()
 
 defineExpose({
@@ -36,13 +39,22 @@ const state = reactive({
   name: '', // 关联表选中的名字,
   key: '', // 记录关联表数据
   list: [] as any,
-  type: '' as any
+  mode: 'default'
 })
+
+function handleClose(idx: any, key: any) {
+  state.formFields[key].splice(idx, 1)
+}
+
+function handleCreated(editor: any) {
+  editorRef.value = editor
+}
 
 function getKeyAndToken() {
   getQiniuToken()
   getQiniuKey()
 }
+
 function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
   state.fieldList = data.fieldList
@@ -93,33 +105,24 @@ function beforeUploadVideo(file: any) {
 /**
  * 展示关联表
  */
-function showTable(val: any, formFields: any, data: any) {
+function showTable(val: any, formFields: any) {
   state.key = val
-  state.type = data
-  const sheetId = formFields.property.sheet_id
-  const params = {}
-  sheet.getSheetById(params, state.teamUrl, state.projectCode, sheetId).then(res => {
-    if (res.code == 1) {
-      const sheetCode = res.content.code
-      table.getRecordList(params, state.teamUrl, state.projectCode, sheetCode).then(res => {
-        if (res.code === 1) {
-          tableChild.value?.getParentData({
-            dialogVisible: true,
-            fields: res.content
-          })
-        }
-      })
-    }
+  tableChild.value?.getParentData({
+    dialogVisible: true,
+    teamUrl: state.teamUrl,
+    projectCode: state.projectCode,
+    sheetId: formFields.property.sheet_id
   })
 }
+
 function getItem(data: any) {
-  if (state.type === '修改') {
-    state.formFields[state.key] = state.formFields[state.key].map((item: any) => {
-      return item.recordId !== data.recordId ? data : item
-    })
-  } else {
+  if (!state.formFields[state.key]) {
     state.formFields[state.key] = []
     state.formFields[state.key].push(data)
+  } else {
+    if (state.formFields[state.key].filter((x: any) => x.recordId == data.recordId).length == 0) {
+      state.formFields[state.key].push(data)
+    }
   }
 }
 /**
@@ -171,6 +174,10 @@ function confirm(formName: any) {
     table.creatRecord(list, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
       if (res.code === 1) {
         state.dialogVisible = false
+        ElMessage({
+          type: 'success',
+          message: '添加成功'
+        })
       }
     })
   } else {
@@ -280,6 +287,10 @@ watch(
               </el-upload>
             </div>
             <!-- 富文本 -->
+            <div v-if="item.type === '富文本'" style="border: 1px solid #ccc">
+              <toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="state.mode" />
+              <editor style="height: 300px" v-model="state.formFields[item.key]" :defaultConfig="editorConfig" :mode="mode" @onCreated="handleCreated" />
+            </div>
             <!-- <MarkdownEditor v-if="item.type === '富文本'" v-model="state.formFields[item.key]"></MarkdownEditor> -->
             <!-- 单行文本 -->
             <el-input v-if="item.type === '单行文本'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
@@ -290,14 +301,15 @@ watch(
             <!-- 关联表 -->
             <div v-if="item.type === '关联表'">
               <el-tag
-                v-for="about in state.formFields[item.key]"
-                :key="about"
-                class="tag"
+                v-for="(about, cindex) in state.formFields[item.key]"
+                :key="cindex"
+                class="mr-2"
                 type="info"
-                @click="showTable(item.key, item, '修改')"
-                v-html="about.fields.name" />
-              <el-tag v-if="item.property.many && state.title === '编辑'" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
-              <el-tag v-if="state.title === '新增' && state.list.length < 1" class="tag" type="info" @click="showTable(item.key, item, '新增')">+添加</el-tag>
+                closable
+                @close="handleClose(cindex, item.key)">
+                {{ about.fields.name }}
+              </el-tag>
+              <el-tag class="cursor-pointer" type="info" @click="showTable(item.key, item)">+添加</el-tag>
             </div>
             <!-- 单选 -->
             <el-select v-if="item.type === '单选'" v-model="state.formFields[item.key]">

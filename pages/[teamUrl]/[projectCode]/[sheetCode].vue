@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Menu } from '@element-plus/icons-vue'
+import { Plus, Menu, Search } from '@element-plus/icons-vue'
 import Edit from './components/edit.vue'
 import AdvancedSearch from './components/advanced-search.vue'
 import Pagination from '@/components/Pagination'
@@ -93,7 +93,7 @@ function getRecordList() {
     if (res.code === 1) {
       state.loadingData = false
       state.recordList = res.content
-      state.pagination.total = Number(res.totalElements)
+      state.pagination.total = res.totalElements
     } else {
       state.loadingData = false
       state.tableText = '暂无数据'
@@ -220,7 +220,7 @@ watch(
       <div>
         <b>{{ state.headline }}</b>
       </div>
-      <div class="mg-tp-15 flex-r just-between">
+      <div class="mt-6 flex algin-center justify-between">
         <div class="tabs">
           <el-tabs v-model="state.activeName" @tab-click="handleClick">
             <el-tab-pane label="全部数据" name="first" />
@@ -229,7 +229,7 @@ watch(
           </el-tabs>
         </div>
         <div class="add">
-          <el-input v-model="state.input2" style="width: 150px" placeholder="请输入搜索内容" prefix-icon="el-icon-search" />
+          <el-input v-model="state.input2" class="mr-3" style="width: 150px" placeholder="请输入搜索内容" :prefix-icon="Search" />
           <el-button type="primary" plain @click="addMore">展开更多</el-button>
           <el-button @click="openSearch">
             <el-icon :size="15">
@@ -247,17 +247,17 @@ watch(
       </div>
     </div>
     <div class="main-content">
-      <div v-if="ifShow">
+      <div v-if="state.ifShow">
         <SearchArea :items="state.searchItems" @search="search" @event="event" @reset="reset" />
       </div>
-      <div v-if="ifDelete" class="mg-tp-10">
-        <span>已选中{{ state.checkedLength }}项</span>
-        <el-button size="small" type="danger" @click="batchRemove">批量删除</el-button>
+      <div v-if="state.ifDelete" class="mt-4 flex items-center">
+        <span class="mr-4">已选中{{ state.checkedLength }}项</span>
+        <el-button type="danger" @click="batchRemove">批量删除</el-button>
       </div>
       <el-table
         v-loading="state.loadingData"
         border
-        class="mg-tp-10"
+        class="mt-4"
         :data="state.recordList"
         :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
         element-loading-text="数据正在加载中..."
@@ -300,58 +300,10 @@ watch(
 </template>
 
 <style scoped>
-.el-tabs__content {
-  overflow: visible;
-}
-
-.el-tabs__item {
-  color: #333333;
-}
-
-.el-tabs__item.is-active {
-  color: #15cbf3;
-}
-
-.el-icon-arrow-left {
-  color: white;
-}
-
-.el-icon-arrow-right {
-  color: white;
-}
-
-.el-tabs__nav-wrap::after {
-  height: 0;
-}
-
-.el-button + .el-button {
-  margin-left: 0px;
-}
-
-.el-tabs__active-bar {
-  background-color: #15cbf3;
-}
-
-.cell .el-tooltip {
-  color: #67c23a;
-}
-
-.tabs {
-  width: 50%;
-}
-
-.just-between {
-  justify-content: space-between;
-}
-
 #video {
   width: 100%;
   height: 500px;
 }
-
-/* /deep/ p img {
-  display: none;
-} */
 
 .table-img {
   width: 50px;
@@ -362,12 +314,6 @@ watch(
   width: 50px;
   height: 50px;
 }
-
-/* .el-table {
-  /deep/ tbody tr:hover > td {
-    cursor: pointer;
-  }
-} */
 
 .rich-text {
   /* 设置宽高可以解决显示两个省略号的问题*/
@@ -390,3 +336,11 @@ watch(
   -webkit-line-clamp: 1; /*行数*/
 }
 </style>
+
+<style>
+.tabs .el-tabs__nav-wrap::after {
+  height: 0;
+}
+</style>
+
+
