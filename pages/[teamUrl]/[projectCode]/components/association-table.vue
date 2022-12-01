@@ -9,10 +9,11 @@ const emit = defineEmits(['getItem'])
 const state = reactive({
   dialogVisible: false,
   fields: [] as any,
+  recordList: [] as any,
   search: '',
   pagination: {
     page: 1,
-    size: 10,
+    size: 5,
     total: 0
   },
   teamUrl: '',
@@ -28,25 +29,32 @@ function getRecordList() {
   }
   table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
     if (res.code === 1) {
-      state.fields = res.content
+      state.recordList = res.content
       state.pagination.total = res.totalElements
     } else {
-      state.fields = []
+      state.recordList = []
       state.pagination.total = 0
     }
   })
 }
 
 function getSheetById() {
+  state.fields = []
   sheet.getSheetById({}, state.teamUrl, state.projectCode, state.sheetId).then(res => {
     if (res.code == 1) {
+      res.content.fields.map((item: any, index: Number) => {
+        if (index < 5) {
+          state.fields.push(item)
+        }
+      })
       state.sheetCode = res.content.code
       getRecordList()
     }
   })
 }
 
-function choice(item: any, index: any) {
+function choice(item: any, key: any) {
+  item.tag = item.fields[key]
   emit('getItem', item)
   state.dialogVisible = false
 }
@@ -59,6 +67,16 @@ function getParentData(data: any) {
   getSheetById()
 }
 
+function fatherSize(data: any) {
+  state.pagination.size = data
+  getRecordList()
+}
+
+function fatherCurrent(data: any) {
+  state.pagination.page = data
+  getRecordList()
+}
+
 defineExpose({
   getParentData
 })
@@ -66,60 +84,33 @@ defineExpose({
 
 <template>
   <el-dialog v-model="state.dialogVisible" title="关联表" append-to-body :close-on-click-modal="false" width="50%">
-    <div class="w-44 mb-4">
+    <div class="w-52 mb-6">
       <el-input v-model="state.search" placeholder="搜索你想关联的内容" :prefix-icon="Search" />
     </div>
-    <div v-for="(item, index) in state.fields" :key="index" class="list" @click="choice(item, index)">
-      <div class="list-left">
-        <h2>{{ item.fields.name }}</h2>
-        <ul>
-          <li>
-            <p>地址</p>
-            <p>{{ item.fields.address }}</p>
-          </li>
-          <li>
-            <p>楼层</p>
-            <p>{{ item.fields.floor }}</p>
-          </li>
-          <li>
-            <p>价格</p>
-            <p>{{ item.fields.price }}</p>
-          </li>
-          <li>
-            <p>电话</p>
-            <p>{{ item.fields.phone }}</p>
-          </li>
-        </ul>
+    <div
+      class="w-full cursor-pointer px-4 pt-6 bg-gray-100 border-2 rounded border border-gray-100 flex items-center mb-4 space-x-8 hover:border-purple-600"
+      v-for="(item, index) in state.recordList"
+      :key="index"
+      @click="choice(item, state.fields[0].key)">
+      <div class="w-1/5" v-for="(citem, cindex) in state.fields" :key="cindex">
+        <div class="flex flex-col">
+          <div class="h-10 text-gray-400 text-sm">{{ citem.name }}</div>
+          <div class="h-10 overflow-hidden text-black text-sm">
+            <div class="truncate" v-if="citem.type == '单行文本' || citem.type == '日期'">{{ item.fields[citem.key] || '--' }}</div>
+            <div v-if="citem.type == '富文本'" v-html="item.fields[citem.key]"></div>
+            <div v-if="citem.type == '附件'">
+              <img class="w-6 h-6" :src="item.fields[citem.key][0].url" alt="" />
+            </div>
+          </div>
+        </div>
       </div>
-      <el-image v-for="img in item.fields.img" :key="img" class="list-right" style="width: 100px; height: 100px" :src="img.url" fit="cover" />
     </div>
+    <div class="flex justify-end">
+      <Pagination :size="state.pagination.size" :total-elements="state.pagination.total" @fatherSize="fatherSize" @fatherCurrent="fatherCurrent" />
+    </div>
+    <div style="clear: both" />
   </el-dialog>
 </template>
 
 <style scoped>
-.list {
-  background-color: #f3f5f9;
-  border: 1px solid #f3f5f9;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.list .list-right {
-  width: 20%;
-}
-
-.list .list-left {
-  width: 80%;
-  padding: 10px;
-}
-
-.list .list-left ul {
-  display: flex;
-}
-
-.list .list-left ul li {
-  width: 25%;
-}
 </style>

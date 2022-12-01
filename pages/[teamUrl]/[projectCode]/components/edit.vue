@@ -307,7 +307,7 @@ watch(
                 type="info"
                 closable
                 @close="handleClose(cindex, item.key)">
-                {{ about.fields.name }}
+                {{ about.tag }}
               </el-tag>
               <el-tag class="cursor-pointer" type="info" @click="showTable(item.key, item)">+添加</el-tag>
             </div>
