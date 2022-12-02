@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
+import { useRoute } from 'nuxt/app'
 const route = useRoute()
 const state = reactive({
   activePath: '',
@@ -8,9 +9,9 @@ const state = reactive({
       title: '常客服务',
       path: '/changke/changke_provider',
       icon: 'el-icon-s-help',
-      serve: 'changke_provider'
-    }
-  ]
+      serve: 'changke_provider',
+    },
+  ],
 })
 
 onMounted(() => {

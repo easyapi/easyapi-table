@@ -85,35 +85,6 @@ export default {
 </template>
 
 <style scoped>
-.ivu-input {
-  height: 30px;
-  flex: 1;
-}
-
-.ivu-select {
-  height: 30px;
-  flex: 1;
-}
-
-.ivu-select-selection {
-  height: 30px;
-}
-
-.ivu-btn {
-  height: 30px;
-}
-
-.ivu-date-picker {
-  flex: 1;
-}
-
-.item-label {
-  /*line-height: 30px;*/
-  /*padding-right: 20px;*/
-  /*text-align: right;*/
-  /*min-width: 116px;*/
-}
-
 .search-item .buttons {
   display: flex;
   margin: 10px 0;

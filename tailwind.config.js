@@ -7,7 +7,7 @@ module.exports = {
   plugins: [
     require('@tailwindcss/typography'),
     function ({
-      addComponents
+      addComponents,
     }) {
       addComponents({
         '.container': {

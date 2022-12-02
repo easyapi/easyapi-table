@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive, onMounted } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { settingStore } from '@/stores/setting'
 const store = settingStore()
 const state = reactive({
   showHeader: true,
-  showSidebar: true
+  showSidebar: true,
 })
 
 onMounted(() => {

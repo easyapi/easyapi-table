@@ -77,7 +77,6 @@ function deleteRecord(index: any) {
     type: 'warning',
   })
     .then(() => {
-      console.log(index)
       state.conditionList.splice(index, 1)
       ElMessage({
         type: 'success',
