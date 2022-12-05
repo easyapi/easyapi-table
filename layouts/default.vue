@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
-import { settingStore } from '@/stores/setting'
-const store = settingStore()
+import { onMounted, reactive } from "vue";
+import { settingStore } from "@/stores/setting";
+const store = settingStore();
 const state = reactive({
   showHeader: true,
   showSidebar: true,
-})
+});
 
 onMounted(() => {
-  state.showHeader = store.showHeader
-  state.showSidebar = store.showSidebar
-})
+  state.showHeader = store.showHeader;
+  state.showSidebar = store.showSidebar;
+});
 </script>
 
 <template>
@@ -18,7 +18,10 @@ onMounted(() => {
     <Header v-show="state.showHeader" />
     <div :class="state.showHeader ? 'content' : 'contents'">
       <Aside v-if="state.showSidebar" />
-      <div :class="state.showSidebar ? 'main' : 'main-left main'">
+      <div
+        :class="state.showSidebar ? 'main' : 'main-left main'"
+        :style="state.showSidebar ? '' : 'padding:0;'"
+      >
         <slot />
       </div>
     </div>
