@@ -25,7 +25,7 @@ onMounted(() => {
 
   if (route.query.backgroundColor) {
     store.$patch({
-      backgroundColor: route.query.backgroundColor as string,
+      backgroundColor: `#${route.query.backgroundColor}`,
     });
   }
 
