@@ -3,8 +3,8 @@ import { onMounted, reactive } from "vue";
 import { settingStore } from "@/stores/setting";
 const store = settingStore();
 const state = reactive({
-  showHeader: true,
-  showSidebar: true,
+  showHeader: false,
+  showSidebar: false,
   backgroundColor: "",
 });
 
