@@ -40,11 +40,10 @@ const state = reactive({
   sheetCode: '',
   recordList: [],
   ifShow: false,
-  ifDelete: false,
   tableList: [],
   headline: '',
   input2: '',
-  checkedLength: '',
+  checkedLength: 0,
   searchItems: [
     { label: '产品类型', type: 'input', key: 'title' },
     { label: '交付方式', type: 'input', key: 'title' },
@@ -125,7 +124,6 @@ function rowClick(row: any) {
 
 function handleSelectionChange(val: any) {
   state.recordIds = []
-  state.ifDelete = val.length > 0
   state.checkedLength = val.length
   const obj = {
     recordId: '',
@@ -141,7 +139,7 @@ function handleSelectionChange(val: any) {
  */
 function batchRemove() {
   const data = state.recordIds
-  ElMessageBox.confirm('是否继续?', '提示', {
+  ElMessageBox.confirm('确定要删除吗?', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -162,7 +160,7 @@ function batchRemove() {
  *展开更多
  */
 function addMore() {
-  state.ifShow = !state.ifShow
+  // state.ifShow = !state.ifShow
 }
 
 /**
@@ -219,10 +217,8 @@ watch(
 
 <template>
   <div>
-    <div class="main-top">
-      <div>
-        <b>{{ state.headline }}</b>
-      </div>
+    <div class="bg-white p-4">
+      <div class="text-2xl font-black">{{ state.headline }}</div>
       <div class="mt-6 flex algin-center justify-between">
         <div class="tabs">
           <el-tabs v-model="state.activeName" @tab-click="handleClick">
@@ -231,8 +227,8 @@ watch(
             <el-tab-pane label="待处理数据" name="third" />
           </el-tabs>
         </div>
-        <div class="add">
-          <el-input v-model="state.input2" class="mr-3" style="width: 150px" placeholder="请输入搜索内容" :prefix-icon="Search" />
+        <div>
+          <el-input v-model="state.input2" class="mr-3" style="width: 250px" placeholder="请输入搜索内容" :prefix-icon="Search" />
           <el-button type="primary" plain @click="addMore">
             展开更多
           </el-button>
@@ -251,15 +247,12 @@ watch(
         </div>
       </div>
     </div>
-    <div class="main-content">
+    <div class="main-content p-4 bg-white">
       <div v-if="state.ifShow">
         <SearchArea :items="state.searchItems" @search="search" @event="event" @reset="reset" />
       </div>
-      <div v-if="state.ifDelete" class="mt-4 flex items-center">
-        <span class="mr-4">已选中{{ state.checkedLength }}项</span>
-        <el-button type="danger" @click="batchRemove">
-          批量删除
-        </el-button>
+      <div class=" flex items-center">
+        <el-button type="danger" :disabled="state.checkedLength > 0 ? false : true" @click="batchRemove">批量删除</el-button>
       </div>
       <el-table
         v-loading="state.loadingData"
@@ -282,32 +275,38 @@ watch(
             <span v-if="item.type === '多行文本'" v-html="scope.row.fields[item.key]" />
             <span v-if="item.type === '富文本'" class="rich-text" v-html="scope.row.fields[item.key]" />
             <span v-if="item.type === '数字'" v-html="scope.row.fields[item.key]" />
-            <div v-for="about in scope.row.fields[item.key]" :key="about">
-              <el-tag v-if="item.type === '关联表'" type="info" v-html="Object.values(about.fields)[0]" />
+            <span v-if="item.type === '电话'" v-html="scope.row.fields[item.key]" />
+            <div v-if="item.type === '关联表'" class="flex flex-wrap">
+              <div class="mr-2" v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
+                <el-tag v-html="Object.values(citem.fields)[0]" />
+              </div> 
             </div>
-
-            <div v-for="url in scope.row.fields[item.key]" :key="url" :src="`${url.url}!icon.jpg`">
-              <img v-if="item.type === '附件' && item.key === 'imgs'" class="table-img" :src="url">
-            </div>
-
-            <div v-for="url in scope.row.fields[item.key]" :key="url">
-              <img v-if="item.type === '附件' && item.key === 'video'" class="video-img" src="../../../assets/svg/video.svg" @click.stop="showVideo(url.url)">
-            </div>
-            <el-dialog v-model="dialogVisible" title="视频预览" width="50%" append-to-body top="20px" @close="close">
+            <div v-if="item.type === '附件'">
+              <div v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
+                <img :src="citem.url"  class="w-12 h-12">
+              </div>
+           </div>
+           <div v-if="item.type === '视频'">
+              <div v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
+                <img src="../../../assets/svg/video.svg" class="w-12 h-12" @click.stop="showVideo(citem.url)">
+              </div>
+           </div>
+           <el-dialog v-model="dialogVisible" title="视频预览" width="50%" append-to-body top="20px" @close="close">
               <video id="video" ref="vueRef" width="100%" autoplay="autoplay" :src="playvideo" :poster="playvideo" controls="controls" preload />
-            </el-dialog>
+           </el-dialog>
           </template>
         </el-table-column>
       </el-table>
+      <div class="flex justify-end mt-4">
+        <Pagination
+          :size="state.pagination.size"
+          :totalPages="state.pagination.page"
+          :totalElements="state.pagination.total"
+          @fatherSize="fatherSize"
+          @fatherCurrent="fatherCurrent"
+        />
+      </div>
     </div>
-    <Pagination
-      :size="state.pagination.size"
-      :total-elements="state.pagination.total"
-      class="paging"
-      @father-size="fatherSize"
-      @father-current="fatherCurrent"
-    />
-    <div style="clear: both" />
     <Edit ref="child" />
     <AdvancedSearch ref="searchChild" />
   </div>
@@ -319,34 +318,18 @@ watch(
   height: 500px;
 }
 
-.table-img {
-  width: 50px;
-  height: 50px;
-}
-
-.video-img {
-  width: 50px;
-  height: 50px;
-}
-
 .rich-text {
   /* 设置宽高可以解决显示两个省略号的问题*/
   width: 620px; /*宽高看个人具体情况进行修改*/
   height: 20px;
-
   /* 1，强制一行显示 */
   white-space: wrap;
-
   /* 2.隐藏溢出的部分 */
   overflow: hidden;
-
   /* 3.隐藏的部分省略号显示 */
   text-overflow: ellipsis;
-
   display: -webkit-box;
-
   -webkit-box-orient: vertical;
-
   -webkit-line-clamp: 1; /*行数*/
 }
 </style>

@@ -88,7 +88,6 @@ img {
 .content {
   min-height: calc(100vh - 50px);
   width: 100%;
-  background: #f4f4f4;
   display: flex;
   position: relative;
 }
@@ -96,7 +95,6 @@ img {
 .contents {
   height: 100%;
   width: 100%;
-  background: #f4f4f4;
   display: flex;
   position: relative;
 }
@@ -107,7 +105,7 @@ img {
   left: 0;
   right: 0;
   bottom: 10px;
-  padding: 10px;
+  padding: 10px 10px 0 10px;
   overflow: auto;
   margin-left: 200px;
 }
@@ -118,15 +116,6 @@ img {
 
 .main::-webkit-scrollbar {
   display: none;
-}
-
-.main-top {
-  background-color: #ffffff;
-  padding: 15px;
-}
-
-.main-top b {
-  font-size: 20px;
 }
 
 .mg-lf-15 {

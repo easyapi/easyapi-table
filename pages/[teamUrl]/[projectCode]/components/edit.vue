@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { defineExpose, reactive, ref, shallowRef, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import AssociationTable from './association-table.vue'
 import { qiniu } from '@/api/qiniu'
 import { table } from '@/api/table'
+import { sheet } from '@/api/sheet'
 
 const editorRef = shallowRef()
 const toolbarConfig = {}
 const editorConfig = { placeholder: '请输入内容...' }
 const tableChild = ref<InstanceType<typeof AssociationTable>>()
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
 
 defineExpose({
   getParentData,
@@ -55,7 +59,7 @@ function getKeyAndToken() {
   getQiniuKey()
 }
 
-function getParentData(data: any) {
+async function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
   state.fieldList = data.fieldList
   state.title = data.title
@@ -63,6 +67,19 @@ function getParentData(data: any) {
   state.teamUrl = data.teamUrl
   state.projectCode = data.projectCode
   state.sheetCode = data.sheetCode
+  if (state.title == "编辑") {
+    const relevanceData = data.fieldList.find((item: any) => {
+      return item.type == "关联表";
+    });
+    if(relevanceData && data.formFields[relevanceData.key] && data.formFields[relevanceData.key].length > 0){
+      const { content:{ fields } } = await sheet.getSheetById({}, state.teamUrl, state.projectCode, relevanceData.property.sheet_id)
+      if(fields && fields.length > 0){
+        data.formFields[relevanceData.key].forEach((item: any) => {
+          item.tag = item.fields[fields[0].key]
+        })
+      }
+    }
+  }
   setTimeout(() => {
     state.formFields = data.formFields
   }, 100)
@@ -152,6 +169,10 @@ function handleAvatarSuccess(res: any, file: any) {
 }
 function handleRemove(res: any, file: any) {
   state.formFields.imgs.splice(state.formFields.imgs.findIndex((item: any) => item.url === res.url))
+}
+function handlePictureCardPreview(uploadFile: any) {
+  dialogImageUrl.value = uploadFile.url!;
+  dialogVisible.value = true;
 }
 function close() {
   state.formFields = {} as any
@@ -253,7 +274,7 @@ watch(
       :close-on-click-modal="false"
       :append-to-body="true"
       custom-class="edit-dialog"
-      width="80%"
+      width="900"
       @close="close"
     >
       <div class="edit">
@@ -269,9 +290,13 @@ watch(
                   list-type="picture-card"
                   :file-list="fileList"
                   :on-remove="handleRemove"
+                  :on-preview="handlePictureCardPreview"
                 >
-                  <i class="el-icon-plus" />
+                  <el-icon><Plus /></el-icon>
                 </el-upload>
+                <el-dialog v-model="dialogVisible">
+                  <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                </el-dialog>
               </div>
             </div>
             <!-- 视频 -->
@@ -296,7 +321,6 @@ watch(
               <toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :default-config="toolbarConfig" :mode="state.mode" />
               <editor v-model="state.formFields[item.key]" style="height: 300px" :default-config="editorConfig" :mode="mode" @onCreated="handleCreated" />
             </div>
-            <!-- <MarkdownEditor v-if="item.type === '富文本'" v-model="state.formFields[item.key]"></MarkdownEditor> -->
             <!-- 单行文本 -->
             <el-input v-if="item.type === '单行文本'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
             <!-- 多行文本 -->
@@ -326,7 +350,7 @@ watch(
             <!-- 日期 -->
             <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" type="datetime" placeholder="选择日期时间" />
             <!-- 电话 -->
-            <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" type="number" placeholder="请输入号码" />
+            <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" placeholder="请输入号码" />
           </el-form-item>
         </el-form>
       </div>
@@ -349,24 +373,6 @@ watch(
   cursor: pointer;
   position: relative;
   overflow: hidden;
-}
-
-.edit-dialog .el-upload--picture-card {
-  width: 60px;
-  height: 60px;
-}
-
-.edit-dialog .el-upload--picture-card i {
-  font-size: 28px;
-  color: #8c939d;
-  margin-bottom: 20px;
-  position: relative;
-  top: -38px;
-}
-
-.edit-dialog .el-upload-list--picture-card .el-upload-list__item {
-  width: 60px;
-  height: 60px;
 }
 
 .edit-dialog .avatar-uploader .el-upload:hover {
@@ -394,19 +400,6 @@ watch(
 
 .edit-dialog .edit .el-form--inline .el-form-item {
   display: flex;
-}
-
-.edit-dialog .el-dialog {
-  display: flex;
-  flex-direction: column;
-  margin: 0 !important;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-height: calc(100% - 30px);
-  max-width: calc(100% - 30px);
-  overflow-y: auto;
 }
 
 .edit-dialog .video-uploader-icon {

@@ -5,22 +5,27 @@ const store = settingStore();
 const state = reactive({
   showHeader: true,
   showSidebar: true,
+  backgroundColor: "",
 });
 
 onMounted(() => {
   state.showHeader = store.showHeader;
   state.showSidebar = store.showSidebar;
+  state.backgroundColor = store.backgroundColor;
 });
 </script>
 
 <template>
   <div class="container">
     <Header v-show="state.showHeader" />
-    <div :class="state.showHeader ? 'content' : 'contents'">
+    <div
+      :class="state.showHeader ? 'content' : 'contents'"
+      :style="{ backgroundColor: state.backgroundColor }"
+    >
       <Aside v-if="state.showSidebar" />
       <div
         :class="state.showSidebar ? 'main' : 'main-left main'"
-        :style="state.showSidebar ? '' : 'padding:0;'"
+        :style="state.showSidebar ? '' : 'padding:0;bottom:0'"
       >
         <slot />
       </div>
