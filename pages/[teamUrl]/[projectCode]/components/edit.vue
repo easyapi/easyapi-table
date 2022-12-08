@@ -19,13 +19,7 @@ defineExpose({
 })
 
 const state = reactive({
-  formFields: {
-    img: [] as any,
-    content: '',
-    video: [] as any,
-    building: '',
-    imgs: [] as any,
-  },
+  formFields: {},
   fileList: [] as any, // 图片回显
   disabled: false,
   content: '',
@@ -152,23 +146,26 @@ function uploadVideoProcess(event: any, file: any, fileList: any) {
 /**
  * 上传成功回调
  */
-function handleVideoSuccess(res: any, file: any) {
+function handleVideoSuccess(key: any, res: any, file: any) {
   state.isShowUploadVideo = true
   state.videoFlag = false
   state.videoUploadPercent = 0
   const video = `https://qiniu.easyapi.com/${res.key}`
-  state.formFields.video = video
+  state.formFields[key] = video
 }
-function handleAvatarSuccess(res: any, file: any) {
+function handleAvatarSuccess( key:any,res: any, file: any) {
   const img = `https://qiniu.easyapi.com/${res.key}`
   file.url = img
   const obj = {
     url: img,
   }
-  state.formFields.imgs.push(obj)
+  if(!state.formFields[key]){
+    state.formFields[key] = []
+  }
+  state.formFields[key].push(obj)
 }
-function handleRemove(res: any, file: any) {
-  state.formFields.imgs.splice(state.formFields.imgs.findIndex((item: any) => item.url === res.url))
+function handleRemove(key:any, res: any, file: any) {
+  state.formFields[key].splice(state.formFields[key].findIndex((item: any) => item.url === res.url))
 }
 function handlePictureCardPreview(uploadFile: any) {
   dialogImageUrl.value = uploadFile.url!;
@@ -230,37 +227,11 @@ watch(
   () => state.dialogVisible,
   (value) => {
     if (value) {
-      for (const a of state.fieldList)
-      { if (a.type === '关联表')
-        state.key = a.key }
+      for (const a of state.fieldList){ 
+        if (a.type === '关联表')
+          state.key = a.key 
+        }
     }
-  },
-  { deep: true },
-)
-
-watch(
-  () => state.formFields.img,
-  (value) => {
-    if (value == null)
-      state.formFields.imgs = []
-  },
-  { deep: true },
-)
-
-watch(
-  () => state.formFields.video,
-  (value) => {
-    if (value == null)
-      state.formFields.video = []
-  },
-  { deep: true },
-)
-
-watch(
-  () => state.formFields.video,
-  (value) => {
-    if (value)
-      state.fileList = value.img
   },
   { deep: true },
 )
@@ -286,10 +257,10 @@ watch(
                 <el-upload
                   :data="state.dataObj"
                   action="https://upload.qiniup.com/"
-                  :on-success="handleAvatarSuccess"
+                  :on-success="(res,file)=>{handleAvatarSuccess(item.key,res,file)}"
                   list-type="picture-card"
                   :file-list="fileList"
-                  :on-remove="handleRemove"
+                  :on-remove="(res,file)=>{handleRemove(item.key,res,file)}"
                   :on-preview="handlePictureCardPreview"
                 >
                   <el-icon><Plus /></el-icon>
@@ -306,7 +277,7 @@ watch(
                 action="https://upload.qiniup.com/"
                 :data="state.dataObj"
                 :on-progress="uploadVideoProcess"
-                :on-success="handleVideoSuccess"
+                :on-success="(res,file)=>{handleVideoSuccess(item.key,res,file)}"
                 :before-upload="beforeUploadVideo"
                 :show-file-list="false"
               >
