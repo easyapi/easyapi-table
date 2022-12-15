@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineExpose, reactive, ref, shallowRef, watch } from 'vue'
+import { defineExpose, reactive, ref, shallowRef, watch} from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import AssociationTable from './association-table.vue'
@@ -9,10 +9,28 @@ import { sheet } from '@/api/sheet'
 
 const editorRef = shallowRef()
 const toolbarConfig = {}
-const editorConfig = { placeholder: '请输入内容...' }
+const editorConfig = {
+  placeholder: '请输入内容...',
+  MENU_CONF: {
+    uploadImage: {
+       async customUpload(file: File, insertFn: any) {
+        const {
+          content: { upToken },
+        } = await qiniu.getQiniuToken();
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("token", upToken);
+        const { key } = await qiniu.uploadFiles(formData);
+        let url = `https://qiniu.easyapi.com/${key}`;
+        insertFn(url);
+      },
+    }
+  }
+}
 const tableChild = ref<InstanceType<typeof AssociationTable>>()
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
+const emit = defineEmits(['getList'])
 
 defineExpose({
   getParentData,
@@ -77,6 +95,12 @@ async function getParentData(data: any) {
   setTimeout(() => {
     state.formFields = data.formFields
   }, 100)
+
+  data.fieldList.forEach((item: any) => {
+    if (item.type == "附件") {
+      state.fileList = data.formFields[item.key];
+    } 
+  });
 }
 /**
  * 获取七牛token
@@ -195,6 +219,7 @@ function confirm(formName: any) {
           type: 'success',
           message: '添加成功',
         })
+        emit('getList');
       }
     })
   } else {
@@ -218,6 +243,7 @@ function confirm(formName: any) {
           type: 'success',
           message: '修改成功',
         })
+        emit('getList');
       }
     })
   }
@@ -259,7 +285,7 @@ watch(
                   action="https://upload.qiniup.com/"
                   :on-success="(res,file)=>{handleAvatarSuccess(item.key,res,file)}"
                   list-type="picture-card"
-                  :file-list="fileList"
+                  :file-list="state.fileList"
                   :on-remove="(res,file)=>{handleRemove(item.key,res,file)}"
                   :on-preview="handlePictureCardPreview"
                 >
@@ -289,8 +315,8 @@ watch(
             </div>
             <!-- 富文本 -->
             <div v-if="item.type === '富文本'" style="border: 1px solid #ccc">
-              <toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :default-config="toolbarConfig" :mode="state.mode" />
-              <editor v-model="state.formFields[item.key]" style="height: 300px" :default-config="editorConfig" :mode="mode" @onCreated="handleCreated" />
+              <toolbar v-if="state.dialogVisible" style="border-bottom: 1px solid #ccc" :editor="editorRef" :default-config="toolbarConfig" :mode="state.mode" />
+              <editor v-if="state.dialogVisible" v-model="state.formFields[item.key]" style="height: 300px" :default-config="editorConfig" :mode="state.mode" @onCreated="handleCreated" />
             </div>
             <!-- 单行文本 -->
             <el-input v-if="item.type === '单行文本'" v-model="state.formFields[item.key]" placeholder="请输入内容" />
@@ -304,13 +330,12 @@ watch(
                 v-for="(about, cindex) in state.formFields[item.key]"
                 :key="cindex"
                 class="mr-2"
-                type="info"
                 closable
                 @close="handleClose(cindex, item.key)"
               >
                 {{ about.tag }}
               </el-tag>
-              <el-tag class="cursor-pointer" type="info" @click="showTable(item.key, item)">
+              <el-tag class="cursor-pointer" @click="showTable(item.key, item)">
                 +添加
               </el-tag>
             </div>
@@ -319,7 +344,7 @@ watch(
               <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
             <!-- 日期 -->
-            <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" type="datetime" placeholder="选择日期时间" />
+            <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" value-format="YYYY-MM-DD hh:mm:ss"  type="datetime" placeholder="选择日期时间" />
             <!-- 电话 -->
             <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" placeholder="请输入号码" />
           </el-form-item>

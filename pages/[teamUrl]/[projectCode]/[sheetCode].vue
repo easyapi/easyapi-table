@@ -61,6 +61,11 @@ const state = reactive({
   detailList: [],
 })
 
+function getList(){
+  state.pagination.page = 1
+  getRecordList()
+}
+
 function showVideo(url: any) {
   state.dialogVisible = true
   state.playvideo = url
@@ -270,27 +275,23 @@ watch(
         <el-table-column type="selection" width="55" />
         <el-table-column v-for="(item, index) in state.fieldList" :key="index" :show-overflow-tooltip="item.type !== '富文本'" :label="item.name">
           <template #default="scope">
-            <span v-if="item.type === '单选'" v-html="scope.row.fields[item.key]" />
-            <span v-if="item.type === '单行文本'" v-html="scope.row.fields[item.key]" />
-            <span v-if="item.type === '多行文本'" v-html="scope.row.fields[item.key]" />
-            <span v-if="item.type === '富文本'" class="rich-text" v-html="scope.row.fields[item.key]" />
-            <span v-if="item.type === '数字'" v-html="scope.row.fields[item.key]" />
-            <span v-if="item.type === '电话'" v-html="scope.row.fields[item.key]" />
-            <div v-if="item.type === '关联表'" class="flex flex-wrap">
+            <div v-if="item.type === '富文本'" class="rich-text" v-html="scope.row.fields[item.key]" />
+            <div v-else-if="item.type === '关联表'" class="flex flex-wrap">
               <div class="mr-2" v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
                 <el-tag v-html="Object.values(citem.fields)[0]" />
               </div> 
             </div>
-            <div v-if="item.type === '附件'">
+            <div v-else-if="item.type === '附件'">
               <div v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
                 <img :src="citem.url"  class="w-12 h-12">
               </div>
            </div>
-           <div v-if="item.type === '视频'">
+           <div v-else-if="item.type === '视频'">
               <div v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
                 <img src="../../../assets/svg/video.svg" class="w-12 h-12" @click.stop="showVideo(citem.url)">
               </div>
            </div>
+           <div v-else v-html="scope.row.fields[item.key]"></div>
            <el-dialog v-model="dialogVisible" title="视频预览" width="50%" append-to-body top="20px" @close="close">
               <video id="video" ref="vueRef" width="100%" autoplay="autoplay" :src="playvideo" :poster="playvideo" controls="controls" preload />
            </el-dialog>
@@ -307,7 +308,7 @@ watch(
         />
       </div>
     </div>
-    <Edit ref="child" />
+    <Edit ref="child" @getList="getList" />
     <AdvancedSearch ref="searchChild" />
   </div>
 </template>
