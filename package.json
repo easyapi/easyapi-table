@@ -19,11 +19,11 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "nuxt": "^3.0.0",
     "quill-vue3": "^3.2.45",
-    "unplugin-auto-import": "^0.12.0",
-    "unplugin-vue-components": "^0.22.11"
+    "unplugin-auto-import": "^0.12.1",
+    "unplugin-vue-components": "^0.22.12"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.33.1",
+    "@antfu/eslint-config": "^0.34.0",
     "@element-plus/icons-vue": "^2.0.10",
     "@nuxt/kit": "^3.0.0",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
@@ -33,7 +33,7 @@
     "@types/lodash": "^4.14.191",
     "cross-env": "^7.0.3",
     "element-plus": "^2.2.26",
-    "eslint": "^8.28.0",
-    "typescript": "^4.9.3"
+    "eslint": "^8.29.0",
+    "typescript": "^4.9.4"
   }
 }
