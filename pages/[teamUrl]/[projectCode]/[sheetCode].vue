@@ -1,54 +1,62 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Menu, Plus, Search } from '@element-plus/icons-vue'
-import Edit from './components/edit.vue'
-import AdvancedSearch from './components/advanced-search.vue'
-import Pagination from '@/components/Pagination'
-import SearchArea from '@/components/SearchArea'
-import { table } from '@/api/table'
-import { sheet } from '@/api/sheet'
+import { onMounted, reactive, ref, watch } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Menu, Plus, Search } from "@element-plus/icons-vue";
+import Edit from "./components/edit.vue";
+import AdvancedSearch from "./components/advanced-search.vue";
+import Pagination from "@/components/Pagination";
+import SearchArea from "@/components/SearchArea";
+import { table } from "@/api/table";
+import { sheet } from "@/api/sheet";
 
-const route = useRoute()
-const router = useRouter()
-const searchChild = ref<InstanceType<typeof AdvancedSearch>>()
-const child = ref<InstanceType<typeof Edit>>()
+const route = useRoute();
+const router = useRouter();
+const searchChild = ref<InstanceType<typeof AdvancedSearch>>();
+const child = ref<InstanceType<typeof Edit>>();
 
 onMounted(() => {
-  if (route.params.sheetCode && route.params.projectCode && route.params.teamUrl) {
-    state.sheetCode = route.params.sheetCode as any
-    state.projectCode = route.params.projectCode as any
-    state.teamUrl = route.params.teamUrl as any
-    getFields(route.params.teamUrl, route.params.projectCode, route.params.sheetCode)
+  if (
+    route.params.sheetCode &&
+    route.params.projectCode &&
+    route.params.teamUrl
+  ) {
+    state.sheetCode = route.params.sheetCode as any;
+    state.projectCode = route.params.projectCode as any;
+    state.teamUrl = route.params.teamUrl as any;
+    getFields(
+      route.params.teamUrl,
+      route.params.projectCode,
+      route.params.sheetCode
+    );
   } else {
-    router.push('/')
+    router.push("/");
   }
-})
+});
 
 useHead({
-  title: '数据表格 - EasyAPI服务市场',
-  meta: [{ name: 'description', content: 'EasyAPI数据表格' }],
-})
+  title: "数据表格 - EasyAPI服务市场",
+  meta: [{ name: "description", content: "EasyAPI数据表格" }],
+});
 
 const state = reactive({
-  activeName: 'first',
+  activeName: "first",
   dialogVisible: false,
-  playvideo: '',
+  playvideo: "",
   fieldList: [],
-  teamUrl: '',
-  projectCode: '',
-  sheetCode: '',
+  teamUrl: "",
+  projectCode: "",
+  sheetCode: "",
   recordList: [],
   ifShow: false,
   tableList: [],
-  headline: '',
-  input2: '',
+  headline: "",
+  input2: "",
   checkedLength: 0,
   searchItems: [
-    { label: '产品类型', type: 'input', key: 'title' },
-    { label: '交付方式', type: 'input', key: 'title' },
-    { label: '产品状态', type: 'input', key: 'title' },
-    { label: '计费方式', type: 'select', key: 'title' },
+    { label: "产品类型", type: "input", key: "title" },
+    { label: "交付方式", type: "input", key: "title" },
+    { label: "产品状态", type: "input", key: "title" },
+    { label: "计费方式", type: "select", key: "title" },
   ],
   pagination: {
     page: 1,
@@ -56,23 +64,23 @@ const state = reactive({
     total: 0,
   },
   loadingData: false,
-  tableText: '',
+  tableText: "",
   recordIds: [] as any,
   detailList: [],
-})
+});
 
-function getList(){
-  state.pagination.page = 1
-  getRecordList()
+function getList() {
+  state.pagination.page = 1;
+  getRecordList();
 }
 
 function showVideo(url: any) {
-  state.dialogVisible = true
-  state.playvideo = url
+  state.dialogVisible = true;
+  state.playvideo = url;
 }
 
 function close() {
-  state.playvideo = ''
+  state.playvideo = "";
 }
 
 function handleClick() {}
@@ -80,62 +88,64 @@ function handleClick() {}
 function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
   const params = {
     size: 50,
-  }
+  };
   sheet.getSheet(params, teamUrl, projectCode, sheetCode).then((res) => {
     if (res.code == 1) {
-      state.fieldList = res.content.fields
-      state.headline = res.content.name
+      state.fieldList = res.content.fields;
+      state.headline = res.content.name;
     }
-  })
+  });
 }
 
 function getRecordList() {
-  state.recordList = []
-  state.loadingData = true
+  state.recordList = [];
+  state.loadingData = true;
   const params = {
     size: state.pagination.size,
     page: state.pagination.page - 1,
-  }
-  table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
-    if (res.code === 1) {
-      state.loadingData = false
-      state.recordList = res.content
-      state.pagination.total = res.totalElements
-    } else {
-      state.loadingData = false
-      state.tableText = '暂无数据'
-      state.recordList = []
-      state.pagination.total = 0
-    }
-  })
+  };
+  table
+    .getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode)
+    .then((res) => {
+      if (res.code === 1) {
+        state.loadingData = false;
+        state.recordList = res.content;
+        state.pagination.total = res.totalElements;
+      } else {
+        state.loadingData = false;
+        state.tableText = "暂无数据";
+        state.recordList = [];
+        state.pagination.total = 0;
+      }
+    });
 }
 
 /**
  * 表格行点击
  */
 function rowClick(row: any) {
-  const record = JSON.parse(JSON.stringify(row))
+  const record = JSON.parse(JSON.stringify(row));
   child.value?.getParentData({
     dialogVisible: true,
-    title: '编辑',
+    title: "编辑",
     fieldList: state.fieldList,
     recordId: record.recordId,
     teamUrl: state.teamUrl,
     projectCode: state.projectCode,
     sheetCode: state.sheetCode,
     formFields: record.fields,
-  })
+  });
 }
 
 function handleSelectionChange(val: any) {
-  state.recordIds = []
-  state.checkedLength = val.length
-  const obj = {
-    recordId: '',
-  }
-  for (const item of val) {
-    obj.recordId = item.recordId
-    state.recordIds.push(obj)
+  state.recordIds = [];
+  state.checkedLength = val.length;
+  for (let item of val) {
+    let obj = {
+      recordId: "",
+    };
+    obj.recordId = item.recordId;
+    state.recordIds.push(obj);
   }
 }
 
@@ -143,22 +153,26 @@ function handleSelectionChange(val: any) {
  * 删除
  */
 function batchRemove() {
-  const data = state.recordIds
-  ElMessageBox.confirm('确定要删除吗?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
+  const data = state.recordIds;
+  ElMessageBox.confirm("确定要删除吗?", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
   }).then(() => {
-    table.deleteRecord(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
-      if (res.code === 1) {
-        ElMessage({
-          type: 'success',
-          message: '删除成功',
-        })
-        getRecordList()
-      }
-    })
-  })
+    table
+      .deleteRecord(data, state.teamUrl, state.projectCode, state.sheetCode)
+      .then((res) => {
+        if (res.code === 1) {
+          ElMessage({
+            type: "success",
+            message: "删除成功",
+          });
+          setTimeout(() => {
+            getList();
+          }, 2000);
+        }
+      });
+  });
 }
 
 /**
@@ -175,7 +189,7 @@ function openSearch() {
   searchChild.value?.getParentData({
     dialogVisible: true,
     fieldList: state.fieldList,
-  })
+  });
 }
 /**
  * 新增服务商
@@ -183,26 +197,26 @@ function openSearch() {
 function addProvider(teamUrl: any, projectCode: any, sheetCode: any) {
   child.value?.getParentData({
     dialogVisible: true,
-    title: '新增',
+    title: "新增",
     fieldList: state.fieldList,
-    recordId: '',
+    recordId: "",
     teamUrl,
     projectCode,
     sheetCode,
     formFields: [],
-  })
+  });
 }
 /**
  * 分页
  */
 function fatherSize(data: any) {
-  state.pagination.size = data
-  getRecordList()
+  state.pagination.size = data;
+  getRecordList();
 }
 
 function fatherCurrent(data: any) {
-  state.pagination.page = data
-  getRecordList()
+  state.pagination.page = data;
+  getRecordList();
 }
 
 function search() {}
@@ -214,10 +228,10 @@ function event() {}
 watch(
   () => state.teamUrl,
   (value) => {
-    getRecordList()
+    getRecordList();
   },
-  { deep: true },
-)
+  { deep: true }
+);
 </script>
 
 <template>
@@ -233,7 +247,13 @@ watch(
           </el-tabs>
         </div>
         <div>
-          <el-input v-model="state.input2" class="mr-3" style="width: 250px" placeholder="请输入搜索内容" :prefix-icon="Search" />
+          <el-input
+            v-model="state.input2"
+            class="mr-3"
+            style="width: 250px"
+            placeholder="请输入搜索内容"
+            :prefix-icon="Search"
+          />
           <el-button type="primary" plain @click="addMore">
             展开更多
           </el-button>
@@ -243,7 +263,12 @@ watch(
             </el-icon>
             高级筛选
           </el-button>
-          <el-button type="primary" @click="addProvider(state.teamUrl, state.projectCode, state.sheetCode)">
+          <el-button
+            type="primary"
+            @click="
+              addProvider(state.teamUrl, state.projectCode, state.sheetCode)
+            "
+          >
             <el-icon :size="15">
               <Plus />
             </el-icon>
@@ -254,10 +279,20 @@ watch(
     </div>
     <div class="main-content p-4 bg-white">
       <div v-if="state.ifShow">
-        <SearchArea :items="state.searchItems" @search="search" @event="event" @reset="reset" />
+        <SearchArea
+          :items="state.searchItems"
+          @search="search"
+          @event="event"
+          @reset="reset"
+        />
       </div>
-      <div class=" flex items-center">
-        <el-button type="danger" :disabled="state.checkedLength > 0 ? false : true" @click="batchRemove">批量删除</el-button>
+      <div class="flex items-center">
+        <el-button
+          type="danger"
+          :disabled="state.checkedLength > 0 ? false : true"
+          @click="batchRemove"
+          >批量删除</el-button
+        >
       </div>
       <el-table
         v-loading="state.loadingData"
@@ -273,28 +308,67 @@ watch(
           <p>{{ state.tableText }}</p>
         </template>
         <el-table-column type="selection" width="55" />
-        <el-table-column v-for="(item, index) in state.fieldList" :key="index" :show-overflow-tooltip="item.type !== '富文本'" :label="item.name">
+        <el-table-column
+          v-for="(item, index) in state.fieldList"
+          :key="index"
+          :show-overflow-tooltip="item.type !== '富文本'"
+          :label="item.name"
+        >
           <template #default="scope">
-            <div v-if="item.type === '富文本'" class="rich-text" v-html="scope.row.fields[item.key]" />
+            <div
+              v-if="item.type === '富文本'"
+              class="rich-text"
+              v-html="scope.row.fields[item.key]"
+            />
             <div v-else-if="item.type === '关联表'" class="flex flex-wrap">
-              <div class="mr-2" v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
+              <div
+                class="mr-2"
+                v-for="(citem, index) in scope.row.fields[item.key]"
+                :key="index"
+              >
                 <el-tag v-html="Object.values(citem.fields)[0]" />
-              </div> 
+              </div>
             </div>
             <div v-else-if="item.type === '附件'">
-              <div v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
-                <img :src="citem.url"  class="w-12 h-12">
+              <div
+                v-for="(citem, index) in scope.row.fields[item.key]"
+                :key="index"
+              >
+                <img :src="citem.url" class="w-12 h-12" />
               </div>
-           </div>
-           <div v-else-if="item.type === '视频'">
-              <div v-for="(citem,index) in scope.row.fields[item.key]" :key="index">
-                <img src="../../../assets/svg/video.svg" class="w-12 h-12" @click.stop="showVideo(citem.url)">
+            </div>
+            <div v-else-if="item.type === '视频'">
+              <div
+                v-for="(citem, index) in scope.row.fields[item.key]"
+                :key="index"
+              >
+                <img
+                  src="../../../assets/svg/video.svg"
+                  class="w-12 h-12"
+                  @click.stop="showVideo(citem.url)"
+                />
               </div>
-           </div>
-           <div v-else v-html="scope.row.fields[item.key]"></div>
-           <el-dialog v-model="dialogVisible" title="视频预览" width="50%" append-to-body top="20px" @close="close">
-              <video id="video" ref="vueRef" width="100%" autoplay="autoplay" :src="playvideo" :poster="playvideo" controls="controls" preload />
-           </el-dialog>
+            </div>
+            <div v-else v-html="scope.row.fields[item.key]"></div>
+            <el-dialog
+              v-model="dialogVisible"
+              title="视频预览"
+              width="50%"
+              append-to-body
+              top="20px"
+              @close="close"
+            >
+              <video
+                id="video"
+                ref="vueRef"
+                width="100%"
+                autoplay="autoplay"
+                :src="playvideo"
+                :poster="playvideo"
+                controls="controls"
+                preload
+              />
+            </el-dialog>
           </template>
         </el-table-column>
       </el-table>
