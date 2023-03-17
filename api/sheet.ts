@@ -1,13 +1,6 @@
 import http from '~/api/request'
 
 export const sheet = {
-  /**
-   * 获取用户信息
-   *
-   */
-  getUser(): Promise<ApiResponse> {
-    return http.get(`${http.baseUrl}/account`)
-  },
 
   /**
    * 获取数据表详情
@@ -19,7 +12,7 @@ export const sheet = {
    * @see https://www.easyapi.com
    */
   getSheet(params: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.get(`${http.tableUrl}/${teamUrl}/${projectCode}/sheet/${sheetCode}`, params)
+    return http.get(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/sheet/${sheetCode}`, params)
   },
 
   /**
@@ -32,6 +25,6 @@ export const sheet = {
    * @see https://www.easyapi.com
    */
   getSheetById(params: any, teamUrl: string, projectCode: string, sheetId: string): Promise<ApiResponse> {
-    return http.get(`${http.tableUrl}/${teamUrl}/${projectCode}/sheet/id-${sheetId}`, params)
+    return http.get(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/sheet/id-${sheetId}`, params)
   },
 }

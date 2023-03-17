@@ -1,5 +1,5 @@
 interface ApiResponse {
-  totalElements(totalElements: any): number
+  totalElements: number
   code: number
   message: string
   content: any

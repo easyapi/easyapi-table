@@ -1,88 +1,89 @@
 <script setup lang="ts">
-import { defineExpose, reactive } from "vue";
-import { Search } from "@element-plus/icons-vue";
-import { sheet } from "@/api/sheet";
-import { table } from "@/api/table";
+import { defineExpose, reactive } from 'vue'
+import { Search } from '@element-plus/icons-vue'
+import { sheet } from '@/api/sheet'
+import { table } from '@/api/table'
 
-const emit = defineEmits(["getItem"]);
+const emit = defineEmits(['getItem'])
 
 const state = reactive({
   dialogVisible: false,
   fields: [] as any,
   recordList: [] as any,
-  search: "",
+  search: '',
   pagination: {
     page: 1,
     size: 5,
     total: 0,
     pageSizes: [5, 10],
   },
-  teamUrl: "",
-  projectCode: "",
-  sheetId: "",
-  sheetCode: "",
-});
+  teamUrl: '',
+  projectCode: '',
+  sheetId: '',
+  sheetCode: '',
+})
 
 function getRecordList() {
   const params = {
     page: state.pagination.page - 1,
     size: state.pagination.size,
-  };
+  }
   table
     .getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode)
     .then((res) => {
       if (res.code === 1) {
-        state.recordList = res.content;
-        state.pagination.total = res.totalElements;
+        state.recordList = res.content
+        state.pagination.total = res.totalElements
       } else {
-        state.recordList = [];
-        state.pagination.total = 0;
+        state.recordList = []
+        state.pagination.total = 0
       }
-    });
+    })
 }
 
 function getSheetById() {
-  state.fields = [];
+  state.fields = []
   sheet
     .getSheetById({}, state.teamUrl, state.projectCode, state.sheetId)
     .then((res) => {
       if (res.code === 1) {
-        res.content.fields.map((item: any, index: Number) => {
-          if (index < 5) state.fields.push(item);
-        });
-        state.sheetCode = res.content.code;
-        getRecordList();
+        res.content.fields.forEach((item: any, index: Number) => {
+          if (index < 5)
+            state.fields.push(item)
+        })
+        state.sheetCode = res.content.code
+        getRecordList()
       }
-    });
+    })
 }
 
 function choice(item: any, key: any) {
-  item.tag = item.fields[key];
-  emit("getItem", item);
-  state.dialogVisible = false;
+  item.tag = item.fields[key]
+  emit('getItem', item)
+  state.dialogVisible = false
 }
 
 function getParentData(data: any) {
-  state.dialogVisible = data.dialogVisible;
-  state.teamUrl = data.teamUrl;
-  state.projectCode = data.projectCode;
-  state.sheetId = data.sheetId;
-  getSheetById();
+  state.dialogVisible = data.dialogVisible
+  state.teamUrl = data.teamUrl
+  state.projectCode = data.projectCode
+  state.sheetId = data.sheetId
+  getSheetById()
 }
 
 function fatherSize(data: any) {
-  state.pagination.size = data;
-  getRecordList();
+  state.pagination.size = data
+  getRecordList()
 }
 
 function fatherCurrent(data: any) {
-  state.pagination.page = data;
-  getRecordList();
+  state.pagination.page = data
+  getRecordList()
 }
 
 defineExpose({
   getParentData,
-});
+})
 </script>
 
 <template>
@@ -126,14 +127,14 @@ defineExpose({
           </div>
           <div class="h-10 overflow-hidden text-black text-sm">
             <div
-              class="truncate w-28"
               v-if="citem.type === '单行文本' || citem.type === '日期'"
+              class="truncate w-28"
             >
               {{ item.fields[citem.key] || "--" }}
             </div>
             <div
-              class="truncate w-28"
               v-if="citem.type === '富文本'"
+              class="truncate w-28"
               v-html="item.fields[citem.key]"
             />
             <div v-if="citem.type === '附件'">
@@ -141,7 +142,7 @@ defineExpose({
                 class="w-6 h-6"
                 :src="item.fields[citem.key][0].url"
                 alt=""
-              />
+              >
             </div>
           </div>
         </div>
@@ -149,10 +150,10 @@ defineExpose({
     </div>
     <div class="flex justify-end">
       <Pagination
-        :pageSizes="state.pagination.pageSizes"
-        :totalPages="state.pagination.page"
+        :page-sizes="state.pagination.pageSizes"
+        :total-pages="state.pagination.page"
         :size="state.pagination.size"
-        :totalElements="state.pagination.total"
+        :total-elements="state.pagination.total"
         @fatherSize="fatherSize"
         @fatherCurrent="fatherCurrent"
       />

@@ -11,7 +11,7 @@ export const table = {
    * @see https://www.easyapi.com
    */
   getFieldList(params: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.get(`${http.tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/fields`, params)
+    return http.get(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/fields`, params)
   },
 
   /**
@@ -24,7 +24,7 @@ export const table = {
    * @see https://www.easyapi.com
    */
   getRecordList(params: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.get(`${http.tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, params)
+    return http.get(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, params)
   },
 
   /**
@@ -37,7 +37,7 @@ export const table = {
    * @see https://www.easyapi.com
    */
   creatRecord(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.post(`${http.tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
+    return http.post(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
   },
 
   /**
@@ -50,7 +50,7 @@ export const table = {
    * @see https://www.easyapi.com
    */
   updateRecord(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.put(`${http.tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
+    return http.put(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
   },
 
   /**
@@ -63,6 +63,6 @@ export const table = {
    * @see https://www.easyapi.com
    */
   deleteRecord(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.del(`${http.tableUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
+    return http.delete(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
   },
 }

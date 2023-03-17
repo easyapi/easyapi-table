@@ -8,7 +8,7 @@ export const settingStore = defineStore('setting', {
       showHeader: true, // 头部显示隐藏
       showSidebar: true, // 左侧菜单显示隐藏
       menuType: 1, // 0只有一级菜单 1有两层第一层不能点击
-      backgroundColor: '#F4F4F4'
+      backgroundColor: '#F4F4F4',
     }
   },
 })

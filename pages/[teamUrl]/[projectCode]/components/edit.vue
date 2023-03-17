@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineExpose, reactive, ref, shallowRef, watch} from 'vue'
+import { defineExpose, reactive, ref, shallowRef, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import AssociationTable from './association-table.vue'
@@ -7,31 +7,30 @@ import { qiniu } from '@/api/qiniu'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
 
+const emit = defineEmits(['getList'])
 const editorRef = shallowRef()
 const toolbarConfig = {}
 const editorConfig = {
   placeholder: '请输入内容...',
   MENU_CONF: {
     uploadImage: {
-       async customUpload(file: File, insertFn: any) {
+      async customUpload(file: File, insertFn: any) {
         const {
           content: { upToken },
-        } = await qiniu.getQiniuToken();
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("token", upToken);
-        const { key } = await qiniu.uploadFiles(formData);
-        let url = `https://qiniu.easyapi.com/${key}`;
-        insertFn(url);
+        } = await qiniu.getQiniuToken()
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('token', upToken)
+        const { key } = await qiniu.uploadFiles(formData)
+        const url = `https://qiniu.easyapi.com/${key}`
+        insertFn(url)
       },
-    }
-  }
+    },
+  },
 }
 const tableChild = ref<InstanceType<typeof AssociationTable>>()
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
-const emit = defineEmits(['getList'])
-
 defineExpose({
   getParentData,
 })
@@ -79,13 +78,13 @@ async function getParentData(data: any) {
   state.teamUrl = data.teamUrl
   state.projectCode = data.projectCode
   state.sheetCode = data.sheetCode
-  if (state.title == "编辑") {
+  if (state.title === '编辑') {
     const relevanceData = data.fieldList.find((item: any) => {
-      return item.type == "关联表";
-    });
-    if(relevanceData && data.formFields[relevanceData.key] && data.formFields[relevanceData.key].length > 0){
-      const { content:{ fields } } = await sheet.getSheetById({}, state.teamUrl, state.projectCode, relevanceData.property.sheet_id)
-      if(fields && fields.length > 0){
+      return item.type === '关联表'
+    })
+    if (relevanceData && data.formFields[relevanceData.key] && data.formFields[relevanceData.key].length > 0) {
+      const { content: { fields } } = await sheet.getSheetById({}, state.teamUrl, state.projectCode, relevanceData.property.sheet_id)
+      if (fields && fields.length > 0) {
         data.formFields[relevanceData.key].forEach((item: any) => {
           item.tag = item.fields[fields[0].key]
         })
@@ -97,10 +96,9 @@ async function getParentData(data: any) {
   }, 100)
 
   data.fieldList.forEach((item: any) => {
-    if (item.type == "附件") {
-      state.fileList = data.formFields[item.key];
-    } 
-  });
+    if (item.type === '附件')
+      state.fileList = data.formFields[item.key]
+  })
 }
 /**
  * 获取七牛token
@@ -155,7 +153,7 @@ function getItem(data: any) {
     state.formFields[state.key] = []
     state.formFields[state.key].push(data)
   } else {
-    if (state.formFields[state.key].filter((x: any) => x.recordId == data.recordId).length == 0)
+    if (state.formFields[state.key].filter((x: any) => x.recordId === data.recordId).length === 0)
       state.formFields[state.key].push(data)
   }
 }
@@ -177,23 +175,23 @@ function handleVideoSuccess(key: any, res: any, file: any) {
   const video = `https://qiniu.easyapi.com/${res.key}`
   state.formFields[key] = video
 }
-function handleAvatarSuccess( key:any,res: any, file: any) {
+function handleAvatarSuccess(key: any, res: any, file: any) {
   const img = `https://qiniu.easyapi.com/${res.key}`
   file.url = img
   const obj = {
     url: img,
   }
-  if(!state.formFields[key]){
+  if (!state.formFields[key])
     state.formFields[key] = []
-  }
+
   state.formFields[key].push(obj)
 }
-function handleRemove(key:any, res: any, file: any) {
+function handleRemove(key: any, res: any, file: any) {
   state.formFields[key].splice(state.formFields[key].findIndex((item: any) => item.url === res.url))
 }
 function handlePictureCardPreview(uploadFile: any) {
-  dialogImageUrl.value = uploadFile.url!;
-  dialogVisible.value = true;
+  dialogImageUrl.value = uploadFile.url!
+  dialogVisible.value = true
 }
 function close() {
   state.formFields = {} as any
@@ -201,7 +199,7 @@ function close() {
 function confirm(formName: any) {
   if (state.title === '新增') {
     const list = []
-    const obj = {}
+    const obj = { fields: {} }
     const data = {
       ...state.formFields,
     }
@@ -219,12 +217,12 @@ function confirm(formName: any) {
           type: 'success',
           message: '添加成功',
         })
-        emit('getList');
+        emit('getList')
       }
     })
   } else {
     const list = []
-    const obj = {}
+    const obj = { fields: {}, recordId: null }
     const data = {
       ...state.formFields,
     }
@@ -243,7 +241,7 @@ function confirm(formName: any) {
           type: 'success',
           message: '修改成功',
         })
-        emit('getList');
+        emit('getList')
       }
     })
   }
@@ -253,10 +251,10 @@ watch(
   () => state.dialogVisible,
   (value) => {
     if (value) {
-      for (const a of state.fieldList){ 
+      for (const a of state.fieldList) {
         if (a.type === '关联表')
-          state.key = a.key 
-        }
+          state.key = a.key
+      }
     }
   },
   { deep: true },
@@ -270,7 +268,7 @@ watch(
       :title="state.title"
       :close-on-click-modal="false"
       :append-to-body="true"
-      custom-class="edit-dialog"
+      class="edit-dialog"
       width="900"
       @close="close"
     >
@@ -283,16 +281,16 @@ watch(
                 <el-upload
                   :data="state.dataObj"
                   action="https://upload.qiniup.com/"
-                  :on-success="(res,file)=>{handleAvatarSuccess(item.key,res,file)}"
+                  :on-success="(res, file) => { handleAvatarSuccess(item.key, res, file) }"
                   list-type="picture-card"
                   :file-list="state.fileList"
-                  :on-remove="(res,file)=>{handleRemove(item.key,res,file)}"
+                  :on-remove="(res, file) => { handleRemove(item.key, res, file) }"
                   :on-preview="handlePictureCardPreview"
                 >
                   <el-icon><Plus /></el-icon>
                 </el-upload>
                 <el-dialog v-model="dialogVisible">
-                  <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                  <img w-full :src="dialogImageUrl" alt="Preview Image">
                 </el-dialog>
               </div>
             </div>
@@ -303,7 +301,7 @@ watch(
                 action="https://upload.qiniup.com/"
                 :data="state.dataObj"
                 :on-progress="uploadVideoProcess"
-                :on-success="(res,file)=>{handleVideoSuccess(item.key,res,file)}"
+                :on-success="(res, file) => { handleVideoSuccess(item.key, res, file) }"
                 :before-upload="beforeUploadVideo"
                 :show-file-list="false"
               >
@@ -344,7 +342,7 @@ watch(
               <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
             <!-- 日期 -->
-            <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" value-format="YYYY-MM-DD hh:mm:ss"  type="datetime" placeholder="选择日期时间" />
+            <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" value-format="YYYY-MM-DD hh:mm:ss" type="datetime" placeholder="选择日期时间" />
             <!-- 电话 -->
             <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" placeholder="请输入号码" />
           </el-form-item>
