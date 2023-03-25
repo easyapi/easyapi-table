@@ -265,12 +265,7 @@ watch(
             </el-icon>
             高级筛选
           </el-button>
-          <el-button
-            type="primary"
-            @click="
-              addProvider(state.teamUrl, state.projectCode, state.sheetCode)
-            "
-          >
+          <el-button type="primary" @click="addProvider(state.teamUrl, state.projectCode, state.sheetCode)">
             <el-icon :size="15">
               <Plus />
             </el-icon>
@@ -289,11 +284,7 @@ watch(
         />
       </div>
       <div class="flex items-center">
-        <el-button
-          type="danger"
-          :disabled="state.checkedLength > 0 ? false : true"
-          @click="batchRemove"
-        >
+        <el-button type="danger" :disabled="state.checkedLength <= 0" @click="batchRemove">
           批量删除
         </el-button>
       </div>

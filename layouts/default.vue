@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { onMounted, reactive } from "vue";
-import { settingStore } from "@/stores/setting";
-import { ElLoading } from "element-plus";
-const store = settingStore();
+import { onMounted, reactive } from 'vue'
+import { settingStore } from '@/stores/setting'
+const store = settingStore()
 const state = reactive({
   showHeader: false,
   showSidebar: false,
-  backgroundColor: "",
-});
+  backgroundColor: '',
+})
 onMounted(() => {
-  state.showHeader = store.showHeader;
-  state.showSidebar = store.showSidebar;
-  state.backgroundColor = store.backgroundColor;
-});
+  state.showHeader = store.showHeader
+  state.showSidebar = store.showSidebar
+  state.backgroundColor = store.backgroundColor
+})
 </script>
 
 <template>

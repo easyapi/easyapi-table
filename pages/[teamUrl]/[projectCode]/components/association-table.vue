@@ -138,11 +138,7 @@ defineExpose({
               v-html="item.fields[citem.key]"
             />
             <div v-if="citem.type === '附件'">
-              <img
-                class="w-6 h-6"
-                :src="item.fields[citem.key][0].url"
-                alt=""
-              >
+              <img class="w-6 h-6" :src="item.fields[citem.key][0].url" alt="">
             </div>
           </div>
         </div>
