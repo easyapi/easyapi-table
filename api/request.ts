@@ -1,4 +1,5 @@
 import { ElMessage } from 'element-plus'
+import { getToken } from '~/utils/token'
 
 /**
  * API请求封装
@@ -6,21 +7,22 @@ import { ElMessage } from 'element-plus'
  * @param options
  * @param headers
  */
-const fetch = async (url: string, options?: any, headers?: any): Promise<ApiResponse> => {
+async function fetch(url: string, options?: any, headers?: any): Promise<ApiResponse> {
   const router = useRouter()
   try {
-    const customHeaders = { Authorization: `Bearer ${useCookie('authenticationToken').value}`, ...headers }
-    const res = await $fetch<ApiResponse>(url,
+    const customHeaders = { ...headers }
+    const authenticationToken = getToken()
+    if (authenticationToken)
+      customHeaders.Authorization = `Bearer ${authenticationToken}`
+    return await $fetch<ApiResponse>(url,
       { ...options, headers: customHeaders },
     )
-    return res
   } catch (error: any) {
-    ElMessage({
-      type: 'error',
-      message: error.data.message,
-    })
-    if (error.data.code === -9)
+    if (error.data.code === -9) {
       router.push('/login')
+      return
+    }
+    ElMessage.error(error.data.message)
     return error.data
   }
 }
