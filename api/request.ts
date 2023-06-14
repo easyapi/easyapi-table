@@ -8,7 +8,6 @@ import { getToken } from '~/utils/token'
  * @param headers
  */
 async function fetch(url: string, options?: any, headers?: any): Promise<ApiResponse> {
-  const router = useRouter()
   try {
     const customHeaders = { ...headers }
     const authenticationToken = getToken()
@@ -18,10 +17,6 @@ async function fetch(url: string, options?: any, headers?: any): Promise<ApiResp
       { ...options, headers: customHeaders },
     )
   } catch (error: any) {
-    if (error.data.code === -9) {
-      router.push('/login')
-      return
-    }
     ElMessage.error(error.data.message)
     return error.data
   }
