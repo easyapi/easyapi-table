@@ -15,7 +15,7 @@
     "start": "cross-env NODE_ENV=production PORT=7282 nuxt start "
   },
   "dependencies": {
-    "@vueuse/integrations": "^10.1.2",
+    "@vueuse/integrations": "^10.2.0",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "nuxt": "^3.5.3",
@@ -36,7 +36,7 @@
     "consola": "^3.1.0",
     "cross-env": "^7.0.3",
     "element-plus": "^2.3.6",
-    "eslint": "^8.42.0",
+    "eslint": "^8.43.0",
     "postcss-custom-properties": "^13.2.0",
     "typescript": "^5.1.3"
   }
