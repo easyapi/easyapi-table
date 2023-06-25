@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-import { settingStore } from '@/stores/setting'
-const store = settingStore()
+import { useRoute } from 'nuxt/app'
+
+const route = useRoute()
 const state = reactive({
   showHeader: false,
   showSidebar: false,
   backgroundColor: '',
 })
 onMounted(() => {
-  state.showHeader = store.showHeader
-  state.showSidebar = store.showSidebar
-  state.backgroundColor = store.backgroundColor
+  state.showHeader = route.query.showHeader === 'false' ? false : true
+  state.showSidebar = route.query.showSidebar === 'false' ? false : true
+  state.backgroundColor = route.query.backgroundColor as any
 })
 </script>
 

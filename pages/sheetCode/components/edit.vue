@@ -78,6 +78,7 @@ async function getParentData(data: any) {
   state.teamUrl = data.teamUrl
   state.projectCode = data.projectCode
   state.sheetCode = data.sheetCode
+
   if (state.title === '编辑') {
     const relevanceData = data.fieldList.find((item: any) => {
       return item.type === '关联表'
@@ -95,11 +96,14 @@ async function getParentData(data: any) {
     state.formFields = data.formFields
   }, 100)
 
-  data.fieldList.forEach((item: any) => {
-    if (item.type === '附件')
-      state.fileList = data.formFields[item.key]
-  })
+
+    data.fieldList.forEach((item: any) => {
+      if (item.type === '附件')
+        state.fileList = data.formFields[item.key] ? data.formFields[item.key] : []
+    })
+
 }
+
 /**
  * 获取七牛token
  */
@@ -267,7 +271,7 @@ watch(
       v-model="state.dialogVisible"
       :title="state.title"
       :close-on-click-modal="false"
-      :append-to-body="true"
+      append-to-body
       class="edit-dialog"
       width="900"
       @close="close"
@@ -345,6 +349,8 @@ watch(
             <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" value-format="YYYY-MM-DD hh:mm:ss" type="datetime" placeholder="选择日期时间" />
             <!-- 电话 -->
             <el-input v-if="item.type === '电话'" v-model="state.formFields[item.key]" placeholder="请输入号码" />
+            <!-- 邮箱 -->
+            <el-input v-if="item.type === '邮箱'" v-model="state.formFields[item.key]" placeholder="请输入邮箱" />
           </el-form-item>
         </el-form>
       </div>
@@ -352,7 +358,7 @@ watch(
         <el-button @click="state.dialogVisible = false">
           取 消
         </el-button>
-        <el-button type="primary" @click="confirm()">
+        <el-button type="primary" @click="confirm">
           确 定
         </el-button>
       </template>

@@ -11,29 +11,9 @@ onMounted(() => {
   if (route.query.accessToken)
     localStorage.setItem('accessToken', route.query.accessToken as string)
 
-  if (route.query.showHeader) {
-    store.$patch({
-      showHeader: route.query.showHeader === 'true',
-    })
-  }
-
-  if (route.query.showSidebar) {
-    store.$patch({
-      showSidebar: route.query.showSidebar === 'true',
-    })
-  }
-
-  if (route.query.backgroundColor) {
-    store.$patch({
-      backgroundColor: `#${route.query.backgroundColor}`,
-    })
-  }
-
   if (route.query.url) {
     router.push(route.query.url as string)
-  }
-  else
-  {
+  } else {
     const path = `/${route.query.teamUrl}/${route.query.projectCode}/${route.query.sheetCode}`
     router.push(path)
   }

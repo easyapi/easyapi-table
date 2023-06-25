@@ -15,6 +15,19 @@ export default defineNuxtConfig({
     transpile: lifecycle === 'build' ? ['element-plus'] : [],
   },
   css: ['~/assets/css/page.css'],
+  hooks:{
+    'pages:extend': function (routes) {
+      routes.push({
+        path: '/:teamUrl/:projectCode/:sheetCode',
+        name: 'dataTable',
+        file: '~/pages/sheetCode/index.vue',
+      }, {
+        path: '/access-token',
+        name: 'accessToken',
+        file: '~/pages/accessToken/index.vue',
+      })
+    }
+  },
   components: true,
   vite: {
     build: {

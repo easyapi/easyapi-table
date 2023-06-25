@@ -256,9 +256,9 @@ watch(
             placeholder="请输入搜索内容"
             :prefix-icon="Search"
           />
-          <el-button type="primary" plain @click="addMore">
-            展开更多
-          </el-button>
+<!--          <el-button type="primary" plain @click="addMore">-->
+<!--            展开更多-->
+<!--          </el-button>-->
           <el-button @click="openSearch">
             <el-icon :size="15">
               <Menu />
