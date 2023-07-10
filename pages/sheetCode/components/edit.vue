@@ -198,7 +198,8 @@ function handlePictureCardPreview(uploadFile: any) {
   dialogVisible.value = true
 }
 function close() {
-  state.formFields = {} as any
+  state.fileList = []
+  state.formFields = {}
 }
 function confirm(formName: any) {
   if (state.title === '新增') {
