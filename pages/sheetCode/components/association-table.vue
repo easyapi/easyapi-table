@@ -13,7 +13,7 @@ const state = reactive({
   search: '',
   pagination: {
     page: 1,
-    size: 5,
+    size: 10,
     total: 0,
     pageSizes: [5, 10],
   },
@@ -21,6 +21,8 @@ const state = reactive({
   projectCode: '',
   sheetId: '',
   sheetCode: '',
+  selects: [],
+  selectedRows: [],
 })
 
 function getRecordList() {
@@ -47,7 +49,7 @@ function getSheetById() {
     .getSheetById({}, state.teamUrl, state.projectCode, state.sheetId)
     .then((res) => {
       if (res.code === 1) {
-        res.content.fields.forEach((item: any, index: Number) => {
+        res.content.fields.forEach((item: any, index: number) => {
           if (index < 5)
             state.fields.push(item)
         })
@@ -57,10 +59,28 @@ function getSheetById() {
     })
 }
 
-function choice(item: any, key: any) {
-  item.tag = item.fields[key]
-  emit('getItem', item)
-  state.dialogVisible = false
+// function choice(item: any, key: any) {
+//   console.log(key, 99999)
+//   item.tag = item.fields[key]
+//   emit('getItem', item)
+//   // state.dialogVisible = false
+// }
+
+function handleSelectionChange(data: any) {
+  state.selects = data
+  state.selectedRows = data.map(row => row.fields.locationId)
+}
+
+function toggleRowSelections(row: any, selected: any) {
+  console.log(row, selected, 3636)
+  return state.selectedRows.includes(row.fields.locationId) // 判断该行是否在选中的行中
+}
+
+function close() {
+  state.selects.forEach((item: any) => {
+    item.tag = item.fields.name
+  })
+  emit('getItem', state.selects)
 }
 
 function getParentData(data: any) {
@@ -81,6 +101,30 @@ function fatherCurrent(data: any) {
   getRecordList()
 }
 
+function search() {
+  const data = {
+    relation: 'and',
+    conditions: [
+      {
+        field: 'name',
+        operator: 'like',
+        value: [state.search],
+      },
+    ],
+  }
+  table
+    .searchRecordList(data, state.teamUrl, state.projectCode, state.sheetCode)
+    .then((res) => {
+      if (res.code === 1) {
+        state.recordList = res.content
+        state.pagination.total = res.totalElements
+      } else {
+        state.recordList = []
+        state.pagination.total = 0
+      }
+    })
+}
+
 defineExpose({
   getParentData,
 })
@@ -93,15 +137,17 @@ defineExpose({
     append-to-body
     :close-on-click-modal="false"
     width="800"
+    @close="close"
   >
     <div class="w-52 mb-6">
       <el-input
         v-model="state.search"
         placeholder="搜索你想关联的内容"
         :prefix-icon="Search"
+        @blur="search"
       />
     </div>
-    <div
+    <!-- <div
       v-for="(item, index) in state.recordList"
       :key="index"
       class="
@@ -119,8 +165,28 @@ defineExpose({
         hover:border-purple-600
       "
       @click="choice(item, state.fields[0].key)"
+    > -->
+    <el-table
+      class=" mb-6"
+      :data="state.recordList"
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
     >
-      <div v-for="(citem, cindex) in state.fields" :key="cindex" class="w-1/5">
+      <el-table-column
+        type="selection" width="55"
+      />
+      <el-table-column label="小区名称">
+        <template #default="scope">
+          {{ scope.row.fields.name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="小区ID">
+        <template #default="scope">
+          {{ scope.row.fields.locationId }}
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- <div v-for="(citem, cindex) in state.fields" :key="cindex" class="w-1/5">
         <div class="flex flex-col">
           <div class="h-10 text-gray-500 text-sm">
             {{ citem.name }}
@@ -143,7 +209,7 @@ defineExpose({
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="flex justify-end">
       <Pagination
         :page-sizes="state.pagination.pageSizes"

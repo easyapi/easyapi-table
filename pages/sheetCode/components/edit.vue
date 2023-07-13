@@ -96,12 +96,10 @@ async function getParentData(data: any) {
     state.formFields = data.formFields
   }, 100)
 
-
-    data.fieldList.forEach((item: any) => {
-      if (item.type === '附件')
-        state.fileList = data.formFields[item.key] ? data.formFields[item.key] : []
-    })
-
+  data.fieldList.forEach((item: any) => {
+    if (item.type === '附件')
+      state.fileList = data.formFields[item.key] ? data.formFields[item.key] : []
+  })
 }
 
 /**
@@ -153,13 +151,15 @@ function showTable(val: any, formFields: any) {
 }
 
 function getItem(data: any) {
-  if (!state.formFields[state.key]) {
-    state.formFields[state.key] = []
-    state.formFields[state.key].push(data)
-  } else {
-    if (state.formFields[state.key].filter((x: any) => x.recordId === data.recordId).length === 0)
-      state.formFields[state.key].push(data)
-  }
+  data.forEach((item: any) => {
+    if (!state.formFields[state.key]) {
+      state.formFields[state.key] = []
+      state.formFields[state.key].push(item)
+    } else {
+      if (state.formFields[state.key].filter((x: any) => x.recordId === item.recordId).length === 0)
+        state.formFields[state.key].push(item)
+    }
+  })
 }
 /**
  * 进度条
