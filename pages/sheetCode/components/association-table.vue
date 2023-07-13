@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { defineExpose, reactive } from 'vue'
+import { defineExpose, reactive, ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
+import { ElTable } from 'element-plus'
 import { sheet } from '@/api/sheet'
 import { table } from '@/api/table'
 
 const emit = defineEmits(['getItem'])
+const recordListRef = ref<InstanceType<typeof ElTable>>()
 
 const state = reactive({
   dialogVisible: false,
@@ -23,8 +25,14 @@ const state = reactive({
   sheetCode: '',
   selects: [],
   selectedRows: [],
+  isCheckAll: false,
+  checkData: [], // 已选数据 1
+  recordListAll: [], // 全部数据 1
+  openList: [], // 打开时的数组
 })
-
+/**
+ * 获取数据
+ */
 function getRecordList() {
   const params = {
     page: state.pagination.page - 1,
@@ -36,10 +44,29 @@ function getRecordList() {
       if (res.code === 1) {
         state.recordList = res.content
         state.pagination.total = res.totalElements
+        changePageCheck()
       } else {
         state.recordList = []
         state.pagination.total = 0
       }
+    })
+}
+
+/**
+ * 获取所有的数据
+ */
+function getRecordListAll() {
+  const params = {
+    page: 0,
+    size: 100,
+  }
+  table
+    .getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode)
+    .then((res) => {
+      if (res.code === 1)
+        state.recordListAll = res.content
+      else
+        state.recordListAll = []
     })
 }
 
@@ -55,32 +82,17 @@ function getSheetById() {
         })
         state.sheetCode = res.content.code
         getRecordList()
+        getRecordListAll()
       }
     })
 }
 
-// function choice(item: any, key: any) {
-//   console.log(key, 99999)
-//   item.tag = item.fields[key]
-//   emit('getItem', item)
-//   // state.dialogVisible = false
-// }
-
-function handleSelectionChange(data: any) {
-  state.selects = data
-  state.selectedRows = data.map(row => row.fields.locationId)
-}
-
-function toggleRowSelections(row: any, selected: any) {
-  console.log(row, selected, 3636)
-  return state.selectedRows.includes(row.fields.locationId) // 判断该行是否在选中的行中
-}
-
-function close() {
-  state.selects.forEach((item: any) => {
+function confirm() {
+  state.checkData.forEach((item: any) => {
     item.tag = item.fields.name
   })
-  emit('getItem', state.selects)
+  emit('getItem', state.checkData)
+  state.dialogVisible = false
 }
 
 function getParentData(data: any) {
@@ -88,7 +100,9 @@ function getParentData(data: any) {
   state.teamUrl = data.teamUrl
   state.projectCode = data.projectCode
   state.sheetId = data.sheetId
+  state.checkData = data.list
   getSheetById()
+  changePageCheck()
 }
 
 function fatherSize(data: any) {
@@ -125,6 +139,71 @@ function search() {
     })
 }
 
+/**
+ * 跨页全选/取消全选
+ */
+function handleSelectAllPage(value: boolean) {
+  if (value) {
+    state.checkData = JSON.parse(JSON.stringify(state.recordListAll))
+    state.recordList.forEach((row) => {
+      recordListRef.value.toggleRowSelection(row, true)
+    })
+  } else {
+    state.checkData = []
+    recordListRef.value.clearSelection()
+  }
+  state.isCheckAll = value
+}
+/**
+ * 切换分页之后选中
+ */
+function changePageCheck() {
+  state.checkData.forEach((item) => {
+    state.recordList.forEach((row) => {
+      if (item.fields.locationId === row.fields.locationId) {
+        nextTick(() => {
+          recordListRef.value.toggleRowSelection(row, true)
+        })
+      }
+    })
+  })
+}
+
+/**
+ * 手动勾选数据行的Checkbox时触发的事件
+ */
+function select(selection, row) {
+  if (
+    state.checkData.filter(x => x.fields.locationId === row.fields.locationId).length === 0
+  ) {
+    state.checkData.push(row)
+    return
+  }
+  state.checkData.forEach((item, index) => {
+    if (item.fields.locationId === row.fields.locationId)
+      state.checkData.splice(index, 1)
+  })
+}
+
+/**
+ * 手动勾选全选Checkbox时触发的事件
+ */
+function selectAll(selection) {
+  if (selection.length === 0) {
+    const list = []
+    state.checkData.forEach((row) => {
+      if (state.recordList.filter(x => x.fields.locationId === row.fields.locationId).length === 0)
+        list.push(row)
+    })
+    state.checkData = JSON.parse(JSON.stringify(list))
+  } else {
+    selection.forEach((row) => {
+      if (state.checkData.filter(x => x.fields.locationId === row.fields.locationId).length === 0)
+        state.checkData.push(row)
+    })
+  }
+}
+
 defineExpose({
   getParentData,
 })
@@ -139,7 +218,7 @@ defineExpose({
     width="800"
     @close="close"
   >
-    <div class="w-52 mb-6">
+    <div class="w-52 mb-4">
       <el-input
         v-model="state.search"
         placeholder="搜索你想关联的内容"
@@ -166,11 +245,28 @@ defineExpose({
       "
       @click="choice(item, state.fields[0].key)"
     > -->
-    <el-table
+    <div class="mb-4 flex justify-between">
+      <div>
+        <el-button type="primary" @click="handleSelectAllPage(true)">
+          跨页全选
+        </el-button>
+        <el-button @click="handleSelectAllPage(false)">
+          取消全选
+        </el-button>
+      </div>
+      <div>
+        <el-button type="primary" @click="confirm">
+          确认
+        </el-button>
+      </div>
+    </div>
+    <ElTable
+      ref="recordListRef"
       class=" mb-6"
       :data="state.recordList"
       style="width: 100%"
-      @selection-change="handleSelectionChange"
+      @select="select"
+      @select-all="selectAll"
     >
       <el-table-column
         type="selection" width="55"
@@ -185,7 +281,7 @@ defineExpose({
           {{ scope.row.fields.locationId }}
         </template>
       </el-table-column>
-    </el-table>
+    </ElTable>
     <!-- <div v-for="(citem, cindex) in state.fields" :key="cindex" class="w-1/5">
         <div class="flex flex-col">
           <div class="h-10 text-gray-500 text-sm">

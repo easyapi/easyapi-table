@@ -147,10 +147,12 @@ function showTable(val: any, formFields: any) {
     teamUrl: state.teamUrl,
     projectCode: state.projectCode,
     sheetId: formFields.property.sheet_id,
+    list: state.formFields[state.key],
   })
 }
 
 function getItem(data: any) {
+  state.formFields[state.key] = []
   data.forEach((item: any) => {
     if (!state.formFields[state.key]) {
       state.formFields[state.key] = []
