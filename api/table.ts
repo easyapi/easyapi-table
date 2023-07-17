@@ -78,4 +78,5 @@ export const table = {
   deleteRecord(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
     return http.delete(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/records`, data)
   },
+
 }

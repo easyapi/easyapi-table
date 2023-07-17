@@ -8,6 +8,7 @@ import Pagination from '@/components/Pagination'
 import SearchArea from '@/components/SearchArea'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,7 +40,6 @@ useHead({
 })
 
 const state = reactive({
-  activeName: 'first',
   dialogVisible: false,
   playvideo: '',
   fieldList: [],
@@ -83,8 +83,6 @@ function close() {
   state.playvideo = ''
 }
 
-function handleClick() {}
-
 function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
   const params = {
     size: 50,
@@ -106,6 +104,23 @@ function getRecordList() {
   }
   table
     .getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode)
+    .then((res) => {
+      if (res.code === 1) {
+        state.loadingData = false
+        state.recordList = res.content
+        state.pagination.total = res.totalElements
+      } else {
+        state.loadingData = false
+        state.tableText = '暂无数据'
+        state.recordList = []
+        state.pagination.total = 0
+      }
+    })
+}
+
+function searchRecordList(data) {
+  table
+    .searchRecordList(data, state.teamUrl, state.projectCode, state.sheetCode)
     .then((res) => {
       if (res.code === 1) {
         state.loadingData = false
@@ -241,13 +256,6 @@ watch(
         {{ state.headline }}
       </div>
       <div class="mt-6 flex algin-center justify-between">
-        <div class="tabs">
-          <el-tabs v-model="state.activeName" @tab-click="handleClick">
-            <el-tab-pane label="全部数据" name="first" />
-            <el-tab-pane label="我的数据" name="second" />
-            <el-tab-pane label="待处理数据" name="third" />
-          </el-tabs>
-        </div>
         <div>
           <el-input
             v-model="state.input2"
@@ -377,7 +385,7 @@ watch(
       </div>
     </div>
     <Edit ref="child" @getList="getList" />
-    <AdvancedSearch ref="searchChild" />
+    <AdvancedSearch ref="searchChild" @search="searchRecordList" />
   </div>
 </template>
 

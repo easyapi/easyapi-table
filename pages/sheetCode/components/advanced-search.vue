@@ -7,6 +7,8 @@ defineExpose({
   getParentData,
 })
 
+const emit = defineEmits(['scarch'])
+
 const state = reactive({
   conditionList: [] as any,
   dialogVisible: false,
@@ -48,26 +50,23 @@ const state = reactive({
   ],
 })
 
-watch(
-  () => state.fieldList,
-  (value) => {
-    state.conditionList.push({
-      fieldValue: value[0].label,
-      value: '等于',
-      checked: false,
-    })
-  },
-  { deep: true },
-)
 
 function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
-  data.fieldList.forEach((item: any) => {
-    state.fieldList.push({
-      label: item.name,
-      value: item.key,
+    data.fieldList.forEach((item: any) => {
+      state.fieldList.push({
+        label: item.name,
+        value: item.key,
+      })
     })
-  })
+  if(state.conditionList.length === 0){
+    state.conditionList.push({
+      fieldValue: state.fieldList[0].value,
+      value: '等于',
+      inputValue: '',
+      checked: false,
+    })
+  }
 }
 
 function deleteRecord(index: any) {
@@ -95,9 +94,26 @@ function addMore() {
   const obj = {
     fieldValue: '',
     value: '等于',
+    inputValue: '',
     checked: false,
   }
   state.conditionList.push(obj)
+}
+
+function onsubmit() {
+  const data = {
+    relation: 'and',
+    conditions: []
+  }
+  state.conditionList.forEach(item => {
+    data.conditions.push({
+      field: item.fieldValue,
+      operator: 'like',
+      value: item.inputValue.split(','),
+    })
+  })
+  state.dialogVisible = false
+  emit('search',data)
 }
 </script>
 
@@ -111,7 +127,7 @@ function addMore() {
       <el-select v-if="item.fieldValue" v-model="item.value" class="mr-15">
         <el-option v-for="child in state.options" :key="child.value" :label="child.label" :value="child.value" />
       </el-select>
-      <el-input style="width: 400px" placeholder="多个条件请用；隔开" />
+      <el-input v-model="item.inputValue" style="width: 400px" placeholder="多个条件请用；隔开" />
       <i class="el-icon-delete-solid cursor mg-lf-15" @click="deleteRecord(index)" />
       <el-checkbox v-model="item.checked" class="mg-lf-15">
         外露
@@ -130,7 +146,7 @@ function addMore() {
       <el-button @click="state.dialogVisible = false">
         取 消
       </el-button>
-      <el-button type="primary" @click="state.dialogVisible = false">
+      <el-button type="primary" @click="onsubmit">
         确 定
       </el-button>
     </template>
