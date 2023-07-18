@@ -2,55 +2,27 @@
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { defineExpose, reactive, watch } from 'vue'
+import { CircleCloseFilled }  from '@element-plus/icons-vue'
+import { options } from '@/utils/options'
 
 defineExpose({
   getParentData,
 })
 
-const emit = defineEmits(['scarch'])
+const emit = defineEmits(['scarch', 'exposed'])
 
 const state = reactive({
   conditionList: [] as any,
   dialogVisible: false,
   save: false,
   fieldList: [] as any,
-  options: [
-    {
-      value: '等于',
-      label: '等于',
-    },
-    {
-      value: '不等于',
-      label: '不等于',
-    },
-    {
-      value: '包含',
-      label: '包含',
-    },
-    {
-      value: '不包含',
-      label: '不包含',
-    },
-    {
-      value: '开始于',
-      label: '开始于',
-    },
-    {
-      value: '结束于',
-      label: '结束于',
-    },
-    {
-      value: '为空',
-      label: '为空',
-    },
-    {
-      value: '不为空',
-      label: '不为空',
-    },
-  ],
+  options
 })
 
-
+/**
+ * 获取参数
+ * @param data
+ */
 function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
     data.fieldList.forEach((item: any) => {
@@ -61,14 +33,19 @@ function getParentData(data: any) {
     })
   if(state.conditionList.length === 0){
     state.conditionList.push({
-      fieldValue: state.fieldList[0].value,
-      value: '等于',
+      fieldLabel: '',
+      fieldValue: '',
+      value: 'eq',
       inputValue: '',
       checked: false,
     })
   }
 }
 
+/**
+ * 删除条件
+ * @param index
+ */
 function deleteRecord(index: any) {
   ElMessageBox.confirm('您确定要删除这一条数据?', '提示', {
     confirmButtonText: '确定',
@@ -90,30 +67,71 @@ function deleteRecord(index: any) {
     })
 }
 
+/**
+ * 添加条件
+ */
 function addMore() {
   const obj = {
+    fieldLabel: '',
     fieldValue: '',
-    value: '等于',
+    value: 'eq',
     inputValue: '',
     checked: false,
   }
   state.conditionList.push(obj)
 }
 
+/**
+ * 选择字段
+ */
+function changeField() {
+  state.conditionList.forEach((item) => {
+    state.fieldList.forEach((citem) => {
+      if(item.fieldValue === citem.value ){
+        item.fieldLabel = citem.label
+      }
+    })
+  })
+}
+
+/**
+ * 删除查询寻参数
+ */
+function deleteData(index) {
+  state.conditionList.splice(index, 1)
+}
+
+/**
+ * 确认
+ * @param arr 外露参数
+ * @param data 查询参数
+ */
 function onsubmit() {
+  const arr = []
   const data = {
     relation: 'and',
     conditions: []
   }
   state.conditionList.forEach(item => {
-    data.conditions.push({
-      field: item.fieldValue,
-      operator: 'like',
-      value: item.inputValue.split(','),
-    })
+    if(item.checked) {
+      arr.push(item)
+    }
+    if(item.inputValue){
+      data.conditions.push({
+        field: item.fieldValue,
+        operator: item.value,
+        value: item.inputValue.split('；'),
+      })
+    }
   })
   state.dialogVisible = false
-  emit('search',data)
+  if(data.conditions.length !== 0){
+    emit('search',data)
+  }
+  if(arr.length !== 0){
+    emit('exposed', arr)
+  }
+
 }
 </script>
 
@@ -121,17 +139,18 @@ function onsubmit() {
   <el-dialog v-model="state.dialogVisible" title="高级筛选" append-to-body width="50%">
     <p>筛选条件</p>
     <div v-for="(item, index) in state.conditionList" :key="index" class="flex-r  mg-tp-15 align-center ">
-      <el-select v-model="item.fieldValue" placeholder="请选择要筛选的字段名" class="mr-15">
+      <el-select v-model="item.fieldValue" placeholder="请选择要筛选的字段名" class="mr-15" @change="changeField">
         <el-option v-for="field in state.fieldList" :key="field.value" :label="field.label" :value="field.value" />
       </el-select>
       <el-select v-if="item.fieldValue" v-model="item.value" class="mr-15">
         <el-option v-for="child in state.options" :key="child.value" :label="child.label" :value="child.value" />
       </el-select>
-      <el-input v-model="item.inputValue" style="width: 400px" placeholder="多个条件请用；隔开" />
+      <el-input v-model="item.inputValue" style="width: 400px" placeholder="多条件请用；隔开" />
       <i class="el-icon-delete-solid cursor mg-lf-15" @click="deleteRecord(index)" />
       <el-checkbox v-model="item.checked" class="mg-lf-15">
         外露
       </el-checkbox>
+      <el-icon class="ml-2 cursor" color="#bbbbbb" @click="deleteData(index)"><CircleCloseFilled /></el-icon>
     </div>
     <p class="mg-tp-15 cursor" @click="addMore">
       <el-icon :size="15">
@@ -139,9 +158,6 @@ function onsubmit() {
       </el-icon>
       添加筛选条件
     </p>
-    <el-checkbox v-model="state.save" class="mg-tp-15">
-      保存为场景
-    </el-checkbox>
     <template #footer class="dialog-footer">
       <el-button @click="state.dialogVisible = false">
         取 消

@@ -36,8 +36,20 @@ export const table = {
    *
    * @see https://www.easyapi.com
    */
-  searchRecordList(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.post(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/record/search`, data)
+  searchRecordList(teamUrl: string, projectCode: string, sheetCode: string, data: any, params: any): Promise<ApiResponse> {
+    let str = ''
+    if (params) {
+      let index = 0
+      for (const key in params) {
+        if (index === 0) {
+          str = `?${key}=${params[key]}`
+        } else {
+          str = str + `&${key}=${params[key]}`
+        }
+        index++
+      }
+    }
+    return http.post(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/record/search${str}`, data)
   },
 
   /**

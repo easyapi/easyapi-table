@@ -9,6 +9,7 @@ import SearchArea from '@/components/SearchArea'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
 import { useRoute, useRouter } from 'vue-router'
+import { options } from '@/utils/options'
 
 const route = useRoute()
 const router = useRouter()
@@ -67,6 +68,12 @@ const state = reactive({
   tableText: '',
   recordIds: [] as any,
   detailList: [],
+  exposedList: [],
+  exposedData: {
+    relation: 'and',
+    conditions: []
+  },
+  options
 })
 
 function getList() {
@@ -95,6 +102,9 @@ function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
   })
 }
 
+/**
+ * 列表查询
+ */
 function getRecordList() {
   state.recordList = []
   state.loadingData = true
@@ -118,9 +128,57 @@ function getRecordList() {
     })
 }
 
-function searchRecordList(data) {
+/**
+ * 筛选
+ */
+function search() {
+  const data = {
+    relation: 'and',
+    conditions: []
+  }
+  state.exposedList.forEach(item => {
+    if(item.inputValue){
+      data.conditions.push({
+        field: item.fieldValue,
+        operator: item.value,
+        value: item.inputValue.split('；'),
+      })
+    }
+  })
+  state.pagination.page = 1
+  searchRecordList(data)
+}
+
+/**
+ * 筛选数据清除
+ */
+function clean() {
+  state.exposedList.forEach(item => {
+    item.inputValue  = ''
+  })
+  searchRecordList(null)
+}
+
+/**
+ * 筛选查询
+ * @param data
+ */
+function searchRecordList(row) {
+  let data = null
+  if(row) {
+    state.exposedData = row
+  }
+  const params = {
+    size: state.pagination.size,
+    page: state.pagination.page - 1,
+  }
+
+  if(state.exposedData.conditions.length !== 0){
+    data = state.exposedData.conditions
+  }
+
   table
-    .searchRecordList(data, state.teamUrl, state.projectCode, state.sheetCode)
+    .searchRecordList(state.teamUrl, state.projectCode, state.sheetCode, data, params)
     .then((res) => {
       if (res.code === 1) {
         state.loadingData = false
@@ -190,12 +248,6 @@ function batchRemove() {
   })
 }
 
-/**
- *展开更多
- */
-function addMore() {
-  // state.ifShow = !state.ifShow
-}
 
 /**
  * 高级筛选
@@ -206,6 +258,7 @@ function openSearch() {
     fieldList: state.fieldList,
   })
 }
+
 /**
  * 新增服务商
  */
@@ -221,6 +274,7 @@ function addProvider(teamUrl: any, projectCode: any, sheetCode: any) {
     formFields: [],
   })
 }
+
 /**
  * 分页
  */
@@ -234,11 +288,12 @@ function fatherCurrent(data: any) {
   getRecordList()
 }
 
-function search() {}
-
-function reset() {}
-
-function event() {}
+/**
+ * 外露设置
+ */
+function exposedSet(arr) {
+  state.exposedList = arr
+}
 
 watch(
   () => state.teamUrl,
@@ -264,9 +319,6 @@ watch(
             placeholder="请输入搜索内容"
             :prefix-icon="Search"
           />
-<!--          <el-button type="primary" plain @click="addMore">-->
-<!--            展开更多-->
-<!--          </el-button>-->
           <el-button @click="openSearch">
             <el-icon :size="15">
               <Menu />
@@ -281,6 +333,20 @@ watch(
           </el-button>
         </div>
       </div>
+    </div>
+    <div v-if="state.exposedList.length !== 0" class="exposed mt-2 bg-white p-4">
+      <div class="text-[16px] mb-3">筛选条件</div>
+      <div class="flex flex-wrap items-center justify-between">
+        <div v-for="(item,index) in state.exposedList" :key="index" class="flex items-center mb-4 w-[49%]">
+          <el-input class="field-label" v-model="item.fieldLabel" disabled  />
+          <el-select v-model="item.value" class="field-option ml-2">
+            <el-option v-for="child in state.options" :key="child.value" :label="child.label" :value="child.value" />
+          </el-select>
+          <el-input class="field-value ml-2" v-model="item.inputValue" placeholder="多条件请用；隔开" />
+        </div>
+      </div>
+      <el-button type="primary" @click="search">筛选</el-button>
+      <el-button @click="clean">清空</el-button>
     </div>
     <div class="main-content p-4 bg-white">
       <div v-if="state.ifShow">
@@ -385,11 +451,11 @@ watch(
       </div>
     </div>
     <Edit ref="child" @getList="getList" />
-    <AdvancedSearch ref="searchChild" @search="searchRecordList" />
+    <AdvancedSearch ref="searchChild" @search="searchRecordList" @exposed="exposedSet" />
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 #video {
   width: 100%;
   height: 500px;
@@ -408,6 +474,18 @@ watch(
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1; /*行数*/
+}
+
+.exposed {
+  .field-label {
+    width: 20%;
+  }
+  .field-option {
+    width: 19%;
+  }
+  .field-value {
+    width: 60%;
+  }
 }
 </style>
 
