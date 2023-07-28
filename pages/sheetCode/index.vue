@@ -5,6 +5,7 @@ import { Menu, Plus, Search } from '@element-plus/icons-vue'
 import Edit from './components/edit.vue'
 import AdvancedSearch from './components/advanced-search.vue'
 import Pagination from '@/components/Pagination'
+import Export from './components/export.vue'
 import SearchArea from '@/components/SearchArea'
 import { table } from '@/api/table'
 import { sheet } from '@/api/sheet'
@@ -14,6 +15,7 @@ const route = useRoute()
 const router = useRouter()
 const searchChild = ref<InstanceType<typeof AdvancedSearch>>()
 const child = ref<InstanceType<typeof Edit>>()
+const exportDialog = ref<InstanceType<typeof Export>>()
 
 onMounted(() => {
   if (
@@ -38,6 +40,7 @@ useHead({
   title: '数据表格 - EasyAPI服务市场',
   meta: [{ name: 'description', content: 'EasyAPI数据表格' }],
 })
+
 
 const state = reactive({
   dialogVisible: false,
@@ -67,6 +70,7 @@ const state = reactive({
   tableText: '',
   recordIds: [] as any,
   detailList: [],
+  exportDialog: null,
 })
 
 function getList() {
@@ -206,6 +210,7 @@ function openSearch() {
     fieldList: state.fieldList,
   })
 }
+
 /**
  * 新增服务商
  */
@@ -240,6 +245,15 @@ function reset() {}
 
 function event() {}
 
+/**
+ * 打开导出弹窗
+ */
+function openExport() {
+  exportDialog.value?.getParentData({
+    dialogVisible: true,
+  })
+}
+
 watch(
   () => state.teamUrl,
   (value) => {
@@ -251,6 +265,7 @@ watch(
 
 <template>
   <div>
+    <!-- 头部内容 -->
     <div class="bg-white p-4">
       <div class="text-2xl font-black">
         {{ state.headline }}
@@ -283,6 +298,7 @@ watch(
       </div>
     </div>
     <div class="main-content p-4 bg-white">
+      <!-- 搜索区域 -->
       <div v-if="state.ifShow">
         <SearchArea
           :items="state.searchItems"
@@ -291,11 +307,16 @@ watch(
           @reset="reset"
         />
       </div>
+      <!-- 按钮区域 -->
       <div class="flex items-center">
         <el-button type="danger" :disabled="state.checkedLength <= 0" @click="batchRemove">
           批量删除
         </el-button>
+        <el-button type="primary" @click="openExport">
+          批量导出
+        </el-button>
       </div>
+      <!-- 表格区域 -->
       <el-table
         v-loading="state.loadingData"
         border
@@ -386,6 +407,7 @@ watch(
     </div>
     <Edit ref="child" @getList="getList" />
     <AdvancedSearch ref="searchChild" @search="searchRecordList" />
+    <Export ref="exportDialog" />
   </div>
 </template>
 
