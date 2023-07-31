@@ -4,10 +4,6 @@ export const  options = [
     label: '等于',
   },
   {
-    value: 'ne',
-    label: '不等于',
-  },
-  {
     value: 'like',
     label: '包含',
   },

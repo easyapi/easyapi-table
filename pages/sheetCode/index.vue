@@ -168,7 +168,10 @@ function clean() {
  * @param data
  */
 function searchRecordList(row) {
-  let data = null
+  let data = {
+    relation: 'and',
+    conditions: []
+  }
   if(row) {
     state.exposedData = row
   }
@@ -178,7 +181,7 @@ function searchRecordList(row) {
   }
 
   if(state.exposedData.conditions.length !== 0){
-    data = state.exposedData.conditions
+    data.conditions = state.exposedData.conditions
   }
 
   table
