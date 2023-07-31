@@ -19,6 +19,7 @@ const state = reactive({
   dataObj: {},
   exportList: [],
   title: '',
+  fileList: [],
 })
 
 /**
@@ -36,6 +37,13 @@ function getKeyAndToken() {
   getQiniuToken()
   getQiniuKey()
 }
+
+/**
+ * 上传成功后后重新获取七牛参数
+ */
+function handleSuccess() {
+  getKeyAndToken()
+}
 /**
  * 获取七牛token
  */
@@ -51,10 +59,11 @@ function getQiniuKey() {
 }
 
 /**
- * 打开导入
+ * 打开导入并获取七牛参数
  */
 function addExport() {
   state.createDialog = true
+  getKeyAndToken()
 }
 
 </script>
@@ -127,7 +136,11 @@ function addExport() {
         <el-upload
           class="upload-demo"
           drag
-          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          action="https://upload.qiniup.com/"
+          :data="{ key: state.dataObj.key, token: state.dataObj.token }"
+          :file-list="state.fileList"
+          :on-success="handleSuccess"
+          @click="getKeyAndToken"
           multiple
         >
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>

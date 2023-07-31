@@ -24,12 +24,15 @@ const state = reactive({
  * @param data
  */
 function getParentData(data: any) {
+  console.log(data.fieldList, 999)
   state.dialogVisible = data.dialogVisible
     data.fieldList.forEach((item: any) => {
-      state.fieldList.push({
-        label: item.name,
-        value: item.key,
-      })
+      if(item.type === '单行文本') {
+        state.fieldList.push({
+          label: item.name,
+          value: item.key,
+        })
+      }
     })
   if(state.conditionList.length === 0){
     state.conditionList.push({
