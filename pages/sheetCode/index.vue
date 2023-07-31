@@ -440,6 +440,17 @@ watch(
                 >
               </div>
             </div>
+            <div v-else-if="item.type === '多选'">
+              <div v-for="(citem,cindex) in JSON.parse(scope.row.fields[item.key])" :key="cindex">
+                {{cindex + 1}}、{{citem}}
+              </div>
+            </div>
+            <div v-else-if="item.type === '勾选'">
+              <el-tag :type="scope.row.fields[item.key] && JSON.parse(scope.row.fields[item.key]) ? 'success' : 'warning'">
+                {{scope.row.fields[item.key] && JSON.parse(scope.row.fields[item.key]) ? '是' : '否'}}
+              </el-tag>
+
+            </div>
             <div v-else v-html="scope.row.fields[item.key]" />
             <el-dialog
               v-model="dialogVisible"

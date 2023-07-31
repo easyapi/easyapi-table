@@ -91,7 +91,14 @@ async function getParentData(data: any) {
         })
       }
     }
+    state.fieldList.forEach((item) => {
+        if(item.type === "多选") {
+           data.formFields[item.key] = JSON.parse(data.formFields[item.key])
+        }
+    })
+    console.log(state.fieldList)
   }
+
   setTimeout(() => {
     state.formFields = data.formFields
   }, 100)
@@ -137,6 +144,7 @@ function beforeUploadVideo(file: any) {
   }
   state.isShowUploadVideo = false
 }
+
 /**
  * 展示关联表
  */
@@ -163,6 +171,7 @@ function getItem(data: any) {
     }
   })
 }
+
 /**
  * 进度条
  */
@@ -171,6 +180,7 @@ function uploadVideoProcess(event: any, file: any, fileList: any) {
   state.videoFlag = true
   state.videoUploadPercent = file.percentage.toFixed(0) * 1
 }
+
 /**
  * 上传成功回调
  */
@@ -181,6 +191,7 @@ function handleVideoSuccess(key: any, res: any, file: any) {
   const video = `https://qiniu.easyapi.com/${res.key}`
   state.formFields[key] = video
 }
+
 function handleAvatarSuccess(key: any, res: any, file: any) {
   const img = `https://qiniu.easyapi.com/${res.key}`
   file.url = img
@@ -192,17 +203,21 @@ function handleAvatarSuccess(key: any, res: any, file: any) {
 
   state.formFields[key].push(obj)
 }
+
 function handleRemove(key: any, res: any, file: any) {
   state.formFields[key].splice(state.formFields[key].findIndex((item: any) => item.url === res.url))
 }
+
 function handlePictureCardPreview(uploadFile: any) {
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
+
 function close() {
   state.fileList = []
   state.formFields = {}
 }
+
 function confirm(formName: any) {
   if (state.title === '新增') {
     const list = []
@@ -234,7 +249,7 @@ function confirm(formName: any) {
       ...state.formFields,
     }
     obj.fields = data
-    if (state.key) {
+    if (state.key && obj.fields[state.key] && obj.fields[state.key].length !== 0) {
       obj.fields[state.key] = obj.fields[state.key].map((item: any) => {
         return item.recordId
       })
@@ -347,6 +362,25 @@ watch(
             <!-- 单选 -->
             <el-select v-if="item.type === '单选'" v-model="state.formFields[item.key]">
               <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+            <!-- 勾选 -->
+            <el-select v-if="item.type === '勾选'" v-model="state.formFields[item.key]">
+              <el-checkbox v-model="state.formFields[item.key]" label="是"/>
+            </el-select>
+            <!-- 多选 -->
+            <el-select
+              v-if="item.type === '多选'"
+              v-model="state.formFields[item.key]"
+              multiple
+              collapse-tags
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in item.property.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
             <!-- 日期 -->
             <el-date-picker v-if="item.type === '日期'" v-model="state.formFields[item.key]" value-format="YYYY-MM-DD hh:mm:ss" type="datetime" placeholder="选择日期时间" />
