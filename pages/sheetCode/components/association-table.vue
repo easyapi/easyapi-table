@@ -104,7 +104,7 @@ function getParentData(data: any) {
   state.teamUrl = data.teamUrl
   state.projectCode = data.projectCode
   state.sheetId = data.sheetId
-  state.checkData = data.list
+  state.checkData = data.list ? data.list : []
   getSheetById() // 获取展示数据参数
   changePageCheck()
 }
