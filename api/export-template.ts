@@ -1,7 +1,12 @@
 import http from '~/api/request'
 
 export const exportTemplate = {
-
+  /**
+   * 导出
+   */
+  derive(params: any): Promise<ApiResponse> {
+    return http.get(`${useRuntimeConfig().public.baseUrl}/manage/payment-bill/export`, params, {responseType: 'blob'})
+  },
   /**
    * 获取自定义导出模板列表
    *

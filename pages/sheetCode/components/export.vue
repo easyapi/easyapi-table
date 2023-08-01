@@ -146,6 +146,18 @@ function deleteTemplate(row) {
     })
   })
 }
+
+/**
+ * 导出
+ */
+function derive(row) {
+  exportTemplate.derive(row).then((res) => {
+    if (res.code  === 1)
+      ElMessage.success(res.message)
+    else
+      ElMessage.error(res.message)
+  })
+}
 </script>
 
 <template>
@@ -162,7 +174,7 @@ function deleteTemplate(row) {
     >
       <div class="dialog-content ">
         <div class="card-list">
-          <div class="export-card">
+          <div class="export-card" @click="derive(null)">
             <div class="hover-card" >
               <svg-icon class="export-icon" icon-class="export-template" />
               <div class="export-text">导出</div>
@@ -177,7 +189,7 @@ function deleteTemplate(row) {
           <div class="export-card" v-for="item in state.exportList">
             <div class="hover-card" >
               <div class="list-icon">
-                <div class="select">
+                <div class="select" @click="derive(item)">
                   <svg-icon class="export-icon" icon-class="export-template" />
                   <div class="export-text">导出</div>
                 </div>
