@@ -347,7 +347,11 @@ watch(
             placeholder="请输入搜索内容"
             :prefix-icon="Search"
             @keyup.enter="searchRecordList(null)"
-          />
+          >
+            <template #append>
+              <el-icon class="cursor-pointer" @click="searchRecordList(null)"><Search /></el-icon>
+            </template>
+          </el-input>
           <el-button @click="openSearch">
             <el-icon :size="15">
               <Menu />
@@ -525,6 +529,7 @@ watch(
 
 .exposed {
   .field-label {
+
     width: 20%;
   }
   .field-option {
