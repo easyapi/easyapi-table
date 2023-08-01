@@ -316,6 +316,9 @@ function exposedSet(arr) {
 function openExport() {
   exportDialog.value?.getParentData({
     dialogVisible: true,
+    teamUrl: state.teamUrl,
+    projectCode: state.projectCode,
+    sheetCode: state.sheetCode,
   })
 }
 

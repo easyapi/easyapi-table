@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { defineExpose, reactive, ref, shallowRef, watch } from 'vue'
-import { ElMessage } from 'element-plus'
-import { UploadFilled } from '@element-plus/icons-vue'
-import AssociationTable from './association-table.vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {Discount, UploadFilled} from '@element-plus/icons-vue'
 import { qiniu } from '@/api/qiniu'
-import { table } from '@/api/table'
-import { sheet } from '@/api/sheet'
+import { exportTemplate } from '@/api/export-template'
 
 const emit = defineEmits(['getList'])
 
@@ -18,9 +16,29 @@ const state = reactive({
   createDialog: false,
   dataObj: {},
   exportList: [],
-  title: '',
+  name: '',
+  file: '',
   fileList: [],
+  teamUrl: '',
+  projectCode: '',
+  sheetCode: '',
 })
+
+/**
+ * 获取列表
+ */
+function getList() {
+  const data = {
+    page: 0,
+    size: 100
+  }
+  exportTemplate.getList(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) =>{
+    if(res.code === 1)
+      state.exportList = res.content
+    else
+      state.exportList = []
+  })
+}
 
 /**
  * 抛出打开
@@ -28,6 +46,10 @@ const state = reactive({
  */
 async function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
+  state.teamUrl = data.teamUrl
+  state.projectCode = data.projectCode
+  state.sheetCode = data.sheetCode
+  getList()
 }
 
 /**
@@ -41,9 +63,11 @@ function getKeyAndToken() {
 /**
  * 上传成功后后重新获取七牛参数
  */
-function handleSuccess() {
+function handleSuccess(row) {
+  state.file = `https://qiniu.easyapi.com/${row.key}`
   getKeyAndToken()
 }
+
 /**
  * 获取七牛token
  */
@@ -66,6 +90,62 @@ function addExport() {
   getKeyAndToken()
 }
 
+/**
+ * 取消上传
+ */
+function close() {
+  state.fileList = []
+  state.file = ''
+  state.name = ''
+  state.createDialog = false
+}
+/**
+ * 确认提交
+ */
+function submit() {
+  if(state.name) {
+    ElMessage.error('模板名称不能为空')
+    return
+  }
+  if(state.file) {
+    ElMessage.error('模板不能为空')
+    return
+  }
+  const data = {
+    name: state.name,
+    file: state.file
+  }
+  exportTemplate.create(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+      if(res.code === 1) {
+        ElMessage.success('上传成功')
+        state.name = ''
+        state.file = ''
+        state.fileList = []
+        state.createDialog = false
+      } else {
+        ElMessage.error(res.message)
+      }
+  })
+}
+
+/**
+ * 删除模板
+ */
+function deleteTemplate(row) {
+  ElMessageBox.confirm('您确定要删除这个模板?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      exportTemplate.delete(row, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+        if (res.code === 1)
+          ElMessage.success(res.message)
+        else
+          ElMessage.error(res.message)
+    })
+  })
+}
 </script>
 
 <template>
@@ -96,14 +176,23 @@ function addExport() {
           </div>
           <div class="export-card" v-for="item in state.exportList">
             <div class="hover-card" >
-              <svg-icon class="export-icon" icon-class="export-template" />
-              <div class="export-text">导出</div>
+              <div class="list-icon">
+                <div class="select">
+                  <svg-icon class="export-icon" icon-class="export-template" />
+                  <div class="export-text">导出</div>
+                </div>
+                <div class="select" @click="deleteTemplate(item)">
+                  <svg-icon class="export-icon" icon-class="export-template" />
+                  <div class="export-text">删除</div>
+                </div>
+              </div>
+
             </div>
             <div class="card-header bg-gray-200">
               <svg-icon class="card-icon" icon-class="word" />
             </div>
             <div class="card-bottom bg-gray-300 text-center">
-              默认模板
+              {{ item.name }}
             </div>
           </div>
           <div class="export-card" @click="addExport">
@@ -130,7 +219,7 @@ function addExport() {
     >
       <div>
         <span>模板名称：</span>
-        <el-input v-model="state.title" placeholder="请输入模板名称" />
+        <el-input v-model="state.name" placeholder="请输入模板名称" />
       </div>
       <div class="export-update">
         <el-upload
@@ -151,10 +240,10 @@ function addExport() {
       </div>
 
       <template #footer>
-        <el-button @click="state.dialogVisible = false">
+        <el-button @click="close">
           取 消
         </el-button>
-        <el-button type="primary">
+        <el-button type="primary" @click="submit">
           确 定
         </el-button>
       </template>
@@ -194,6 +283,31 @@ function addExport() {
           color: #ffffff;
           font-size: 14px;
           text-align: center;
+        }
+        .list-icon {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          .select {
+            margin-top: 40px;
+            padding: 6px;
+            border-radius: 5px;
+            &:hover {
+              background-color: rgba(0,0,0,0.6);
+            }
+          }
+
+          .export-icon {
+            width: 30px;
+            height: 30px;
+            margin: 0 0 5px 0;
+          }
+
+          .export-text {
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+          }
         }
 
       }
