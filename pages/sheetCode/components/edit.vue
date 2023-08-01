@@ -92,11 +92,10 @@ async function getParentData(data: any) {
       }
     }
     state.fieldList.forEach((item) => {
-        if(item.type === "多选") {
+        if(item.type === "多选" || item.type === "勾选") {
            data.formFields[item.key] = JSON.parse(data.formFields[item.key])
         }
     })
-    console.log(state.fieldList)
   }
 
   setTimeout(() => {
