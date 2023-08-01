@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Menu, Plus, Search } from '@element-plus/icons-vue'
+import { Menu, Plus, Search, Lock, Unlock} from '@element-plus/icons-vue'
 import Edit from './components/edit.vue'
 import AdvancedSearch from './components/advanced-search.vue'
 import Pagination from '@/components/Pagination'
@@ -94,12 +94,32 @@ function close() {
   state.playvideo = ''
 }
 
+/**
+ * 获取字段数据
+ * @param teamUrl
+ * @param projectCode
+ * @param sheetCode
+ */
 function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
   const params = {
     size: 50,
   }
   sheet.getSheet(params, teamUrl, projectCode, sheetCode).then((res) => {
     if (res.code === 1) {
+      if(!localStorage.getItem(String(state.sheetCode))) {
+        res.content.fields.forEach((item) => {
+          item.ifFixed = false
+        })
+      }else{
+        const list = JSON.parse(localStorage.getItem(String(state.sheetCode)))
+        list.forEach((item) => {
+          res.content.fields.forEach((citem) => {
+            if(item.name === citem.name && item.key === citem.key)
+              citem.ifFixed = item.ifFixed
+          })
+        })
+      }
+
       state.fieldList = res.content.fields
       state.headline = res.content.name
     }
@@ -322,6 +342,14 @@ function openExport() {
   })
 }
 
+/**
+ * 锁定功能
+ */
+function lock (index){
+  state.fieldList[index].ifFixed = !state.fieldList[index].ifFixed
+  localStorage.setItem( String(state.sheetCode), JSON.stringify(state.fieldList) )
+}
+
 watch(
   () => state.teamUrl,
   (value) => {
@@ -417,10 +445,17 @@ watch(
         <el-table-column type="selection" width="55" />
         <el-table-column
           v-for="(item, index) in state.fieldList"
+          :fixed="item.ifFixed"
           :key="index"
           :show-overflow-tooltip="item.type !== '富文本'"
-          :label="item.name"
         >
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div>{{item.name}}</div>
+              <el-icon v-if="item.ifFixed" class="cursor-pointer" size="15" @click="lock(index)"><Lock /></el-icon>
+              <el-icon v-else class="cursor-pointer" size="15" @click="lock(index)"><Unlock /></el-icon>
+            </div>
+          </template>
           <template #default="scope">
             <div
               v-if="item.type === '富文本'"
