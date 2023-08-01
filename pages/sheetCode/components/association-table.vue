@@ -31,16 +31,14 @@ const state = reactive({
   openList: [], // 打开时的数组
 })
 /**
- * 获取数据
+ * 获取当前页数据
  */
 function getRecordList() {
   const params = {
     page: state.pagination.page - 1,
     size: state.pagination.size,
   }
-  table
-    .getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode)
-    .then((res) => {
+  table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
       if (res.code === 1) {
         state.recordList = res.content
         state.pagination.total = res.totalElements
@@ -60,9 +58,7 @@ function getRecordListAll() {
     page: 0,
     size: 100,
   }
-  table
-    .getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode)
-    .then((res) => {
+  table.getRecordList(params, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
       if (res.code === 1)
         state.recordListAll = res.content
       else
@@ -70,14 +66,15 @@ function getRecordListAll() {
     })
 }
 
+/**
+ * 通过sheetId获取展示数据参数
+ */
 function getSheetById() {
   state.fields = []
-  sheet
-    .getSheetById({}, state.teamUrl, state.projectCode, state.sheetId)
-    .then((res) => {
+  sheet.getSheetById({}, state.teamUrl, state.projectCode, state.sheetId).then((res) => {
       if (res.code === 1) {
         res.content.fields.forEach((item: any, index: number) => {
-          if (index < 5)
+          if (index < 3)
             state.fields.push(item)
         })
         state.sheetCode = res.content.code
@@ -87,6 +84,9 @@ function getSheetById() {
     })
 }
 
+/**
+ * 确认
+ */
 function confirm() {
   state.checkData.forEach((item: any) => {
     item.tag = item.fields.name
@@ -95,26 +95,41 @@ function confirm() {
   state.dialogVisible = false
 }
 
+/**
+ * 打开页面
+ * @param data
+ */
 function getParentData(data: any) {
   state.dialogVisible = data.dialogVisible
   state.teamUrl = data.teamUrl
   state.projectCode = data.projectCode
   state.sheetId = data.sheetId
   state.checkData = data.list
-  getSheetById()
+  getSheetById() // 获取展示数据参数
   changePageCheck()
 }
 
+/**
+ * 切换页面大小
+ * @param data
+ */
 function fatherSize(data: any) {
   state.pagination.size = data
   getRecordList()
 }
 
+/**
+ * 切换页面页数
+ * @param data
+ */
 function fatherCurrent(data: any) {
   state.pagination.page = data
   getRecordList()
 }
 
+/**
+ * 查询数据
+ */
 function search() {
   const data = {
     relation: 'and',
@@ -154,6 +169,7 @@ function handleSelectAllPage(value: boolean) {
   }
   state.isCheckAll = value
 }
+
 /**
  * 切换分页之后选中
  */
@@ -226,25 +242,6 @@ defineExpose({
         @blur="search"
       />
     </div>
-    <!-- <div
-      v-for="(item, index) in state.recordList"
-      :key="index"
-      class="
-        w-full
-        cursor-pointer
-        px-4
-        pt-6
-        bg-gray-100
-        rounded
-        border border-gray-100
-        flex
-        items-center
-        mb-4
-        space-x-8
-        hover:border-purple-600
-      "
-      @click="choice(item, state.fields[0].key)"
-    > -->
     <div class="mb-4 flex justify-between">
       <div>
         <el-button type="primary" @click="handleSelectAllPage(true)">
@@ -260,7 +257,7 @@ defineExpose({
         </el-button>
       </div>
     </div>
-    <ElTable
+    <el-table
       ref="recordListRef"
       class=" mb-6"
       :data="state.recordList"
@@ -271,41 +268,58 @@ defineExpose({
       <el-table-column
         type="selection" width="55"
       />
-      <el-table-column label="小区名称">
+      <el-table-column v-for="(item,index) in state.fields" :key="index" :label="item.name">
         <template #default="scope">
-          {{ scope.row.fields.name }}
-        </template>
-      </el-table-column>
-      <el-table-column label="小区ID">
-        <template #default="scope">
-          {{ scope.row.fields.locationId }}
-        </template>
-      </el-table-column>
-    </ElTable>
-    <!-- <div v-for="(citem, cindex) in state.fields" :key="cindex" class="w-1/5">
-        <div class="flex flex-col">
-          <div class="h-10 text-gray-500 text-sm">
-            {{ citem.name }}
-          </div>
-          <div class="h-10 overflow-hidden text-black text-sm">
+          <!-- 富文本 -->
+          <div v-if="item.type === '富文本'" class="rich-text" v-html="scope.row.fields[item.key]"/>
+          <!-- 关联表 -->
+          <div v-else-if="item.type === '关联表'" class="flex flex-wrap">
             <div
-              v-if="citem.type === '单行文本' || citem.type === '日期'"
-              class="truncate w-28"
+              v-for="(citem, index) in scope.row.fields[item.key]"
+              :key="index"
+              class="mr-2"
             >
-              {{ item.fields[citem.key] || "--" }}
-            </div>
-            <div
-              v-if="citem.type === '富文本'"
-              class="truncate w-28"
-              v-html="item.fields[citem.key]"
-            />
-            <div v-if="citem.type === '附件'">
-              <img class="w-6 h-6" :src="item.fields[citem.key][0].url" alt="">
+              <el-tag v-html="Object.values(citem.fields)[0]" />
             </div>
           </div>
-        </div>
-      </div>
-    </div> -->
+          <!-- 附件 -->
+          <div v-else-if="item.type === '附件'">
+            <div
+              v-for="(citem, index) in scope.row.fields[item.key]"
+              :key="index"
+            >
+              <img :src="citem.url" class="w-12 h-12">
+            </div>
+          </div>
+          <!-- 视频 -->
+          <div v-else-if="item.type === '视频'">
+            <div
+              v-for="(citem, index) in scope.row.fields[item.key]"
+              :key="index"
+            >
+              <img
+                src="../../assets/svg/video.svg"
+                class="w-12 h-12"
+                @click.stop="showVideo(citem.url)"
+              >
+            </div>
+          </div>
+          <!-- 多选 -->
+          <div v-else-if="item.type === '多选'">
+            <div v-for="(citem,cindex) in JSON.parse(scope.row.fields[item.key])" :key="cindex">
+              {{cindex + 1}}、{{citem}}
+            </div>
+          </div>
+          <!-- 勾选 -->
+          <div v-else-if="item.type === '勾选'">
+            <el-tag :type="scope.row.fields[item.key] && JSON.parse(scope.row.fields[item.key]) ? 'success' : 'warning'">
+              {{scope.row.fields[item.key] && JSON.parse(scope.row.fields[item.key]) ? '是' : '否'}}
+            </el-tag>
+          </div>
+          <div v-else v-html="scope.row.fields[item.key]" />
+        </template>
+      </el-table-column>
+    </el-table>
     <div class="flex justify-end">
       <Pagination
         :page-sizes="state.pagination.pageSizes"
