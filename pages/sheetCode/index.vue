@@ -54,7 +54,7 @@ const state = reactive({
   ifShow: false,
   tableList: [],
   headline: '',
-  input2: '',
+  searchValue: '',
   checkedLength: 0,
   searchItems: [
     { label: '产品类型', type: 'input', key: 'title' },
@@ -168,10 +168,18 @@ function clean() {
  * @param data
  */
 function searchRecordList(row) {
-  let data = {
-    relation: 'and',
-    conditions: []
+  let data = {}
+  if(state.searchValue) {
+    data = {
+      q: state.searchValue
+    }
+  } else  {
+    data = {
+      relation: 'and',
+      conditions: []
+    }
   }
+
   if(row) {
     state.exposedData = row
   }
@@ -330,11 +338,12 @@ watch(
       <div class="mt-6 flex algin-center justify-between">
         <div>
           <el-input
-            v-model="state.input2"
+            v-model="state.searchValue"
             class="mr-3"
             style="width: 250px"
             placeholder="请输入搜索内容"
             :prefix-icon="Search"
+            @keyup.enter="searchRecordList(null)"
           />
           <el-button @click="openSearch">
             <el-icon :size="15">

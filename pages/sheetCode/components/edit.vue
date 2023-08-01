@@ -364,9 +364,7 @@ watch(
               <el-option v-for="item in item.property.options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
             <!-- 勾选 -->
-            <el-select v-if="item.type === '勾选'" v-model="state.formFields[item.key]">
-              <el-checkbox v-model="state.formFields[item.key]" label="是"/>
-            </el-select>
+            <el-checkbox v-if="item.type === '勾选'" v-model="state.formFields[item.key]" label="是"/>
             <!-- 多选 -->
             <el-select
               v-if="item.type === '多选'"
