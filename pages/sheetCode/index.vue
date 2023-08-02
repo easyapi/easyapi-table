@@ -117,7 +117,7 @@ function getTheme() {
 }
 
 /**
- * 锁定功能
+ * 设置锁定列
  */
 function lock (item,index){
   state.fieldList[index].ifLock = !state.fieldList[index].ifLock
@@ -133,7 +133,7 @@ function lock (item,index){
 }
 
 /**
- * 设置宽度
+ * 设置列宽度
  */
 function setWidth(newWidth, oldWidth, column, event) {
   state.fieldList[column.no - 1].width = newWidth
