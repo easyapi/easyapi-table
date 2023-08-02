@@ -123,7 +123,8 @@ function lock (item,index){
   state.fieldList[index].ifLock = !state.fieldList[index].ifLock
   const data = {
     fieldKey: item.key,
-    ifLock: state.fieldList[index].ifLock
+    ifLock: state.fieldList[index].ifLock,
+    width: state.fieldList[index].width,
   }
   table.setTheme(data, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
     if(res.code === 1)
@@ -138,6 +139,7 @@ function setWidth(newWidth, oldWidth, column, event) {
   state.fieldList[column.no - 1].width = newWidth
   const data = {
     fieldKey: state.fieldList[column.no - 1].key,
+    ifLock: state.fieldList[column.no - 1].ifLock,
     width: newWidth
   }
   table.setTheme(data, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
