@@ -298,7 +298,7 @@ defineExpose({
               :key="index"
             >
               <img
-                src="../../assets/svg/video.svg"
+                src="@/assets/svg/video.svg"
                 class="w-12 h-12"
                 @click.stop="showVideo(citem.url)"
               >
