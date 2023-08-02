@@ -42,7 +42,6 @@ useHead({
   meta: [{ name: 'description', content: 'EasyAPI数据表格' }],
 })
 
-
 const state = reactive({
   dialogVisible: false,
   playvideo: '',
@@ -95,6 +94,59 @@ function close() {
 }
 
 /**
+ * 获取字段主题
+ * @param teamUrl
+ * @param projectCode
+ * @param sheetCode
+ */
+function getTheme() {
+  table.getTheme(state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+    if(res.code === 1) {
+      state.fieldList.forEach((item) => {
+        res.content.forEach((citem) => {
+          if(item.key === citem.fieldKey) {
+            item.ifHide = citem.ifHide
+            item.ifLock = citem.ifLock
+            item.width = citem.width
+          }
+        })
+      })
+      console.log(state.fieldList)
+    }
+  })
+}
+
+/**
+ * 锁定功能
+ */
+function lock (item,index){
+  state.fieldList[index].ifLock = !state.fieldList[index].ifLock
+  const data = {
+    fieldKey: item.key,
+    ifLock: state.fieldList[index].ifLock
+  }
+  table.setTheme(data, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+    if(res.code === 1)
+      getTheme()
+  })
+}
+
+/**
+ * 设置宽度
+ */
+function setWidth(newWidth, oldWidth, column, event) {
+  state.fieldList[column.no - 1].width = newWidth
+  const data = {
+    fieldKey: state.fieldList[column.no - 1].key,
+    width: newWidth
+  }
+  table.setTheme(data, state.teamUrl, state.projectCode, state.sheetCode).then(res => {
+    if(res.code === 1)
+      getTheme()
+  })
+}
+
+/**
  * 获取字段数据
  * @param teamUrl
  * @param projectCode
@@ -106,22 +158,9 @@ function getFields(teamUrl: any, projectCode: any, sheetCode: any) {
   }
   sheet.getSheet(params, teamUrl, projectCode, sheetCode).then((res) => {
     if (res.code === 1) {
-      if(!localStorage.getItem(String(state.sheetCode))) {
-        res.content.fields.forEach((item) => {
-          item.ifFixed = false
-        })
-      }else{
-        const list = JSON.parse(localStorage.getItem(String(state.sheetCode)))
-        list.forEach((item) => {
-          res.content.fields.forEach((citem) => {
-            if(item.name === citem.name && item.key === citem.key)
-              citem.ifFixed = item.ifFixed
-          })
-        })
-      }
-
       state.fieldList = res.content.fields
       state.headline = res.content.name
+      getTheme()
     }
   })
 }
@@ -342,14 +381,6 @@ function openExport() {
   })
 }
 
-/**
- * 锁定功能
- */
-function lock (index){
-  state.fieldList[index].ifFixed = !state.fieldList[index].ifFixed
-  localStorage.setItem( String(state.sheetCode), JSON.stringify(state.fieldList) )
-}
-
 watch(
   () => state.teamUrl,
   (value) => {
@@ -438,6 +469,7 @@ watch(
         element-loading-text="数据正在加载中..."
         @row-click="rowClick"
         @selection-change="handleSelectionChange"
+        @header-dragend="setWidth"
       >
         <template #empty>
           <p>{{ state.tableText }}</p>
@@ -445,15 +477,16 @@ watch(
         <el-table-column type="selection" width="55" />
         <el-table-column
           v-for="(item, index) in state.fieldList"
-          :fixed="item.ifFixed"
+          :fixed="item.ifLock"
+          :width="item.width"
           :key="index"
           :show-overflow-tooltip="item.type !== '富文本'"
         >
           <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between table-header">
               <div>{{item.name}}</div>
-              <el-icon v-if="item.ifFixed" class="cursor-pointer" size="15" @click="lock(index)"><Lock /></el-icon>
-              <el-icon v-else class="cursor-pointer" size="15" @click="lock(index)"><Unlock /></el-icon>
+              <el-icon v-if="!item.ifLock" class="cursor-pointer icon-lock" size="15" @click="lock(item,index)"><Lock /></el-icon>
+              <el-icon v-else class="cursor-pointer" size="15" @click="lock(item,index)"><Unlock /></el-icon>
             </div>
           </template>
           <template #default="scope">
@@ -542,6 +575,16 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+.table-header {
+  .icon-lock {
+    display: none !important;
+  }
+  &:hover {
+    .icon-lock {
+      display: block !important;
+    }
+  }
+}
 #video {
   width: 100%;
   height: 500px;
