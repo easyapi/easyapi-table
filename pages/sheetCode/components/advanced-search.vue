@@ -3,7 +3,8 @@ import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { defineExpose, reactive, watch } from 'vue'
 import { CircleCloseFilled }  from '@element-plus/icons-vue'
-import { options } from '@/utils/options'
+import { options, dateOptions, checkOptions } from '@/utils/options'
+import dayjs from "dayjs";
 
 defineExpose({
   getParentData,
@@ -16,7 +17,10 @@ const state = reactive({
   dialogVisible: false,
   save: false,
   fieldList: [] as any,
-  options
+  defaultTime: new Date(2000, 1, 1, 12, 0, 0),
+  options,
+  dateOptions,
+  checkOptions
 })
 
 /**
@@ -24,13 +28,23 @@ const state = reactive({
  * @param data
  */
 function getParentData(data: any) {
-  console.log(data.fieldList, 999)
+  console.log(data)
+  state.fieldList = []
   state.dialogVisible = data.dialogVisible
     data.fieldList.forEach((item: any) => {
-      if(item.type === '单行文本') {
+      if(item.type === '单行文本' || item.type === '日期') {
         state.fieldList.push({
           label: item.name,
           value: item.key,
+          type: item.type
+        })
+      }
+      if( item.type === '勾选' ) {
+        state.fieldList.push({
+          label: item.name,
+          value: item.key,
+          type: item.type,
+          icon: item.property.icon
         })
       }
     })
@@ -41,6 +55,7 @@ function getParentData(data: any) {
       value: 'eq',
       inputValue: '',
       checked: false,
+      type: '',
     })
   }
 }
@@ -80,6 +95,7 @@ function addMore() {
     value: 'eq',
     inputValue: '',
     checked: false,
+    type: '',
   }
   state.conditionList.push(obj)
 }
@@ -87,11 +103,14 @@ function addMore() {
 /**
  * 选择字段
  */
-function changeField() {
+function changeField(row) {
   state.conditionList.forEach((item) => {
     state.fieldList.forEach((citem) => {
-      if(item.fieldValue === citem.value ){
+      if(item.fieldValue === citem.value && item.fieldValue === row ) {
+        console.log(item.fieldValue, citem.value)
         item.fieldLabel = citem.label
+        item.value = ''
+        item.type = citem.type
       }
     })
   })
@@ -119,12 +138,36 @@ function onsubmit() {
     if(item.checked) {
       arr.push(item)
     }
-    if(item.inputValue){
+    if(item.inputValue && item.type !== '日期' &&  item.type !== '勾选'){
       data.conditions.push({
         field: item.fieldValue,
         operator: item.value,
         value: item.inputValue.split('；'),
       })
+    }
+    if(item.type === '勾选') {
+      data.conditions.push({
+        field: item.fieldValue,
+        operator: item.value,
+        value: item.disabled ?  [] : [item.inputValue]
+      })
+    }
+    if(item.type === '日期') {
+      if(item.value === 'range') {
+        const starTime = item.starTime ? dayjs(item.starTime).format('YYYY-MM-DD HH:mm:ss') : null
+        const endTime = item.endTime ? dayjs(item.endTime).format('YYYY-MM-DD HH:mm:ss') : null
+        data.conditions.push({
+          field: item.fieldValue,
+          operator: item.value,
+          value: [starTime, endTime]
+        })
+      } else {
+        data.conditions.push({
+          field: item.fieldValue,
+          operator: item.value,
+          value: [dayjs(item.inputValue).format('YYYY-MM-DD HH:mm:ss')]
+        })
+      }
     }
   })
   state.dialogVisible = false
@@ -136,6 +179,33 @@ function onsubmit() {
   }
 
 }
+
+/**
+ * 选择对应的选项条件
+ */
+function getOption(type) {
+  if (type === '勾选')
+    return checkOptions
+  if (type === '日期')
+    return dateOptions
+  return options
+}
+
+/**
+ * 改变内容
+ */
+function selectOption (row) {
+  state.conditionList.forEach((item,index) => {
+    state.fieldList.forEach((citem) => {
+      if(item.type === '勾选' && item.fieldValue === citem.value && index === row ) {
+        item.fieldLabel = citem.label
+        item.inputValue = citem.icon
+        item.type = citem.type
+        console.log(item)
+      }
+    })
+  })
+}
 </script>
 
 <template>
@@ -145,10 +215,40 @@ function onsubmit() {
       <el-select v-model="item.fieldValue" placeholder="请选择要筛选的字段名" class="mr-15" @change="changeField">
         <el-option v-for="field in state.fieldList" :key="field.value" :label="field.label" :value="field.value" />
       </el-select>
-      <el-select v-if="item.fieldValue" v-model="item.value" class="mr-15">
-        <el-option v-for="child in state.options" :key="child.value" :label="child.label" :value="child.value" />
+      <el-select v-if="item.fieldValue" v-model="item.value" class="mr-15" @change="selectOption(index)">
+        <el-option v-for="child in getOption(item.type)" :key="child.value" :label="child.label" :value="child.value" />
       </el-select>
-      <el-input v-model="item.inputValue" style="width: 400px" placeholder="多条件请用；隔开" />
+      <!--   单行文本：输入框   -->
+      <el-input v-if="item.type === '单行文本'" v-model="item.inputValue" style="width: 400px" placeholder="多条件请用；隔开" />
+      <!--   勾选输入框  -->
+      <div v-if="item.type === '勾选' && item.value === 'eq'" class="no-disabled"  @click="item.disabled = !item.disabled">
+        <div v-if="item.disabled" class="disabled" />
+        {{ item.inputValue }}
+      </div>
+      <!--   日期：时间选择器   -->
+      <el-date-picker
+        v-if="item.type === '日期' && item.value !== 'range'"
+        v-model="item.inputValue"
+        type="datetime"
+        placeholder="请选择时间"
+        :default-time="state.defaultTime"
+      />
+      <!--   日期：时间范围选择器   -->
+      <el-date-picker
+        v-if="item.type === '日期' && item.value === 'range'"
+        v-model="item.starTime"
+        type="datetime"
+        placeholder="请选择开始时间"
+        :default-time="state.defaultTime"
+      />
+      <el-date-picker
+        class="ml-2"
+        v-if="item.type === '日期' && item.value === 'range'"
+        v-model="item.endTime"
+        type="datetime"
+        placeholder="请选择结束时间"
+        :default-time="state.defaultTime"
+      />
       <i class="el-icon-delete-solid cursor mg-lf-15" @click="deleteRecord(index)" />
       <el-checkbox v-model="item.checked" class="mg-lf-15">
         外露
@@ -183,5 +283,27 @@ function onsubmit() {
 
 .mr-15 {
   margin-right: 15px;
+}
+
+.disabled {
+  position: absolute;
+  cursor: pointer;
+  background-color: rgba(194, 188, 188, 0.6);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.no-disabled {
+  position: relative;
+  cursor: pointer;
+  width: 400px;
+  height: 32px;
+  line-height: 30px;
+  border: 1px solid #e6e6e6;
+  border-radius: 2px;
+  padding: 0 12px;
+  text-align: center;
 }
 </style>
