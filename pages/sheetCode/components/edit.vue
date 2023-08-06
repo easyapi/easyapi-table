@@ -91,9 +91,19 @@ async function getParentData(data: any) {
         })
       }
     }
+
     state.fieldList.forEach((item) => {
-        if(item.type === "多选" || item.type === "勾选") {
-           data.formFields[item.key] = JSON.parse(data.formFields[item.key])
+        if(item.type === "多选") {
+            if(data.formFields[item.key]) {
+              data.formFields[item.key] = JSON.parse(data.formFields[item.key])
+            }
+        }
+        if(item.type === "勾选") {
+          if(data.formFields[item.key]) {
+            data.formFields[item.key] = JSON.parse(data.formFields[item.key])
+          } else {
+            data.formFields[item.key] = false
+          }
         }
     })
   }
