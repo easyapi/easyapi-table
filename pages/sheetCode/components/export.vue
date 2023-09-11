@@ -103,11 +103,11 @@ function close() {
  * 确认提交
  */
 function submit() {
-  if(state.name) {
+  if(!state.name) {
     ElMessage.error('模板名称不能为空')
     return
   }
-  if(state.file) {
+  if(!state.file) {
     ElMessage.error('模板不能为空')
     return
   }
@@ -136,8 +136,7 @@ function deleteTemplate(row) {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
-  })
-    .then(() => {
+  }).then(() => {
       exportTemplate.delete(row, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
         if (res.code === 1)
           ElMessage.success(res.message)
@@ -150,8 +149,8 @@ function deleteTemplate(row) {
 /**
  * 导出
  */
-function derive(row) {
-  exportTemplate.derive(row).then((res) => {
+function exportExcel(row) {
+  exportTemplate.exportExcel(row,state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
     if (res.code  === 1)
       ElMessage.success(res.message)
     else
@@ -174,7 +173,7 @@ function derive(row) {
     >
       <div class="dialog-content ">
         <div class="card-list">
-          <div class="export-card" @click="derive(null)">
+          <div class="export-card" @click="exportExcel(null)">
             <div class="hover-card" >
               <svg-icon class="export-icon" icon-class="export-template" />
               <div class="export-text">导出</div>
@@ -189,7 +188,7 @@ function derive(row) {
           <div class="export-card" v-for="item in state.exportList">
             <div class="hover-card" >
               <div class="list-icon">
-                <div class="select" @click="derive(item)">
+                <div class="select" @click="exportExcel(item)">
                   <svg-icon class="export-icon" icon-class="export-template" />
                   <div class="export-text">导出</div>
                 </div>
