@@ -41,11 +41,11 @@ export const table = {
     if (params) {
       let index = 0
       for (const key in params) {
-        if (index === 0) {
+        if (index === 0)
           str = `?${key}=${params[key]}`
-        } else {
-          str = str + `&${key}=${params[key]}`
-        }
+        else
+          str = `${str}&${key}=${params[key]}`
+
         index++
       }
     }
@@ -114,6 +114,6 @@ export const table = {
    * @see https://www.easyapi.com
    */
   setTheme(data: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.post(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/thead`,data)
+    return http.post(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/thead`, data)
   },
 }

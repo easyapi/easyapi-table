@@ -1,4 +1,4 @@
-import {useRuntimeConfig} from "nuxt/app";
+import { useRuntimeConfig } from 'nuxt/app'
 import http from '~/api/request'
 
 export const exportTemplate = {
@@ -6,8 +6,8 @@ export const exportTemplate = {
   /**
    * 导出
    */
-  exportExcel(params: any,teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
-    return http.get(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/export-excel`, params, {responseType: 'blob'})
+  exportExcel(params: any, teamUrl: string, projectCode: string, sheetCode: string): Promise<ApiResponse> {
+    return http.get(`${useRuntimeConfig().public.baseUrl}/${teamUrl}/${projectCode}/${sheetCode}/export-excel`, params, { responseType: 'blob' })
   },
 
   /**

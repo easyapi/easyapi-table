@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { defineExpose, reactive, ref, shallowRef, watch } from 'vue'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {Discount, UploadFilled} from '@element-plus/icons-vue'
+import { defineExpose, reactive } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { UploadFilled } from '@element-plus/icons-vue'
 import { qiniu } from '@/api/qiniu'
 import { exportTemplate } from '@/api/export-template'
 
@@ -30,10 +30,10 @@ const state = reactive({
 function getList() {
   const data = {
     page: 0,
-    size: 100
+    size: 100,
   }
-  exportTemplate.getList(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) =>{
-    if(res.code === 1)
+  exportTemplate.getList(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+    if (res.code === 1)
       state.exportList = res.content
     else
       state.exportList = []
@@ -103,28 +103,29 @@ function close() {
  * 确认提交
  */
 function submit() {
-  if(!state.name) {
+  if (!state.name) {
     ElMessage.error('模板名称不能为空')
     return
   }
-  if(!state.file) {
+  if (!state.file) {
     ElMessage.error('模板不能为空')
     return
   }
   const data = {
     name: state.name,
-    file: state.file
+    file: state.file,
   }
   exportTemplate.create(data, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
-      if(res.code === 1) {
-        ElMessage.success('上传成功')
-        state.name = ''
-        state.file = ''
-        state.fileList = []
-        state.createDialog = false
-      } else {
-        ElMessage.error(res.message)
-      }
+    if (res.code === 1) {
+      ElMessage.success('上传成功')
+      state.name = ''
+      state.file = ''
+      state.fileList = []
+      state.createDialog = false
+    }
+    else {
+      ElMessage.error(res.message)
+    }
   })
 }
 
@@ -137,11 +138,11 @@ function deleteTemplate(row) {
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-      exportTemplate.delete(row, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
-        if (res.code === 1)
-          ElMessage.success(res.message)
-        else
-          ElMessage.error(res.message)
+    exportTemplate.delete(row, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+      if (res.code === 1)
+        ElMessage.success(res.message)
+      else
+        ElMessage.error(res.message)
     })
   })
 }
@@ -150,11 +151,16 @@ function deleteTemplate(row) {
  * 导出
  */
 function exportExcel(row) {
-  exportTemplate.exportExcel(row,state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
-    if (res.code  === 1)
-      ElMessage.success(res.message)
-    else
-      ElMessage.error(res.message)
+  exportTemplate.exportExcel({ templateName: row.name }, state.teamUrl, state.projectCode, state.sheetCode).then((res) => {
+    const blob = new Blob([res], {
+      type: 'application/vnd.ms-excel;charset=UTF-8',
+    })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = row.name
+    a.click()
+    window.URL.revokeObjectURL(url)
   })
 }
 </script>
@@ -174,9 +180,11 @@ function exportExcel(row) {
       <div class="dialog-content ">
         <div class="card-list">
           <div class="export-card" @click="exportExcel(null)">
-            <div class="hover-card" >
+            <div class="hover-card">
               <svg-icon class="export-icon" icon-class="export-template" />
-              <div class="export-text">导出</div>
+              <div class="export-text">
+                导出
+              </div>
             </div>
             <div class="card-header bg-gray-200">
               <svg-icon class="card-icon" icon-class="word" />
@@ -185,19 +193,22 @@ function exportExcel(row) {
               默认模板
             </div>
           </div>
-          <div class="export-card" v-for="item in state.exportList">
-            <div class="hover-card" >
+          <div v-for="item in state.exportList" class="export-card">
+            <div class="hover-card">
               <div class="list-icon">
                 <div class="select" @click="exportExcel(item)">
                   <svg-icon class="export-icon" icon-class="export-template" />
-                  <div class="export-text">导出</div>
+                  <div class="export-text">
+                    导出
+                  </div>
                 </div>
                 <div class="select" @click="deleteTemplate(item)">
                   <svg-icon class="export-icon" icon-class="export-template" />
-                  <div class="export-text">删除</div>
+                  <div class="export-text">
+                    删除
+                  </div>
                 </div>
               </div>
-
             </div>
             <div class="card-header bg-gray-200">
               <svg-icon class="card-icon" icon-class="word" />
@@ -240,10 +251,12 @@ function exportExcel(row) {
           :data="{ key: state.dataObj.key, token: state.dataObj.token }"
           :file-list="state.fileList"
           :on-success="handleSuccess"
-          @click="getKeyAndToken"
           multiple
+          @click="getKeyAndToken"
         >
-          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+          <el-icon class="el-icon--upload">
+            <UploadFilled />
+          </el-icon>
           <div class="el-upload__text">
             将文件拖到此处，或<em>点击上传</em>
           </div>
@@ -356,4 +369,3 @@ function exportExcel(row) {
   margin-top: 20px;
 }
 </style>
-

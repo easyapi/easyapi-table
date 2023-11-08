@@ -17,8 +17,8 @@ export const qiniu = {
   },
 
   /**
-  * 七牛上传文件
-  */
+   * 七牛上传文件
+   */
   uploadFiles(data: any): Promise<ApiResponse> {
     return http.post('https://upload.qiniup.com', data)
   },
