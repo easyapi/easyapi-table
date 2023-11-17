@@ -6,8 +6,8 @@ const state = reactive({
   activePath: '',
   menuList: [
     {
-      title: '常客服务',
-      path: '/changke/changke_provider',
+      title: '掼蛋邀请赛',
+      path: '/daoqun/circuit/guandan',
       icon: 'el-icon-s-help',
       serve: 'changke_provider',
     },

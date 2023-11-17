@@ -4,7 +4,7 @@
 <template>
   <div class="header">
     <div class="header-title">
-      <p>API CMS</p>
+      <p>管理系统</p>
       <div>
         <el-dropdown trigger="click">
           <span class="el-dropdown-link">
