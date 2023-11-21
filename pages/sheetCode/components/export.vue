@@ -76,6 +76,7 @@ function getQiniuToken() {
     state.dataObj.token = res.content.upToken
   })
 }
+
 function getQiniuKey() {
   qiniu.getQiniuKey().then((res) => {
     state.dataObj.key = res.content.key
@@ -99,6 +100,7 @@ function close() {
   state.name = ''
   state.createDialog = false
 }
+
 /**
  * 确认提交
  */
@@ -158,7 +160,7 @@ function exportExcel(row) {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = row.name
+    a.download = `${row.name}.xlsx`
     a.click()
     window.URL.revokeObjectURL(url)
   })
@@ -277,18 +279,21 @@ function exportExcel(row) {
 
 <style lang="scss">
 .dialog-content {
-  .card-list{
+  .card-list {
     display: flex;
+
     .export-card {
       width: 150px;
       height: 150px;
       position: relative;
       margin-right: 10px;
+
       &:hover {
-        .hover-card{
+        .hover-card {
           display: block;
         }
       }
+
       .hover-card {
         cursor: pointer;
         position: absolute;
@@ -296,28 +301,33 @@ function exportExcel(row) {
         border-radius: 8px;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,.6);
+        background-color: rgba(0, 0, 0, .6);
         display: none;
+
         .export-icon {
           width: 30px;
           height: 30px;
           margin: 50px 60px 5px 60px;
         }
+
         .export-text {
           color: #ffffff;
           font-size: 14px;
           text-align: center;
         }
+
         .list-icon {
           display: flex;
           align-items: center;
           justify-content: space-around;
+
           .select {
             margin-top: 40px;
             padding: 6px;
             border-radius: 5px;
+
             &:hover {
-              background-color: rgba(0,0,0,0.6);
+              background-color: rgba(0, 0, 0, 0.6);
             }
           }
 
@@ -335,36 +345,43 @@ function exportExcel(row) {
         }
 
       }
+
       .card-header {
         height: 120px;
         border-radius: 8px 8px 0 0;
+
         .card-icon {
           width: 100px;
           height: 100px;
           margin: 10px 25px;
         }
+
         .card-icon-add {
           width: 30px;
           height: 30px;
           margin: 50px 60px;
         }
       }
+
       .card-bottom {
         height: 30px;
         border-radius: 0 0 8px 8px;
         line-height: 30px;
       }
     }
-    .export-card:last-child{
+
+    .export-card:last-child {
       cursor: pointer;
       margin-right: 0;
     }
   }
+
   a {
     color: #409eff;
     margin-top: 10px;
   }
 }
+
 .export-update {
   margin-top: 20px;
 }
