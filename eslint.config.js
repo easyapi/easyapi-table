@@ -2,7 +2,7 @@ import antfu from '@antfu/eslint-config'
 
 export default await antfu(
   {
-    ingores: [
+    ignores: [
       '.vscode',
       '.output',
       'dist',
