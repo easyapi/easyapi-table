@@ -1,24 +1,23 @@
-import path from "node:path";
-import { createSvgIconsPlugin } from "vite-plugin-svg-icons"
+import path from 'node:path'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 
 const lifecycle = process.env.npm_lifecycle_event
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', '@element-plus/nuxt',
-    ['@pinia/nuxt', {
-      autoImports: [
-        // automatically imports `defineStore`
-        'defineStore', // import { defineStore } from 'pinia'
-        // automatically imports `defineStore` as `definePiniaStore`
-        ['defineStore', 'definePiniaStore'], // import { defineStore as definePiniaStore } from 'pinia'
-      ],
-    }]],
+  modules: ['@nuxtjs/tailwindcss', '@element-plus/nuxt', ['@pinia/nuxt', {
+    autoImports: [
+      // automatically imports `defineStore`
+      'defineStore', // import { defineStore } from 'pinia'
+      // automatically imports `defineStore` as `definePiniaStore`
+      ['defineStore', 'definePiniaStore'], // import { defineStore as definePiniaStore } from 'pinia'
+    ],
+  }]],
   build: {
     transpile: lifecycle === 'build' ? ['element-plus'] : [],
   },
   css: ['~/assets/css/page.css'],
-  hooks:{
+  hooks: {
     'pages:extend': function (routes) {
       routes.push({
         path: '/:teamUrl/:projectCode/:sheetCode',
@@ -29,7 +28,7 @@ export default defineNuxtConfig({
         name: 'accessToken',
         file: '~/pages/accessToken/index.vue',
       })
-    }
+    },
   },
   components: true,
   vite: {
